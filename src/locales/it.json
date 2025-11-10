@@ -70,5 +70,9 @@
   "Import Failed": "Importazione non riuscita",
   "An unexpected error occurred during import.": "Si è verificato un errore imprevisto durante l'importazione.",
   "File Read Error": "Errore di lettura del file",
-  "Could not read the selected file.": "Impossibile leggere il file selezionato."
+  "Could not read the selected file.": "Impossibile leggere il file selezionato.",
+  "Calories": "Calorie",
+  "Protein": "Proteine",
+  "Carbohydrates": "Carboidrati",
+  "Fat": "Grassi"
 }

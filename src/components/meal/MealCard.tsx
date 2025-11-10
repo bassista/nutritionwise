@@ -32,6 +32,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import MealBuilder from './MealBuilder';
 import { useLocale } from '@/context/LocaleContext';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
     const totals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
@@ -63,10 +69,10 @@ export default function MealCard({ meal }: { meal: Meal }) {
   };
   
   const nutrientDisplay = [
-    { Icon: Flame, value: totalNutrients.calories.toFixed(0), label: 'kcal', color: 'text-orange-400' },
-    { Icon: Beef, value: totalNutrients.protein.toFixed(1), label: 'g', color: 'text-blue-400' },
-    { Icon: Wheat, value: totalNutrients.carbohydrates.toFixed(1), label: 'g', color: 'text-yellow-400' },
-    { Icon: Droplets, value: totalNutrients.fat.toFixed(1), label: 'g', color: 'text-purple-400' }
+    { Icon: Flame, value: totalNutrients.calories.toFixed(0), label: 'kcal', color: 'text-orange-400', name: t('Calories') },
+    { Icon: Beef, value: totalNutrients.protein.toFixed(1), label: 'g', color: 'text-blue-400', name: t('Protein') },
+    { Icon: Wheat, value: totalNutrients.carbohydrates.toFixed(1), label: 'g', color: 'text-yellow-400', name: t('Carbohydrates') },
+    { Icon: Droplets, value: totalNutrients.fat.toFixed(1), label: 'g', color: 'text-purple-400', name: t('Fat') }
   ];
 
 
@@ -115,13 +121,22 @@ export default function MealCard({ meal }: { meal: Meal }) {
         </CardHeader>
         <CardContent className="flex-grow">
           <div className="grid grid-cols-2 gap-4 text-sm">
-            {nutrientDisplay.map(({ Icon, value, label, color }, index) => (
+            {nutrientDisplay.map(({ Icon, value, label, color, name }, index) => (
                 <div key={index} className="flex items-center space-x-2">
-                    <Icon className={`w-5 h-5 ${color}`} />
-                    <div>
-                        <p className="font-semibold">{value}</p>
-                        <p className="text-xs text-muted-foreground">{label}</p>
-                    </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Icon className={`w-5 h-5 ${color}`} />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{name}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <div>
+                      <p className="font-semibold">{value}</p>
+                      <p className="text-xs text-muted-foreground">{label}</p>
+                  </div>
                 </div>
             ))}
           </div>

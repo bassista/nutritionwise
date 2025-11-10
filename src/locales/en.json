@@ -70,5 +70,9 @@
   "Import Failed": "Import Failed",
   "An unexpected error occurred during import.": "An unexpected error occurred during import.",
   "File Read Error": "File Read Error",
-  "Could not read the selected file.": "Could not read the selected file."
+  "Could not read the selected file.": "Could not read the selected file.",
+  "Calories": "Calories",
+  "Protein": "Protein",
+  "Carbohydrates": "Carbohydrates",
+  "Fat": "Fat"
 }
