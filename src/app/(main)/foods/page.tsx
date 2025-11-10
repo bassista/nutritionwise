@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import PaginationControls from '@/components/food/PaginationControls';
 import { getFoodName, getCategoryName } from '@/lib/utils';
 import { FoodForm } from '@/components/food/FoodForm';
+import { Food } from '@/lib/types';
 import {
   Select,
   SelectContent,
@@ -32,6 +33,7 @@ export default function FoodsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = settings.foodsPerPage > 0 ? settings.foodsPerPage : 8;
   const [isFormOpen, setFormOpen] = useState(false);
+  const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -77,11 +79,28 @@ export default function FoodsPage() {
     }
   };
 
+  const handleNewFood = () => {
+    setFoodToEdit(undefined);
+    setFormOpen(true);
+  };
+
+  const handleEditFood = (food: Food) => {
+    setFoodToEdit(food);
+    setFormOpen(true);
+  };
+
+  const handleFormOpenChange = (open: boolean) => {
+    setFormOpen(open);
+    if (!open) {
+      setFoodToEdit(undefined);
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('All Foods')}>
         <div className="flex gap-2">
-            <Button onClick={() => setFormOpen(true)}>
+            <Button onClick={handleNewFood}>
                 <Plus className="mr-2 h-4 w-4" /> {t('New Food')}
             </Button>
             <Button onClick={() => setMealBuilderOpen(true)} className="hidden md:inline-flex">
@@ -128,7 +147,11 @@ export default function FoodsPage() {
                 </AlertDescription>
               </Alert>
           ) : (
-            <FoodList foods={paginatedFoods} onDeleteFood={handleDeleteFood} />
+            <FoodList 
+              foods={paginatedFoods} 
+              onDeleteFood={handleDeleteFood} 
+              onEditFood={handleEditFood}
+            />
           )}
 
           {filteredFoods.length > 0 && totalPages > 1 && (
@@ -142,7 +165,8 @@ export default function FoodsPage() {
       </div>
        <FoodForm
         open={isFormOpen}
-        onOpenChange={setFormOpen}
+        onOpenChange={handleFormOpenChange}
+        foodToEdit={foodToEdit}
       />
     </div>
   );

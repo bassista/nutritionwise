@@ -67,7 +67,7 @@
   "This will permanently delete the \"{mealName}\" meal. This action cannot be undone.": "This will permanently delete the \"{mealName}\" meal. This action cannot be undone.",
   "ingredients": "ingredients",
   "Import from CSV": "Import from CSV",
-  "CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it').": "CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it').",
+  "CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it').": "The CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it').",
   "Import Successful": "Import Successful",
   "{count} new food(s) imported.": "{count} new food(s) imported.",
   "Import Failed": "Import Failed",
@@ -135,5 +135,6 @@
   "category_vegetable": "Vegetable",
   "category_nuts": "Nuts",
   "category_dairy_and_alternatives": "Dairy & Alternatives",
-  "category_fats_and_oils": "Fats & Oils"
+  "category_fats_and_oils": "Fats & Oils",
+  "Edit food": "Edit food"
 }

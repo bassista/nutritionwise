@@ -18,6 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FoodForm } from '@/components/food/FoodForm';
+import { Food } from '@/lib/types';
+
 
 export default function FavoritesPage() {
   const { foods, favoriteFoodIds, setFavoriteFoodIds, setMealBuilderOpen, settings } = useAppContext();
@@ -27,6 +30,8 @@ export default function FavoritesPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = settings.foodsPerPage > 0 ? settings.foodsPerPage : 8;
+  const [isFormOpen, setFormOpen] = useState(false);
+  const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -59,6 +64,18 @@ export default function FavoritesPage() {
   const handleCreateMeal = () => {
     setMealBuilderOpen(true, 'favorites');
   };
+
+  const handleEditFood = (food: Food) => {
+    setFoodToEdit(food);
+    setFormOpen(true);
+  };
+  
+  const handleFormOpenChange = (open: boolean) => {
+    setFormOpen(open);
+    if (!open) {
+      setFoodToEdit(undefined);
+    }
+  }
 
   const isSearching = searchTerm.trim().length > 0;
 
@@ -105,6 +122,7 @@ export default function FavoritesPage() {
               reorderable={!isSearching && categoryFilter === 'all'}
               onReorder={setFavoriteFoodIds} 
               allFoodIds={favoriteFoodIds}
+              onEditFood={handleEditFood}
             />
           ) : (
             <div className="mt-8">
@@ -127,6 +145,11 @@ export default function FavoritesPage() {
           )}
         </div>
       </div>
+      <FoodForm
+        open={isFormOpen}
+        onOpenChange={handleFormOpenChange}
+        foodToEdit={foodToEdit}
+      />
     </div>
   );
 }
