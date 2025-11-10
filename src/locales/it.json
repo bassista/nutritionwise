@@ -121,5 +121,10 @@
   "Food Created": "Alimento Creato",
   "Food already exists": "Alimento già esistente",
   "A food with this name already exists. Please choose a different name.": "Un alimento con questo nome esiste già. Scegli un nome diverso.",
-  "Create New Food": "Crea Nuovo Alimento"
+  "Create New Food": "Crea Nuovo Alimento",
+  "Filter by category": "Filtra per categoria",
+  "All Categories": "Tutte le categorie",
+  "Select category...": "Seleziona categoria...",
+  "Search or create category...": "Cerca o crea categoria...",
+  "No category found.": "Nessuna categoria trovata."
 }

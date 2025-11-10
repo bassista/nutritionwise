@@ -121,5 +121,10 @@
   "Food Created": "Food Created",
   "Food already exists": "Food already exists",
   "A food with this name already exists. Please choose a different name.": "A food with this name already exists. Please choose a different name.",
-  "Create New Food": "Create New Food"
+  "Create New Food": "Create New Food",
+  "Filter by category": "Filter by category",
+  "All Categories": "All Categories",
+  "Select category...": "Select category...",
+  "Search or create category...": "Search or create category...",
+  "No category found.": "No category found."
 }

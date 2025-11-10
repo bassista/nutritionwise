@@ -14,6 +14,13 @@ import { Button } from '@/components/ui/button';
 import PaginationControls from '@/components/food/PaginationControls';
 import { getFoodName } from '@/lib/utils';
 import { FoodForm } from '@/components/food/FoodForm';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 export default function FoodsPage() {
@@ -21,21 +28,31 @@ export default function FoodsPage() {
   const { t, locale } = useLocale();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = settings.foodsPerPage > 0 ? settings.foodsPerPage : 8;
   const [isFormOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, categoryFilter]);
+
+  const categories = useMemo(() => {
+    const allCategories = foods.map(f => f.category).filter(Boolean);
+    return ['all', ...Array.from(new Set(allCategories))];
+  }, [foods]);
 
   const sortedFoods = useMemo(() => 
     [...foods].sort((a, b) => getFoodName(a, locale).localeCompare(getFoodName(b, locale))), 
     [foods, locale]
   );
 
-  const filteredFoods = sortedFoods.filter(food =>
-    getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredFoods = useMemo(() =>
+    sortedFoods.filter(food => {
+      const matchesSearch = getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = categoryFilter === 'all' || food.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    }), [sortedFoods, searchTerm, categoryFilter, locale]
   );
 
   const totalPages = Math.ceil(filteredFoods.length / itemsPerPage);
@@ -74,16 +91,29 @@ export default function FoodsPage() {
       </PageHeader>
       <div className="sticky top-16 bg-background/80 backdrop-blur-sm z-10 -mb-4">
         <div className="container mx-auto px-4">
-          <div className="relative py-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={t('Search for a food...')}
-              className="pl-10 w-full"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              aria-label={t('Search for a food...')}
-            />
+          <div className="py-4 flex flex-col md:flex-row gap-2">
+            <div className="relative flex-grow">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder={t('Search for a food...')}
+                className="pl-10 w-full"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label={t('Search for a food...')}
+              />
+            </div>
+             {categories.length > 2 && (
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-full md:w-[180px]">
+                  <SelectValue placeholder={t('Filter by category')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('All Categories')}</SelectItem>
+                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
       </div>

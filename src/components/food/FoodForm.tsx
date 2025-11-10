@@ -27,7 +27,8 @@ import { useAppContext } from '@/context/AppContext';
 import { useToast } from '@/hooks/use-toast';
 import { useLocale } from '@/context/LocaleContext';
 import { Food } from '@/lib/types';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { CategoryCombobox } from './CategoryCombobox';
 
 const foodSchema = z.object({
   name_en: z.string().min(1, { message: "English name is required." }),
@@ -55,6 +56,11 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
   const { addFood, updateFood, foods } = useAppContext();
   const { toast } = useToast();
   const { t } = useLocale();
+
+  const categories = useMemo(() => {
+    const allCategories = foods.map(f => f.category).filter(Boolean) as string[];
+    return Array.from(new Set(allCategories));
+  }, [foods]);
 
   const form = useForm<FoodFormValues>({
     resolver: zodResolver(foodSchema),
@@ -184,6 +190,21 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
                     </FormItem>
                   )}
                 />
+                 <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>{t('Category')}</FormLabel>
+                        <CategoryCombobox
+                            categories={categories}
+                            value={field.value}
+                            onChange={field.onChange}
+                        />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -290,19 +311,6 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
                     )}
                   />
                 </div>
-                 <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Category')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
             </ScrollArea>
             <DialogFooter className="pt-4">
