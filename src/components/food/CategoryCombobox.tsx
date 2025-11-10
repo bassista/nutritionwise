@@ -20,6 +20,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { useLocale } from "@/context/LocaleContext"
+import { getCategoryName } from "@/lib/utils"
+import { Food } from "@/lib/types"
 
 interface CategoryComboboxProps {
     categories: string[];
@@ -28,21 +30,21 @@ interface CategoryComboboxProps {
 }
 
 export function CategoryCombobox({ categories, value, onChange }: CategoryComboboxProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
 
-  const handleSelect = (currentValue: string) => {
+  const handleSelect = React.useCallback((currentValue: string) => {
     onChange(currentValue === value ? "" : currentValue);
     setOpen(false);
-  };
+  }, [onChange, value]);
   
-  const handleCreate = (currentValue: string) => {
+  const handleCreate = React.useCallback((currentValue: string) => {
     onChange(currentValue);
     setOpen(false);
-  }
+  }, [onChange]);
 
-  const frameworks = categories.map(cat => ({ value: cat, label: cat }));
+  const frameworks = categories.map(cat => ({ value: cat, label: getCategoryName({category: {[locale]: cat}} as Food, locale, t) }));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -54,7 +56,7 @@ export function CategoryCombobox({ categories, value, onChange }: CategoryCombob
           className="w-full justify-between"
         >
           {value
-            ? value
+            ? getCategoryName({category: {[locale]: value}} as Food, locale, t)
             : t('Select category...')}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
