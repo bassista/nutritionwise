@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -45,7 +46,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Download, Upload, Info } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const settingsSchema = z.object({
@@ -91,7 +92,7 @@ export default function SettingsPage() {
     });
   };
 
-  const handleBackupFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBackupFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -118,7 +119,7 @@ export default function SettingsPage() {
       }
     };
     reader.readAsText(file);
-  };
+  }, [importData, toast, t]);
 
   return (
     <div className="flex flex-col h-full">
@@ -206,7 +207,7 @@ export default function SettingsPage() {
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-80 text-sm">
-                              {t("The CSV should have an `id` column, name columns (e.g., `name_en`, `name_it`), and nutrient values.")}
+                              {t("The CSV should have an `id` column, a `name_category` column, and nutrient values.")}
                             </PopoverContent>
                           </Popover>
                       </div>
@@ -272,3 +273,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    

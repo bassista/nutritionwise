@@ -23,12 +23,12 @@
   "Set the number of food items to show on each page (1-50).": "Imposta il numero di alimenti da mostrare in ogni pagina (1-50).",
   "Save Preferences": "Salva preferenze",
   "Settings Saved": "Impostazioni salvate",
-  "Your preferences have been updated.": "Le tue preferenze sono state aggiornate.",
+  "Le tue preferenze sono state aggiornate.": "Le tue preferenze sono state aggiornate.",
   "Data Management": "Gestione dati",
   "Import your food data or reset the application.": "Importa i tuoi dati alimentari o ripristina l'applicazione.",
   "Import Data": "Importa dati",
   "Upload a CSV file with your food data.": "Carica un file CSV con i tuoi dati alimentari.",
-  "The CSV should have an `id` column, name columns (e.g., `name_en`, `name_it`), and nutrient values.": "Il CSV deve avere una colonna `id`, colonne per il nome (es. `name_en`, `name_it`), e i valori nutrizionali.",
+  "The CSV should have an `id` column, a `name_category` column, and nutrient values.": "Il CSV deve avere una colonna `id`, una colonna `name_category` e i valori nutrizionali.",
   "Danger Zone": "Zona di pericolo",
   "Clear All Data": "Cancella tutti i dati",
   "Are you absolutely sure?": "Sei assolutamente sicuro?",
@@ -129,3 +129,5 @@
   "Name": "Nome",
   "Uncategorized": "Senza categoria"
 }
+
+    

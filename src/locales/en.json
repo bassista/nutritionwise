@@ -28,7 +28,7 @@
   "Import your food data or reset the application.": "Import your food data or reset the application.",
   "Import Data": "Import Data",
   "Upload a CSV file with your food data.": "Upload a CSV file with your food data.",
-  "The CSV should have an `id` column, name columns (e.g., `name_en`, `name_it`), and nutrient values.": "The CSV should have an `id` column, name columns (e.g., `name_en`, `name_it`), and nutrient values.",
+  "The CSV should have an `id` column, a `name_category` column, and nutrient values.": "The CSV should have an `id` column, a `name_category` column, and nutrient values.",
   "Danger Zone": "Danger Zone",
   "Clear All Data": "Clear All Data",
   "Are you absolutely sure?": "Are you absolutely sure?",
@@ -129,3 +129,5 @@
   "Name": "Name",
   "Uncategorized": "Uncategorized"
 }
+
+    
