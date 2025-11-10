@@ -336,5 +336,3 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
     </Dialog>
   );
 }
-
-    
