@@ -125,7 +125,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
               {t('Build your custom meal by adding foods and specifying quantities.')}
             </SheetDescription>
           </SheetHeader>
-          <div className="space-y-4 py-4 flex-grow flex flex-col min-h-0">
+          <div className="flex-grow flex flex-col gap-4 py-4 min-h-0">
             <div className="space-y-2">
               <Label htmlFor="meal-name">{t('Meal Name')}</Label>
               <Input
@@ -174,10 +174,11 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                   })}
                 </div>
               </ScrollArea>
-              <Button variant="outline" className="w-full border-dashed mt-2" onClick={() => setFoodSelectorOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
-              </Button>
             </div>
+
+            <Button variant="outline" className="w-full border-dashed" onClick={() => setFoodSelectorOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
+            </Button>
             
             <div className='pt-2'>
                 <h3 className="font-semibold mb-2">{t('Total Nutrients')}</h3>
