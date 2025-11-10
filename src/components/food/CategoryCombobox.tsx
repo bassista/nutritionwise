@@ -20,7 +20,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { useLocale } from "@/context/LocaleContext"
-import { getCategoryName } from "@/lib/utils"
 
 interface CategoryComboboxProps {
     categories: string[];
@@ -39,12 +38,11 @@ export function CategoryCombobox({ categories, value, onChange }: CategoryCombob
   };
   
   const handleCreate = (currentValue: string) => {
-    const newCategoryKey = currentValue.toLowerCase().replace(/\s+/g, '_');
-    onChange(newCategoryKey);
+    onChange(currentValue);
     setOpen(false);
   }
 
-  const frameworks = categories.map(cat => ({ value: cat, label: getCategoryName(cat, t) }));
+  const frameworks = categories.map(cat => ({ value: cat, label: cat }));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -56,7 +54,7 @@ export function CategoryCombobox({ categories, value, onChange }: CategoryCombob
           className="w-full justify-between"
         >
           {value
-            ? getCategoryName(value, t)
+            ? value
             : t('Select category...')}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -78,8 +76,8 @@ export function CategoryCombobox({ categories, value, onChange }: CategoryCombob
               {frameworks.map((framework) => (
                 <CommandItem
                   key={framework.value}
-                  value={framework.value}
-                  onSelect={handleSelect}
+                  value={framework.label} // Use label for searching
+                  onSelect={() => handleSelect(framework.value)}
                 >
                   <Check
                     className={cn(

@@ -39,19 +39,20 @@ export default function FavoritesPage() {
 
   const favoriteFoods = useMemo(() => {
     const foodMap = new Map(foods.map(f => [f.id, f]));
-    return favoriteFoodIds.map(id => foodMap.get(id)).filter(Boolean);
+    return favoriteFoodIds.map(id => foodMap.get(id)).filter(Boolean) as Food[];
   }, [foods, favoriteFoodIds]);
 
   const categories = useMemo(() => {
-    const allCategories = favoriteFoods.map(f => f.category).filter(Boolean) as string[];
+    const allCategories = favoriteFoods.map(f => getCategoryName(f, locale)).filter(Boolean);
     return ['all', ...Array.from(new Set(allCategories))];
-  }, [favoriteFoods]);
+  }, [favoriteFoods, locale]);
 
   const filteredFoods = useMemo(() =>
     favoriteFoods.filter(food => {
       if (!food) return false;
       const matchesSearch = getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = categoryFilter === 'all' || food.category === categoryFilter;
+      const categoryName = getCategoryName(food, locale);
+      const matchesCategory = categoryFilter === 'all' || categoryName === categoryFilter;
       return matchesSearch && matchesCategory;
     }), [favoriteFoods, searchTerm, categoryFilter, locale]);
 
@@ -107,7 +108,7 @@ export default function FavoritesPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('All Categories')}</SelectItem>
-                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{getCategoryName(cat, t)}</SelectItem>)}
+                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                 </SelectContent>
               </Select>
             )}

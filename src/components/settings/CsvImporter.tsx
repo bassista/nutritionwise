@@ -26,23 +26,15 @@ export default function CsvImporter() {
         const rows = text.split('\n').filter(row => row.trim() !== '');
         const header = rows.shift()?.trim().split(',').map(h => h.trim()) || [];
         
-        const hasId = header.includes('id');
-        const hasAnyName = header.includes('name') || header.includes('name_en') || header.includes('name_it');
-
-        if (!hasId || !hasAnyName) {
-          throw new Error(t("CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it')."));
+        if (!header.includes('id') || !header.includes('name_category')) {
+          throw new Error(t("CSV must contain 'id' and 'name_category' columns."));
         }
 
-        const parsedFoods: Partial<Food>[] = rows.map(row => {
+        const parsedFoods: { [key: string]: string }[] = rows.map(row => {
           const values = row.split(',');
-          const foodObject: any = {};
+          const foodObject: { [key: string]: string } = {};
           header.forEach((h, i) => {
-            const value = values[i]?.trim();
-             if (['calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'serving_size_g'].includes(h)) {
-              foodObject[h] = parseFloat(value) || 0;
-            } else {
-              foodObject[h] = value;
-            }
+            foodObject[h] = values[i]?.trim();
           });
           return foodObject;
         });

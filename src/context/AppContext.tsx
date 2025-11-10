@@ -47,19 +47,7 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<R
     try {
       const item = window.localStorage.getItem(key);
       if (item) {
-        const parsed = JSON.parse(item);
-         // Basic migration for food names from string to object
-        if (key === 'foods' && Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0].name === 'string') {
-            const migratedFoods = parsed.map((food: any) => {
-              if (typeof food.name === 'string') {
-                return { ...food, name: { en: food.name } };
-              }
-              return food;
-            });
-            window.localStorage.setItem(key, JSON.stringify(migratedFoods));
-            return migratedFoods;
-        }
-        return parsed;
+        return JSON.parse(item);
       }
       window.localStorage.setItem(key, JSON.stringify(initialValue));
       return initialValue;
@@ -68,7 +56,7 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<R
       return initialValue;
     }
   });
-  
+
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -78,7 +66,6 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<R
       console.error(error);
     }
   }, [key, storedValue]);
-
 
   return [storedValue, setStoredValue];
 };
@@ -99,56 +86,59 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   
   const getFoodById = (id: string) => foods.find(f => f.id === id);
 
-  const importFoods = (foodsFromCsv: Partial<Food>[]): number => {
+  const importFoods = (csvRows: { [key: string]: string }[]): number => {
     let newFoodsCount = 0;
 
     setFoods(currentFoods => {
         const currentFoodsMap = new Map(currentFoods.map(f => [f.id, f]));
 
-        foodsFromCsv.forEach(csvFoodRow => {
-            const csvFood = csvFoodRow as any;
-            if (!csvFood.id) return;
+        csvRows.forEach(row => {
+            if (!row.id) return;
 
-            const nameObject: { [key in Locale]?: string } = {};
-            if (csvFood.name_en) nameObject.en = csvFood.name_en;
-            if (csvFood.name_it) nameObject.it = csvFood.name_it;
-            
-            // Fallback to 'name' column for backward compatibility or simple cases
-            if (Object.keys(nameObject).length === 0 && csvFood.name) {
-                nameObject.en = csvFood.name; // Assume 'name' is English as a default
+            const name: { [key: string]: string } = {};
+            const category: { [key: string]: string } = {};
+
+            if (row.name_category) {
+                row.name_category.split(';').forEach(pair => {
+                    const [langPart, valuePart] = pair.split('=');
+                    if (langPart && valuePart) {
+                        const [foodName, catName] = valuePart.split(':');
+                        if (foodName) name[langPart] = foodName.trim();
+                        if (catName) category[langPart] = catName.trim();
+                    }
+                });
             }
 
-            if (Object.keys(nameObject).length === 0) return;
+            const existingFood = currentFoodsMap.get(row.id);
 
-            const existingFood = currentFoodsMap.get(csvFood.id);
-            
-            const newFoodData: Partial<Food> = { ...csvFood };
-            delete (newFoodData as any).name_en;
-            delete (newFoodData as any).name_it;
-            delete (newFoodData as any).name;
+            const newFoodData: Omit<Food, 'id' | 'name' | 'category'> = {
+                calories: parseFloat(row.calories) || 0,
+                protein: parseFloat(row.protein) || 0,
+                carbohydrates: parseFloat(row.carbohydrates) || 0,
+                fat: parseFloat(row.fat) || 0,
+                fiber: parseFloat(row.fiber) || 0,
+                sugar: parseFloat(row.sugar) || 0,
+                sodium: parseFloat(row.sodium) || 0,
+                serving_size_g: parseInt(row.serving_size_g) || 100,
+            };
 
             if (existingFood) {
-                const mergedName = typeof existingFood.name === 'object'
-                    ? { ...existingFood.name, ...nameObject }
-                    : nameObject;
-                
                 const updatedFood: Food = {
                     ...existingFood,
                     ...newFoodData,
-                    name: mergedName,
+                    name: { ...existingFood.name, ...name },
+                    category: { ...existingFood.category, ...category },
                 };
-                currentFoodsMap.set(csvFood.id, updatedFood);
+                currentFoodsMap.set(row.id, updatedFood);
             } else {
+                if (Object.keys(name).length === 0) return; // Cannot create a food without a name
                 const newFood: Food = {
-                    id: csvFood.id,
-                    calories: 0,
-                    protein: 0,
-                    carbohydrates: 0,
-                    fat: 0,
+                    id: row.id,
                     ...newFoodData,
-                    name: nameObject,
+                    name: name,
+                    category: category,
                 };
-                currentFoodsMap.set(csvFood.id, newFood);
+                currentFoodsMap.set(row.id, newFood);
                 newFoodsCount++;
             }
         });

@@ -29,10 +29,10 @@ import { useLocale } from '@/context/LocaleContext';
 import { Food } from '@/lib/types';
 import { useEffect, useMemo } from 'react';
 import { CategoryCombobox } from './CategoryCombobox';
+import { getCategoryName } from '@/lib/utils';
 
 const foodSchema = z.object({
-  name_en: z.string().min(1, { message: "English name is required." }),
-  name_it: z.string().min(1, { message: "Italian name is required." }),
+  name: z.string().min(1, { message: "Name is required." }),
   category: z.string().optional(),
   serving_size_g: z.coerce.number().min(0),
   calories: z.coerce.number().min(0),
@@ -55,18 +55,17 @@ interface FoodFormProps {
 export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
   const { addFood, updateFood, foods } = useAppContext();
   const { toast } = useToast();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => f.category).filter(Boolean) as string[];
+    const allCategories = foods.map(f => f.category[locale] || f.category['en']).filter(Boolean);
     return Array.from(new Set(allCategories));
-  }, [foods]);
+  }, [foods, locale]);
 
   const form = useForm<FoodFormValues>({
     resolver: zodResolver(foodSchema),
     defaultValues: {
-      name_en: '',
-      name_it: '',
+      name: '',
       category: '',
       serving_size_g: 100,
       calories: 0,
@@ -82,9 +81,8 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
   useEffect(() => {
     if (open && foodToEdit) {
       form.reset({
-        name_en: typeof foodToEdit.name === 'object' ? foodToEdit.name.en || '' : foodToEdit.name,
-        name_it: typeof foodToEdit.name === 'object' ? foodToEdit.name.it || '' : '',
-        category: foodToEdit.category || '',
+        name: foodToEdit.name[locale] || foodToEdit.name['en'] || '',
+        category: foodToEdit.category[locale] || foodToEdit.category['en'] || '',
         serving_size_g: foodToEdit.serving_size_g || 100,
         calories: foodToEdit.calories || 0,
         protein: foodToEdit.protein || 0,
@@ -96,8 +94,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
       });
     } else if(open && !foodToEdit) {
       form.reset({
-        name_en: '',
-        name_it: '',
+        name: '',
         category: '',
         serving_size_g: 100,
         calories: 0,
@@ -109,28 +106,15 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
         sodium: 0,
       });
     }
-  }, [foodToEdit, form, open]);
+  }, [foodToEdit, form, open, locale]);
 
 
   function onSubmit(data: FoodFormValues) {
-    const foodId = (data.name_en || '').toLowerCase().replace(/\s+/g, '-');
-    
-    if (!foodToEdit && foods.some(f => f.id === foodId)) {
-        toast({
-            variant: "destructive",
-            title: t('Food already exists'),
-            description: t('A food with this name already exists. Please choose a different name.'),
-        });
-        return;
-    }
-
-    const foodData: Food = {
-        id: foodToEdit ? foodToEdit.id : foodId,
-        name: {
-            en: data.name_en,
-            it: data.name_it,
-        },
-        category: data.category,
+    if (foodToEdit) {
+      const updatedFood: Food = {
+        ...foodToEdit,
+        name: { ...foodToEdit.name, [locale]: data.name },
+        category: { ...foodToEdit.category, [locale]: data.category || ''},
         serving_size_g: data.serving_size_g,
         calories: data.calories,
         protein: data.protein,
@@ -139,13 +123,34 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
         fiber: data.fiber,
         sugar: data.sugar,
         sodium: data.sodium,
-    };
-
-    if (foodToEdit) {
-      updateFood(foodToEdit.id, foodData);
+      };
+      updateFood(foodToEdit.id, updatedFood);
       toast({ title: t('Food Updated') });
     } else {
-      addFood(foodData);
+      // Create new food
+      const foodId = (data.name || '').toLowerCase().replace(/\s+/g, '-');
+      if (foods.some(f => f.id === foodId)) {
+          toast({
+              variant: "destructive",
+              title: t('Food already exists'),
+              description: t('A food with this ID already exists. Please choose a different name.'),
+          });
+          return;
+      }
+      const newFood: Food = {
+          id: foodId,
+          name: { [locale]: data.name },
+          category: { [locale]: data.category || '' },
+          serving_size_g: data.serving_size_g,
+          calories: data.calories,
+          protein: data.protein,
+          carbohydrates: data.carbohydrates,
+          fat: data.fat,
+          fiber: data.fiber,
+          sugar: data.sugar,
+          sodium: data.sodium,
+      };
+      addFood(newFood);
       toast({ title: t('Food Created') });
     }
     onOpenChange(false);
@@ -166,23 +171,10 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
               <div className="space-y-4 p-3">
                 <FormField
                   control={form.control}
-                  name="name_en"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('Name (English)')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="name_it"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Name (Italian)')}</FormLabel>
+                      <FormLabel>{t('Name')}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -323,5 +315,3 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
     </Dialog>
   );
 }
-
-    

@@ -40,9 +40,9 @@ export default function FoodsPage() {
   }, [searchTerm, categoryFilter]);
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => f.category).filter(Boolean) as string[];
+    const allCategories = foods.map(f => getCategoryName(f, locale)).filter(Boolean);
     return ['all', ...Array.from(new Set(allCategories))];
-  }, [foods]);
+  }, [foods, locale]);
 
   const sortedFoods = useMemo(() => 
     [...foods].sort((a, b) => getFoodName(a, locale).localeCompare(getFoodName(b, locale))), 
@@ -52,7 +52,8 @@ export default function FoodsPage() {
   const filteredFoods = useMemo(() =>
     sortedFoods.filter(food => {
       const matchesSearch = getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = categoryFilter === 'all' || food.category === categoryFilter;
+      const categoryName = getCategoryName(food, locale);
+      const matchesCategory = categoryFilter === 'all' || categoryName === categoryFilter;
       return matchesSearch && matchesCategory;
     }), [sortedFoods, searchTerm, categoryFilter, locale]
   );
@@ -129,7 +130,7 @@ export default function FoodsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('All Categories')}</SelectItem>
-                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{getCategoryName(cat, t)}</SelectItem>)}
+                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                 </SelectContent>
               </Select>
             )}
