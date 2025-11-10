@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { defaultFoods } from '@/lib/data';
-import type { Food, Meal, AppSettings, MealFood, AppData } from '@/lib/types';
+import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult } from '@/lib/types';
 import { useLocale } from './LocaleContext';
 
 interface AppContextType {
@@ -14,6 +14,7 @@ interface AppContextType {
   setMealBuilderOpen: (isOpen: boolean) => void;
   getFoodById: (id: string) => Food | undefined;
   importFoods: (newFoods: Food[]) => void;
+  deleteFood: (foodId: string) => DeleteFoodResult;
   addMeal: (meal: Meal) => void;
   updateMeal: (meal: Meal) => void;
   deleteMeal: (mealId: string) => void;
@@ -83,6 +84,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const uniqueNewFoods = newFoods.filter(f => !existingIds.has(f.id));
     setFoods(prev => [...prev, ...uniqueNewFoods]);
   };
+  
+  const deleteFood = (foodId: string): DeleteFoodResult => {
+    const conflictingMeals = meals.filter(meal => meal.foods.some(mf => mf.foodId === foodId)).map(meal => meal.name);
+    
+    if (conflictingMeals.length > 0) {
+      return { success: false, conflictingMeals };
+    }
+
+    setFoods(prev => prev.filter(f => f.id !== foodId));
+    setFavoriteFoodIds(prev => prev.filter(id => id !== foodId));
+    
+    return { success: true };
+  };
 
   const addMeal = (meal: Meal) => {
     setMeals(prev => [...prev, meal]);
@@ -149,6 +163,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setMealBuilderOpen,
     getFoodById,
     importFoods,
+    deleteFood,
     addMeal,
     updateMeal,
     deleteMeal,

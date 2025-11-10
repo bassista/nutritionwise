@@ -94,5 +94,11 @@
   "Data Exported": "Data Exported",
   "Your data has been downloaded as a JSON file.": "Your data has been downloaded as a JSON file.",
   "Your data has been restored from the backup.": "Your data has been restored from the backup.",
-  "The selected file is not a valid JSON backup.": "The selected file is not a valid JSON backup."
+  "The selected file is not a valid JSON backup.": "The selected file is not a valid JSON backup.",
+  "Cannot delete food": "Cannot delete food",
+  "Food is used in meal: {mealNames}": "This food is used in the following meal(s): {mealNames}",
+  "Food Deleted": "Food Deleted",
+  "The food has been successfully deleted.": "The food has been successfully deleted.",
+  "This will permanently delete the food \"{foodName}\". This action cannot be undone.": "This will permanently delete the food \"{foodName}\". This action cannot be undone.",
+  "Delete food": "Delete food"
 }

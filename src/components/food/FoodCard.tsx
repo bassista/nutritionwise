@@ -3,12 +3,9 @@
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, GripVertical, Flame, Wheat, Minus } from 'lucide-react';
+import { Heart, GripVertical, Flame, Wheat, Minus, Trash2 } from 'lucide-react';
 import type { Food } from '@/lib/types';
 import { useAppContext } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
@@ -18,17 +15,30 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useLocale } from '@/context/LocaleContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
 
 interface FoodCardProps {
   food: Food;
   reorderable?: boolean;
+  onDelete?: (foodId: string) => void;
   style?: React.CSSProperties;
   attributes?: ReturnType<typeof useSortable>['attributes'];
   listeners?: ReturnType<typeof useSortable>['listeners'];
 }
 
 const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
-  ({ food, reorderable, style, attributes, listeners }, ref) => {
+  ({ food, reorderable, onDelete, style, attributes, listeners }, ref) => {
     const { favoriteFoodIds, toggleFavoriteFood } = useAppContext();
     const { t } = useLocale();
     const isFavorite = favoriteFoodIds.includes(food.id);
@@ -39,17 +49,23 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
       toggleFavoriteFood(food.id);
     };
 
+    const handleDeleteClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+    };
+
     return (
       <>
         <div ref={ref} style={style}>
           <Card
-            className="flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer"
-            onClick={() => setDetailsOpen(true)}
+            className="flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1"
           >
-            <CardHeader className="p-4 flex-row items-start justify-between">
-              <CardTitle className="text-base font-semibold leading-tight truncate">
+            <div className="p-4 flex-row items-start justify-between">
+               <div
+                className="font-semibold leading-tight truncate text-base cursor-pointer"
+                onClick={() => setDetailsOpen(true)}
+              >
                 {food.name}
-              </CardTitle>
+              </div>
               {reorderable && (
                 <div
                   className="p-1 cursor-grab active:cursor-grabbing touch-none"
@@ -60,9 +76,9 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
                   <GripVertical className="w-5 h-5 text-muted-foreground" />
                 </div>
               )}
-            </CardHeader>
+            </div>
             <CardContent className="p-4 pt-0 flex flex-col flex-grow">
-              <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="space-y-2 text-sm text-muted-foreground cursor-pointer" onClick={() => setDetailsOpen(true)}>
                  <div className="flex items-center justify-between">
                   <span className="flex items-center">
                     <Flame className="w-4 h-4 mr-2 text-orange-400" /> {t('Calories')}
@@ -83,7 +99,36 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
                 </div>
               </div>
               <div className="flex-grow" />
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex justify-end gap-1">
+                {onDelete && (
+                   <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="w-8 h-8"
+                        onClick={handleDeleteClick}
+                        aria-label={t('Delete food')}
+                      >
+                        <Trash2 className="w-5 h-5 text-muted-foreground hover:text-destructive" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('Are you absolutely sure?')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t('This will permanently delete the food "{foodName}". This action cannot be undone.', { foodName: food.name })}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => onDelete(food.id)} className="bg-destructive hover:bg-destructive/90">
+                          {t('Delete')}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -139,9 +184,9 @@ function SortableFoodCard({ food }: { food: Food }) {
   );
 }
 
-export default function FoodCardWrapper({ food, reorderable }: Omit<FoodCardProps, 'style' | 'attributes' | 'listeners'>) {
+export default function FoodCardWrapper({ food, reorderable, onDelete }: Omit<FoodCardProps, 'style' | 'attributes' | 'listeners'>) {
   if (reorderable) {
     return <SortableFoodCard food={food} />;
   }
-  return <FoodCard food={food} reorderable={false} />;
+  return <FoodCard food={food} reorderable={false} onDelete={onDelete} />;
 }

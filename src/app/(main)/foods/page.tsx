@@ -9,10 +9,13 @@ import { Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Lightbulb } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
+import { useToast } from '@/hooks/use-toast';
+
 
 export default function FoodsPage() {
-  const { foods } = useAppContext();
+  const { foods, deleteFood } = useAppContext();
   const { t } = useLocale();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
   const sortedFoods = useMemo(() => 
@@ -23,6 +26,22 @@ export default function FoodsPage() {
   const filteredFoods = sortedFoods.filter(food =>
     food.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  const handleDeleteFood = (foodId: string) => {
+    const result = deleteFood(foodId);
+    if (!result.success) {
+      toast({
+        variant: 'destructive',
+        title: t('Cannot delete food'),
+        description: t('Food is used in meal: {mealNames}', { mealNames: result.conflictingMeals?.join(', ') || '' }),
+      });
+    } else {
+        toast({
+            title: t('Food Deleted'),
+            description: t('The food has been successfully deleted.'),
+        });
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -49,7 +68,7 @@ export default function FoodsPage() {
                 </AlertDescription>
               </Alert>
           ) : (
-            <FoodList foods={filteredFoods} />
+            <FoodList foods={filteredFoods} onDeleteFood={handleDeleteFood} />
           )}
         </div>
       </div>

@@ -94,5 +94,11 @@
   "Data Exported": "Dati Esportati",
   "Your data has been downloaded as a JSON file.": "I tuoi dati sono stati scaricati come file JSON.",
   "Your data has been restored from the backup.": "I tuoi dati sono stati ripristinati dal backup.",
-  "The selected file is not a valid JSON backup.": "Il file selezionato non è un backup JSON valido."
+  "The selected file is not a valid JSON backup.": "Il file selezionato non è un backup JSON valido.",
+  "Cannot delete food": "Impossibile eliminare l'alimento",
+  "Food is used in meal: {mealNames}": "L'alimento è attualmente usato dal pasto: {mealNames}",
+  "Food Deleted": "Alimento eliminato",
+  "The food has been successfully deleted.": "L'alimento è stato eliminato con successo.",
+  "This will permanently delete the food \"{foodName}\". This action cannot be undone.": "Questo eliminerà in modo permanente l'alimento \"{foodName}\". Questa azione non può essere annullata.",
+  "Delete food": "Elimina alimento"
 }

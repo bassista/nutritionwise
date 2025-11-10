@@ -37,3 +37,8 @@ export interface AppData {
   settings: AppSettings;
   locale: 'en' | 'it';
 }
+
+export type DeleteFoodResult = {
+  success: boolean;
+  conflictingMeals?: string[];
+};

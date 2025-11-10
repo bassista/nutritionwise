@@ -28,9 +28,10 @@ interface FoodListProps {
   foods: Food[];
   reorderable?: boolean;
   onReorder?: (foodIds: string[]) => void;
+  onDeleteFood?: (foodId: string) => void;
 }
 
-export default function FoodList({ foods, reorderable = false, onReorder }: FoodListProps) {
+export default function FoodList({ foods, reorderable = false, onReorder, onDeleteFood }: FoodListProps) {
   const { settings } = useAppContext();
   const { t } = useLocale();
   const [currentPage, setCurrentPage] = useState(1);
@@ -95,7 +96,7 @@ export default function FoodList({ foods, reorderable = false, onReorder }: Food
     <div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {paginatedFoods.map(food => (
-          <FoodCardWrapper key={food.id} food={food} reorderable={false} />
+          <FoodCardWrapper key={food.id} food={food} reorderable={false} onDelete={onDeleteFood} />
         ))}
       </div>
       {!reorderable && totalPages > 1 && (
