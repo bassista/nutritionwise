@@ -44,7 +44,10 @@ export function CategoryCombobox({ categories, value, onChange }: CategoryCombob
     setOpen(false);
   }, [onChange]);
 
-  const frameworks = categories.map(cat => ({ value: cat, label: getCategoryName({category: {[locale]: cat}} as Food, locale, t) }));
+  const frameworks = React.useMemo(() => 
+    categories.map(cat => ({ value: cat, label: getCategoryName({category: {[locale]: cat}} as Food, locale, t) })),
+    [categories, locale, t]
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
