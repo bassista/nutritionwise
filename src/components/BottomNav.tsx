@@ -56,7 +56,7 @@ export default function BottomNav() {
             <Link
               href={item.href}
               key={item.href}
-              className="flex flex-col items-center justify-center text-center w-16"
+              className="flex-1 flex flex-col items-center justify-center text-center"
             >
               <Icon className={cn('w-6 h-6 mb-1', isActive ? 'text-primary' : 'text-muted-foreground')} />
               <span className={cn('text-xs', isActive ? 'text-primary' : 'text-muted-foreground')}>
