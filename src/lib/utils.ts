@@ -16,9 +16,10 @@ export const getFoodName = (food: Food, locale: Locale): string => {
 
 export const getCategoryName = (category: string, t: (key: string) => string): string => {
   if (!category) return '';
-  const translated = t(`category_${category}`);
-  // If translation doesn't exist, return the category key itself, formatted nicely.
-  return translated.startsWith('category_') 
+  const translationKey = `category_${category}`;
+  const translated = t(translationKey);
+  // If translation doesn't exist (i.e., it returns the key), format the key itself.
+  return translated === translationKey
     ? category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
     : translated;
 };
