@@ -35,27 +35,6 @@ function SidebarHeaderContent() {
   );
 }
 
-function MainLayoutContent({ children }: { children: React.ReactNode }) {
-  const { isMealBuilderOpen, setMealBuilderOpen } = useAppContext();
-  
-  return (
-    <SidebarInset>
-      <div className="flex flex-col min-h-screen">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 md:hidden">
-          <SidebarTrigger />
-          <h1 className="text-lg font-semibold">NutritionWise</h1>
-        </header>
-        <main className="flex-grow pb-24 md:pb-8">{children}</main>
-        <BottomNav />
-        <MealBuilder
-          open={isMealBuilderOpen}
-          onOpenChange={setMealBuilderOpen}
-        />
-      </div>
-    </SidebarInset>
-  );
-}
-
 function SidebarNav() {
     const { t } = useLocale();
     const pathname = usePathname();
@@ -69,7 +48,6 @@ function SidebarNav() {
 
     return (
         <SidebarContent>
-           <SheetTitle className="sr-only">NutritionWise</SheetTitle>
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
@@ -95,13 +73,28 @@ export default function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { isMealBuilderOpen, setMealBuilderOpen } = useAppContext();
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
+        <SheetTitle className="sr-only">Menu</SheetTitle>
         <SidebarHeaderContent />
         <SidebarNav />
       </Sidebar>
-      <MainLayoutContent>{children}</MainLayoutContent>
+      <SidebarInset>
+        <div className="flex flex-col min-h-screen">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 md:hidden">
+            <SidebarTrigger />
+            <h1 className="text-lg font-semibold">NutritionWise</h1>
+          </header>
+          <main className="flex-grow pb-24 md:pb-8">{children}</main>
+          <BottomNav />
+          <MealBuilder
+            open={isMealBuilderOpen}
+            onOpenChange={setMealBuilderOpen}
+          />
+        </div>
+      </SidebarInset>
     </SidebarProvider>
   );
 }
