@@ -2,7 +2,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { defaultFoods } from '@/lib/data';
 import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult } from '@/lib/types';
 import { useLocale, type Locale } from './LocaleContext';
 import { getFoodName } from '@/lib/utils';
@@ -48,11 +47,14 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((va
       const item = window.localStorage.getItem(key);
       if (item) {
         setStoredValue(JSON.parse(item));
+      } else {
+        setStoredValue(initialValue);
       }
     } catch (error) {
       console.error(error);
+      setStoredValue(initialValue);
     }
-  }, [key]);
+  }, [key, initialValue]);
 
   const setValue = (value: T | ((val: T) => T)) => {
       try {
@@ -71,7 +73,7 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((va
 
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [foods, setFoods] = useLocalStorage<Food[]>('foods', defaultFoods);
+  const [foods, setFoods] = useLocalStorage<Food[]>('foods', []);
   const [meals, setMeals] = useLocalStorage<Meal[]>('meals', []);
   const [favoriteFoodIds, setFavoriteFoodIds] = useLocalStorage<string[]>('favoriteFoodIds', []);
   const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
@@ -82,63 +84,64 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const getFoodById = useCallback((id: string) => foods.find(f => f.id === id), [foods]);
 
   const importFoods = useCallback((csvRows: { [key: string]: string }[]): number => {
-    let newFoodsCount = 0;
     const currentFoodsMap = new Map(foods.map(f => [f.id, f]));
+    let newFoodsCount = 0;
 
     csvRows.forEach(row => {
-        if (!row.id) return;
+      if (!row.id) return;
 
-        const name: { [key: string]: string } = {};
-        const category: { [key: string]: string } = {};
+      const name: { [key: string]: string } = {};
+      const category: { [key: string]: string } = {};
 
-        if (row.name_category) {
-            row.name_category.split(';').forEach(pair => {
-                const [langPart, valuePart] = pair.split('=');
-                if (langPart && valuePart) {
-                    const [foodName, catName] = valuePart.split(':');
-                    if (foodName) name[langPart.trim()] = foodName.trim();
-                    if (catName) category[langPart.trim()] = catName.trim();
-                }
-            });
-        }
-        
-        const existingFood = currentFoodsMap.get(row.id);
+      if (row.name_category) {
+        row.name_category.split(';').forEach(pair => {
+          const [langPart, valuePart] = pair.split('=');
+          if (langPart && valuePart) {
+            const [foodName, catName] = valuePart.split(':');
+            if (foodName) name[langPart.trim()] = foodName.trim();
+            if (catName) category[langPart.trim()] = catName.trim();
+          }
+        });
+      }
 
-        const newFoodData: Omit<Food, 'id' | 'name' | 'category'> = {
-            calories: parseFloat(row.calories) || 0,
-            protein: parseFloat(row.protein) || 0,
-            carbohydrates: parseFloat(row.carbohydrates) || 0,
-            fat: parseFloat(row.fat) || 0,
-            fiber: parseFloat(row.fiber) || 0,
-            sugar: parseFloat(row.sugar) || 0,
-            sodium: parseFloat(row.sodium) || 0,
-            serving_size_g: parseInt(row.serving_size_g) || 100,
+      const existingFood = currentFoodsMap.get(row.id);
+
+      const newFoodData: Omit<Food, 'id' | 'name' | 'category'> = {
+        calories: parseFloat(row.calories) || 0,
+        protein: parseFloat(row.protein) || 0,
+        carbohydrates: parseFloat(row.carbohydrates) || 0,
+        fat: parseFloat(row.fat) || 0,
+        fiber: parseFloat(row.fiber) || 0,
+        sugar: parseFloat(row.sugar) || 0,
+        sodium: parseFloat(row.sodium) || 0,
+        serving_size_g: parseInt(row.serving_size_g) || 100,
+      };
+
+      if (existingFood) {
+        const updatedFood: Food = {
+          ...existingFood,
+          ...newFoodData,
+          name: { ...existingFood.name, ...name },
+          category: { ...existingFood.category, ...category },
         };
-
-        if (existingFood) {
-            const updatedFood: Food = {
-                ...existingFood,
-                ...newFoodData,
-                name: { ...existingFood.name, ...name },
-                category: { ...existingFood.category, ...category },
-            };
-            currentFoodsMap.set(row.id, updatedFood);
-        } else {
-            if (Object.keys(name).length === 0) return; // Cannot create a food without a name
-            const newFood: Food = {
-                id: row.id,
-                ...newFoodData,
-                name: name,
-                category: category,
-            };
-            currentFoodsMap.set(row.id, newFood);
-            newFoodsCount++;
-        }
+        currentFoodsMap.set(row.id, updatedFood);
+      } else {
+        if (Object.keys(name).length === 0) return;
+        const newFood: Food = {
+          id: row.id,
+          name: name,
+          category: category,
+          ...newFoodData,
+        };
+        currentFoodsMap.set(row.id, newFood);
+        newFoodsCount++;
+      }
     });
 
     setFoods(Array.from(currentFoodsMap.values()));
     return newFoodsCount;
   }, [foods, setFoods]);
+
 
   const addFood = useCallback((food: Food) => {
     setFoods(prevFoods => [...prevFoods, food]);
@@ -188,7 +191,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [setSettings]);
   
   const clearAllData = useCallback(() => {
-    setFoods(defaultFoods);
+    setFoods([]);
     setMeals([]);
     setFavoriteFoodIds([]);
     setSettings(defaultSettings);
