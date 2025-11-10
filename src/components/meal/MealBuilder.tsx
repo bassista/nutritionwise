@@ -17,7 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/context/AppContext';
 import type { Meal, MealFood, Food } from '@/lib/types';
-import { Plus, Trash2, Flame, Beef, Wheat, Droplets } from 'lucide-react';
+import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown } from 'lucide-react';
 import FoodSelectorForMeal from './FoodSelectorForMeal';
 import { useLocale } from '@/context/LocaleContext';
 
@@ -59,6 +59,16 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
 
   const handleGramsChange = (foodId: string, grams: number) => {
     setMealFoods(prev => prev.map(mf => mf.foodId === foodId ? { ...mf, grams: isNaN(grams) ? 0 : grams } : mf));
+  };
+
+  const moveFood = (index: number, direction: 'up' | 'down') => {
+    const newMealFoods = [...mealFoods];
+    const item = newMealFoods[index];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= newMealFoods.length) return;
+    newMealFoods.splice(index, 1);
+    newMealFoods.splice(newIndex, 0, item);
+    setMealFoods(newMealFoods);
   };
   
   const totalNutrients = useMemo(() => {
@@ -127,11 +137,19 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
             <h3 className="font-semibold">{t('Ingredients')}</h3>
             <ScrollArea className="flex-grow pr-4 -mr-4">
               <div className="space-y-3">
-                {mealFoods.map(({ foodId, grams }) => {
+                {mealFoods.map(({ foodId, grams }, index) => {
                   const food = getFoodById(foodId);
                   if (!food) return null;
                   return (
                     <div key={foodId} className="flex items-center gap-2 bg-muted/50 p-2 rounded-md">
+                      <div className="flex flex-col gap-1 mr-2">
+                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveFood(index, 'up')} disabled={index === 0}>
+                           <ArrowUp className="h-4 w-4" />
+                        </Button>
+                         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveFood(index, 'down')} disabled={index === mealFoods.length - 1}>
+                           <ArrowDown className="h-4 w-4" />
+                        </Button>
+                      </div>
                       <div className="flex-grow">
                         <p className="font-medium text-sm">{food.name}</p>
                         <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
