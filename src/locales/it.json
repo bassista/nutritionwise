@@ -105,5 +105,10 @@
   "This will permanently delete the food \"{foodName}\". This action cannot be undone.": "Questo eliminerà in modo permanente l'alimento \"{foodName}\". Questa azione non può essere annullata.",
   "Delete food": "Elimina alimento",
   "Search for a meal...": "Cerca un pasto...",
-  "No meals match your search.": "Nessun pasto corrisponde alla tua ricerca."
+  "No meals match your search.": "Nessun pasto corrisponde alla tua ricerca.",
+  "Save": "Salva",
+  "Name cannot be empty": "Il nome non può essere vuoto",
+  "Food Updated": "Alimento aggiornato",
+  "The food name has been updated.": "Il nome dell'alimento è stato aggiornato.",
+  "Edit food name": "Modifica nome alimento"
 }

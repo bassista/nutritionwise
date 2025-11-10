@@ -17,6 +17,7 @@ interface AppContextType {
   setMealBuilderOpen: (isOpen: boolean, context?: MealBuilderContext) => void;
   getFoodById: (id: string) => Food | undefined;
   importFoods: (newFoods: Food[]) => void;
+  updateFood: (foodId: string, updates: Partial<Food>) => void;
   deleteFood: (foodId: string) => DeleteFoodResult;
   addMeal: (meal: Meal) => void;
   updateMeal: (meal: Meal) => void;
@@ -90,6 +91,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setFoods(prev => [...prev, ...uniqueNewFoods]);
   };
   
+  const updateFood = (foodId: string, updates: Partial<Food>) => {
+    setFoods(prevFoods =>
+      prevFoods.map(food =>
+        food.id === foodId ? { ...food, ...updates } : food
+      )
+    );
+  };
+
   const deleteFood = (foodId: string): DeleteFoodResult => {
     const conflictingMeals = meals.filter(meal => meal.foods.some(mf => mf.foodId === foodId)).map(meal => meal.name);
     
@@ -179,6 +188,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setMealBuilderOpen: handleSetMealBuilderOpen,
     getFoodById,
     importFoods,
+    updateFood,
     deleteFood,
     addMeal,
     updateMeal,

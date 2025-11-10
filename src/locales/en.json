@@ -105,5 +105,10 @@
   "This will permanently delete the food \"{foodName}\". This action cannot be undone.": "This will permanently delete the food \"{foodName}\". This action cannot be undone.",
   "Delete food": "Delete food",
   "Search for a meal...": "Search for a meal...",
-  "No meals match your search.": "No meals match your search."
+  "No meals match your search.": "No meals match your search.",
+  "Save": "Save",
+  "Name cannot be empty": "Name cannot be empty",
+  "Food Updated": "Food Updated",
+  "The food name has been updated.": "The food name has been updated.",
+  "Edit food name": "Edit food name"
 }

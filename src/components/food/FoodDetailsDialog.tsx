@@ -1,11 +1,13 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import {
     Table,
@@ -17,6 +19,11 @@ import {
 } from '@/components/ui/table';
 import type { Food } from '@/lib/types';
 import { useLocale } from '@/context/LocaleContext';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { useAppContext } from '@/context/AppContext';
+import { Edit, Save } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface FoodDetailsDialogProps {
   food: Food;
@@ -50,12 +57,58 @@ export default function FoodDetailsDialog({
   onOpenChange,
 }: FoodDetailsDialogProps) {
   const { t } = useLocale();
+  const { updateFood } = useAppContext();
+  const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(food.name);
+
+  useEffect(() => {
+    if (open) {
+      setEditedName(food.name);
+      setIsEditing(false);
+    }
+  }, [open, food.name]);
+
+  const handleSave = () => {
+    if (editedName.trim() === '') {
+      toast({
+        variant: 'destructive',
+        title: t('Name cannot be empty'),
+      });
+      return;
+    }
+    updateFood(food.id, { name: editedName });
+    toast({
+      title: t('Food Updated'),
+      description: t('The food name has been updated.'),
+    });
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedName(food.name);
+    setIsEditing(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-headline">{food.name}</DialogTitle>
+          {isEditing ? (
+            <Input 
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              className="text-2xl font-headline h-auto p-0 border-0 shadow-none focus-visible:ring-0"
+              aria-label={t('Edit food name')}
+            />
+          ) : (
+            <DialogTitle className="text-2xl font-headline flex items-center">
+              {food.name}
+              <Button variant="ghost" size="icon" className="ml-2 h-7 w-7" onClick={() => setIsEditing(true)}>
+                <Edit className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          )}
           <DialogDescription>
             {t('Nutritional values per {serving_size}g serving.', { serving_size: food.serving_size_g || 100 })}
           </DialogDescription>
@@ -84,6 +137,15 @@ export default function FoodDetailsDialog({
             </TableBody>
           </Table>
         </div>
+        {isEditing && (
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancel}>{t('Cancel')}</Button>
+            <Button onClick={handleSave}>
+              <Save className="mr-2 h-4 w-4" />
+              {t('Save')}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
