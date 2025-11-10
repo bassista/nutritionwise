@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { defaultFoods } from '@/lib/data';
-import type { Food, Meal, AppSettings, MealFood } from '@/lib/types';
+import type { Food, Meal, AppSettings, MealFood, AppData } from '@/lib/types';
+import { useLocale } from './LocaleContext';
 
 interface AppContextType {
   foods: Food[];
@@ -20,6 +21,8 @@ interface AppContextType {
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   clearAllData: () => void;
   setFavoriteFoodIds: React.Dispatch<React.SetStateAction<string[]>>;
+  exportData: () => AppData;
+  importData: (data: AppData) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -37,6 +40,8 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<R
       const item = window.localStorage.getItem(key);
       if (item) {
         setStoredValue(JSON.parse(item));
+      } else {
+        window.localStorage.setItem(key, JSON.stringify(initialValue));
       }
     } catch (error) {
       console.error(error);
@@ -65,6 +70,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
   const [isMealBuilderOpen, setMealBuilderOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const { locale, setLocale } = useLocale();
 
   useEffect(() => {
     setIsMounted(true);
@@ -107,11 +113,29 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setSettings(defaultSettings);
     // Also clear from localStorage directly
     if (typeof window !== 'undefined') {
-        window.localStorage.removeItem('foods');
-        window.localStorage.removeItem('meals');
-        window.localStorage.removeItem('favoriteFoodIds');
-        window.localStorage.removeItem('settings');
+        window.localStorage.setItem('foods', JSON.stringify(defaultFoods));
+        window.localStorage.setItem('meals', JSON.stringify([]));
+        window.localStorage.setItem('favoriteFoodIds', JSON.stringify([]));
+        window.localStorage.setItem('settings', JSON.stringify(defaultSettings));
     }
+  };
+
+  const exportData = (): AppData => {
+    return {
+      foods,
+      meals,
+      favoriteFoodIds,
+      settings,
+      locale,
+    };
+  };
+
+  const importData = (data: AppData) => {
+    if (data.foods) setFoods(data.foods);
+    if (data.meals) setMeals(data.meals);
+    if (data.favoriteFoodIds) setFavoriteFoodIds(data.favoriteFoodIds);
+    if (data.settings) setSettings(data.settings);
+    if (data.locale) setLocale(data.locale);
   };
 
   // Prevent hydration mismatch by returning default/empty values on server
@@ -132,6 +156,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     updateSettings,
     clearAllData,
     setFavoriteFoodIds,
+    exportData,
+    importData,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

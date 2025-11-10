@@ -29,3 +29,11 @@ export interface Meal {
 export interface AppSettings {
   foodsPerPage: number;
 }
+
+export interface AppData {
+  foods: Food[];
+  meals: Meal[];
+  favoriteFoodIds: string[];
+  settings: AppSettings;
+  locale: 'en' | 'it';
+}

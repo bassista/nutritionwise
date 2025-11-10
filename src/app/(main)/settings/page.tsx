@@ -39,6 +39,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Download, Upload } from 'lucide-react';
+import { useRef } from 'react';
 
 const settingsSchema = z.object({
   foodsPerPage: z.coerce
@@ -49,9 +51,10 @@ const settingsSchema = z.object({
 });
 
 export default function SettingsPage() {
-  const { settings, updateSettings, clearAllData } = useAppContext();
+  const { settings, updateSettings, clearAllData, exportData, importData } = useAppContext();
   const { toast } = useToast();
   const { t, setLocale, locale } = useLocale();
+  const backupFileRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
@@ -67,6 +70,49 @@ export default function SettingsPage() {
       description: t('Your preferences have been updated.'),
     });
   }
+
+  const handleExport = () => {
+    const data = exportData();
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
+    const link = document.createElement("a");
+    link.href = jsonString;
+    link.download = `nutrition-wise-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    link.remove();
+     toast({
+      title: t('Data Exported'),
+      description: t('Your data has been downloaded as a JSON file.'),
+    });
+  };
+
+  const handleBackupFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const data = JSON.parse(text);
+        importData(data);
+        toast({
+          title: t('Import Successful'),
+          description: t('Your data has been restored from the backup.'),
+        });
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: t('Import Failed'),
+          description: t('The selected file is not a valid JSON backup.'),
+        });
+      } finally {
+        if(backupFileRef.current) {
+          backupFileRef.current.value = '';
+        }
+      }
+    };
+    reader.readAsText(file);
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -139,6 +185,30 @@ export default function SettingsPage() {
                   {t('Upload a CSV file with your food data. The file should have columns: `id`, `name`, `calories`, `protein`, `carbohydrates`, `fat`.')}
                 </p>
                 <CsvImporter />
+              </div>
+              <Separator />
+               <div>
+                <h3 className="font-semibold mb-2">{t('Backup & Restore')}</h3>
+                 <p className="text-sm text-muted-foreground mb-3">
+                  {t('Download all your data to a file, or restore it from a backup.')}
+                </p>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handleExport}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {t('Download Data')}
+                  </Button>
+                   <Button variant="outline" onClick={() => backupFileRef.current?.click()}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    {t('Load from Backup')}
+                  </Button>
+                  <Input
+                    type="file"
+                    ref={backupFileRef}
+                    className="hidden"
+                    accept=".json"
+                    onChange={handleBackupFileChange}
+                  />
+                </div>
               </div>
               <Separator />
               <div>

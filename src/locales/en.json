@@ -86,5 +86,13 @@
   "Fiber (g)": "Fiber (g)",
   "Sugar (g)": "Sugar (g)",
   "Sodium (mg)": "Sodium (mg)",
-  "Sugar": "Sugar"
+  "Sugar": "Sugar",
+  "Backup & Restore": "Backup & Restore",
+  "Download all your data to a file, or restore it from a backup.": "Download all your data to a file, or restore it from a backup.",
+  "Download Data": "Download Data",
+  "Load from Backup": "Load from Backup",
+  "Data Exported": "Data Exported",
+  "Your data has been downloaded as a JSON file.": "Your data has been downloaded as a JSON file.",
+  "Your data has been restored from the backup.": "Your data has been restored from the backup.",
+  "The selected file is not a valid JSON backup.": "The selected file is not a valid JSON backup."
 }
