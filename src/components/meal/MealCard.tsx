@@ -38,6 +38,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Separator } from '../ui/separator';
+import { ScrollArea } from '../ui/scroll-area';
 
 const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
     const totals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
@@ -119,7 +121,7 @@ export default function MealCard({ meal }: { meal: Meal }) {
             </DropdownMenu>
           </div>
         </CardHeader>
-        <CardContent className="flex-grow">
+        <CardContent className="flex-grow flex flex-col">
           <div className="grid grid-cols-2 gap-4 text-sm">
             {nutrientDisplay.map(({ Icon, value, label, color, name }, index) => (
                 <div key={index} className="flex items-center space-x-2">
@@ -140,9 +142,25 @@ export default function MealCard({ meal }: { meal: Meal }) {
                 </div>
             ))}
           </div>
+          <Separator className="my-4" />
+            <div className="flex-grow space-y-2">
+                <h4 className="text-sm font-medium mb-2">{t('Ingredients')}</h4>
+                <ScrollArea className="h-24 pr-3">
+                    <ul className="text-sm text-muted-foreground list-disc list-inside">
+                        {meal.foods.map(({ foodId, grams }) => {
+                            const food = getFoodById(foodId);
+                            return food ? (
+                                <li key={foodId} className="truncate">
+                                    {food.name} ({grams}g)
+                                </li>
+                            ) : null;
+                        })}
+                    </ul>
+                </ScrollArea>
+            </div>
         </CardContent>
-        <CardFooter className="text-xs text-muted-foreground">
-            <p>{meal.foods.length} {t('ingredients')}</p>
+        <CardFooter className="text-xs text-muted-foreground pt-4">
+            <p>{meal.foods.length} {meal.foods.length === 1 ? t('ingredient') : t('ingredients')}</p>
         </CardFooter>
       </Card>
       {isEditing && (

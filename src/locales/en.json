@@ -74,5 +74,6 @@
   "Calories": "Calories",
   "Protein": "Protein",
   "Carbohydrates": "Carbohydrates",
-  "Fat": "Fat"
+  "Fat": "Fat",
+  "ingredient": "ingredient"
 }
