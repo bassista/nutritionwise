@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import FoodList from '@/components/food/FoodList';
 import { PageHeader } from '@/components/PageHeader';
@@ -11,13 +11,20 @@ import { Lightbulb } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import PaginationControls from '@/components/food/PaginationControls';
 
 
 export default function FoodsPage() {
-  const { foods, deleteFood, setMealBuilderOpen } = useAppContext();
+  const { foods, deleteFood, setMealBuilderOpen, settings } = useAppContext();
   const { t } = useLocale();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = settings.foodsPerPage > 0 ? settings.foodsPerPage : 8;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const sortedFoods = useMemo(() => 
     [...foods].sort((a, b) => a.name.localeCompare(b.name)), 
@@ -26,6 +33,12 @@ export default function FoodsPage() {
 
   const filteredFoods = sortedFoods.filter(food =>
     food.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredFoods.length / itemsPerPage);
+  const paginatedFoods = filteredFoods.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
   
   const handleDeleteFood = (foodId: string) => {
@@ -73,7 +86,15 @@ export default function FoodsPage() {
                 </AlertDescription>
               </Alert>
           ) : (
-            <FoodList foods={filteredFoods} onDeleteFood={handleDeleteFood} />
+            <FoodList foods={paginatedFoods} onDeleteFood={handleDeleteFood} />
+          )}
+
+          {filteredFoods.length > 0 && totalPages > 1 && (
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
         </div>
       </div>

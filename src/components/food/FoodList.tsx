@@ -32,15 +32,7 @@ interface FoodListProps {
 }
 
 export default function FoodList({ foods, reorderable = false, onReorder, onDeleteFood }: FoodListProps) {
-  const { settings } = useAppContext();
   const { t } = useLocale();
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = reorderable ? foods.length : (settings.foodsPerPage > 0 ? settings.foodsPerPage : 8);
-
-
-  const totalPages = Math.ceil(foods.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedFoods = foods.slice(startIndex, startIndex + itemsPerPage);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -52,13 +44,14 @@ export default function FoodList({ foods, reorderable = false, onReorder, onDele
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = foods.findIndex((f) => f.id === active.id);
-      const newIndex = foods.findIndex((f) => f.id === over.id);
-      const newOrder = arrayMove(foods, oldIndex, newIndex);
-      onReorder?.(newOrder.map(f => f.id));
+      const allFoodIds = (onReorder as any).allFoodIds as string[];
+      const oldIndex = allFoodIds.findIndex((id) => id === active.id);
+      const newIndex = allFoodIds.findIndex((id) => id === over.id);
+
+      const reorderedIds = arrayMove(allFoodIds, oldIndex, newIndex);
+      onReorder?.(reorderedIds);
     }
   }
-
 
   if (foods.length === 0) {
     return (
@@ -95,17 +88,10 @@ export default function FoodList({ foods, reorderable = false, onReorder, onDele
   return (
     <div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {paginatedFoods.map(food => (
+        {foods.map(food => (
           <FoodCardWrapper key={food.id} food={food} reorderable={false} onDelete={onDeleteFood} />
         ))}
       </div>
-      {!reorderable && totalPages > 1 && (
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      )}
     </div>
   );
 }
