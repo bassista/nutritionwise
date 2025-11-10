@@ -18,18 +18,18 @@ interface LocaleContextType {
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
-    const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-    useEffect(() => {
-        try {
-            const item = window.localStorage.getItem(key);
-            if (item) {
-                setStoredValue(JSON.parse(item));
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    }, [key]);
+    const [storedValue, setStoredValue] = useState(() => {
+      if (typeof window === 'undefined') {
+        return initialValue;
+      }
+      try {
+        const item = window.localStorage.getItem(key);
+        return item ? JSON.parse(item) : initialValue;
+      } catch (error) {
+        console.error(error);
+        return initialValue;
+      }
+    });
 
     const setValue = (value: T | ((val: T) => T)) => {
         try {
@@ -42,6 +42,11 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((va
             console.error(error);
         }
     };
+    
+    useEffect(() => {
+        const valueToStore = storedValue instanceof Function ? storedValue(storedValue) : storedValue;
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      }, [key, storedValue]);
 
     return [storedValue, setValue];
 };
@@ -56,7 +61,7 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
 
   const t = useCallback((key: string, values?: Record<string, string | number>): string => {
     const currentLocale = isMounted ? locale : 'en';
-    let translation = translations[currentLocale][key] || key;
+    let translation = translations[currentLocale]?.[key] || key;
     if (values) {
         Object.keys(values).forEach(valueKey => {
             translation = translation.replace(`{${valueKey}}`, String(values[valueKey]));

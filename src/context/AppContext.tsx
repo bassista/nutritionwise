@@ -41,21 +41,19 @@ const defaultSettings: AppSettings = {
 };
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-  useEffect(() => {
+  const [storedValue, setStoredValue] = useState(() => {
+    // This function is only executed on the client, on the first render.
+    if (typeof window === 'undefined') {
+      return initialValue;
+    }
     try {
       const item = window.localStorage.getItem(key);
-      if (item) {
-        setStoredValue(JSON.parse(item));
-      } else {
-        setStoredValue(initialValue);
-      }
+      return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       console.error(error);
-      setStoredValue(initialValue);
+      return initialValue;
     }
-  }, [key, initialValue]);
+  });
 
   const setValue = (value: T | ((val: T) => T)) => {
       try {
@@ -68,6 +66,12 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((va
           console.error(error);
       }
   };
+  
+  useEffect(() => {
+    const valueToStore = storedValue instanceof Function ? storedValue(storedValue) : storedValue;
+    window.localStorage.setItem(key, JSON.stringify(valueToStore));
+  }, [key, storedValue]);
+
 
   return [storedValue, setValue];
 };
@@ -85,64 +89,62 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const getFoodById = useCallback((id: string) => foods.find(f => f.id === id), [foods]);
 
   const importFoods = useCallback((csvRows: { [key: string]: string }[]): number => {
+    const foodsMap = new Map(foods.map(f => [f.id, f]));
     let newFoodsCount = 0;
-    setFoods(currentFoods => {
-      const foodsMap = new Map(currentFoods.map(f => [f.id, f]));
-      
-      for (const row of csvRows) {
-        if (!row.id) continue;
+    
+    for (const row of csvRows) {
+      if (!row.id) continue;
 
-        const name: { [key: string]: string } = {};
-        const category: { [key: string]: string } = {};
+      const name: { [key: string]: string } = {};
+      const category: { [key: string]: string } = {};
 
-        if (row.name_category) {
-          row.name_category.split(';').forEach(pair => {
-            const [langPart, valuePart] = pair.split('=');
-            if (langPart && valuePart) {
-              const [foodName, catName] = valuePart.split(':');
-              if (foodName) name[langPart.trim()] = foodName.trim();
-              if (catName) category[langPart.trim()] = catName.trim();
-            }
-          });
-        }
-
-        const existingFood = foodsMap.get(row.id);
-
-        const newFoodData: Omit<Food, 'id' | 'name' | 'category'> = {
-          calories: parseFloat(row.calories) || 0,
-          protein: parseFloat(row.protein) || 0,
-          carbohydrates: parseFloat(row.carbohydrates) || 0,
-          fat: parseFloat(row.fat) || 0,
-          fiber: parseFloat(row.fiber) || 0,
-          sugar: parseFloat(row.sugar) || 0,
-          sodium: parseFloat(row.sodium) || 0,
-          serving_size_g: parseInt(row.serving_size_g, 10) || 100,
-        };
-
-        if (existingFood) {
-          const updatedFood: Food = {
-            ...existingFood,
-            ...newFoodData,
-            name: { ...existingFood.name, ...name },
-            category: { ...existingFood.category, ...category },
-          };
-          foodsMap.set(row.id, updatedFood);
-        } else {
-          if (Object.keys(name).length === 0) continue;
-          const newFood: Food = {
-            id: row.id,
-            name,
-            category,
-            ...newFoodData,
-          };
-          foodsMap.set(row.id, newFood);
-          newFoodsCount++;
-        }
+      if (row.name_category) {
+        row.name_category.split(';').forEach(pair => {
+          const [langPart, valuePart] = pair.split('=');
+          if (langPart && valuePart) {
+            const [foodName, catName] = valuePart.split(':');
+            if (foodName) name[langPart.trim()] = foodName.trim();
+            if (catName) category[langPart.trim()] = catName.trim();
+          }
+        });
       }
-      return Array.from(foodsMap.values());
-    });
+
+      const existingFood = foodsMap.get(row.id);
+
+      const newFoodData: Omit<Food, 'id' | 'name' | 'category'> = {
+        calories: parseFloat(row.calories) || 0,
+        protein: parseFloat(row.protein) || 0,
+        carbohydrates: parseFloat(row.carbohydrates) || 0,
+        fat: parseFloat(row.fat) || 0,
+        fiber: parseFloat(row.fiber) || 0,
+        sugar: parseFloat(row.sugar) || 0,
+        sodium: parseFloat(row.sodium) || 0,
+        serving_size_g: parseInt(row.serving_size_g, 10) || 100,
+      };
+
+      if (existingFood) {
+        const updatedFood: Food = {
+          ...existingFood,
+          ...newFoodData,
+          name: { ...existingFood.name, ...name },
+          category: { ...existingFood.category, ...category },
+        };
+        foodsMap.set(row.id, updatedFood);
+      } else {
+        if (Object.keys(name).length === 0) continue;
+        const newFood: Food = {
+          id: row.id,
+          name,
+          category,
+          ...newFoodData,
+        };
+        foodsMap.set(row.id, newFood);
+        newFoodsCount++;
+      }
+    }
+    setFoods(Array.from(foodsMap.values()));
     return newFoodsCount;
-  }, [setFoods]);
+  }, [foods, setFoods]);
 
 
   const addFood = useCallback((food: Food) => {
