@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,7 @@ interface FoodSelectorProps {
   onOpenChange: (open: boolean) => void;
   onSelectFood: (food: Food) => void;
   currentFoodIds: string[];
+  context?: 'all' | 'favorites';
 }
 
 export default function FoodSelectorForMeal({
@@ -30,12 +31,21 @@ export default function FoodSelectorForMeal({
   onOpenChange,
   onSelectFood,
   currentFoodIds,
+  context = 'all',
 }: FoodSelectorProps) {
-  const { foods } = useAppContext();
+  const { foods, favoriteFoodIds } = useAppContext();
   const { t } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const availableFoods = foods.filter(food => !currentFoodIds.includes(food.id));
+  const sourceFoods = useMemo(() => {
+    if (context === 'favorites') {
+      const favoriteFoodMap = new Map(foods.map(f => [f.id, f]));
+      return favoriteFoodIds.map(id => favoriteFoodMap.get(id)).filter(Boolean) as Food[];
+    }
+    return foods;
+  }, [context, foods, favoriteFoodIds]);
+
+  const availableFoods = sourceFoods.filter(food => !currentFoodIds.includes(food.id));
 
   const filteredFoods = searchTerm
     ? availableFoods.filter(food =>

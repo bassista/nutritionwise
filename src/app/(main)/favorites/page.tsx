@@ -18,11 +18,14 @@ export default function FavoritesPage() {
     return favoriteFoodIds.map(id => foodMap.get(id)).filter(Boolean);
   }, [foods, favoriteFoodIds]);
   
+  const handleCreateMeal = () => {
+    setMealBuilderOpen(true, 'favorites');
+  };
 
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('Favorite Foods')}>
-        <Button onClick={() => setMealBuilderOpen(true)} className="hidden md:inline-flex">
+        <Button onClick={handleCreateMeal} className="md:inline-flex">
           <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
         </Button>
       </PageHeader>

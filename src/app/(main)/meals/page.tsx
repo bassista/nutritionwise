@@ -49,7 +49,7 @@ export default function MealsPage() {
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('My Meals')}>
-        <Button onClick={() => setMealBuilderOpen(true)} className="hidden md:inline-flex">
+        <Button onClick={() => setMealBuilderOpen(true, 'all')} className="md:inline-flex">
           <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
         </Button>
       </PageHeader>
@@ -76,7 +76,7 @@ export default function MealsPage() {
                 <AlertDescription className="mt-2 text-muted-foreground">
                   {t('Create your first meal to see it here.')}
                 </AlertDescription>
-                <Button className="mt-4" onClick={() => setMealBuilderOpen(true)}>
+                <Button className="mt-4" onClick={() => setMealBuilderOpen(true, 'all')}>
                     <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
                 </Button>
             </div>

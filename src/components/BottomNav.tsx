@@ -29,6 +29,11 @@ export default function BottomNav() {
     [t('Settings')]: Settings,
   };
 
+  const handleCreateMealClick = () => {
+    const context = pathname === '/favorites' ? 'favorites' : 'all';
+    setMealBuilderOpen(true, context);
+  };
+
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 h-20 bg-card border-t border-border shadow-t-lg z-50 md:hidden">
@@ -43,7 +48,7 @@ export default function BottomNav() {
                 <Button
                   size="icon"
                   className="w-16 h-16 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg"
-                  onClick={() => setMealBuilderOpen(true)}
+                  onClick={handleCreateMealClick}
                   aria-label={t('Create new meal')}
                 >
                   <Plus className="w-8 h-8" />

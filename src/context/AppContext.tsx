@@ -5,13 +5,16 @@ import { defaultFoods } from '@/lib/data';
 import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult } from '@/lib/types';
 import { useLocale } from './LocaleContext';
 
+type MealBuilderContext = 'all' | 'favorites';
+
 interface AppContextType {
   foods: Food[];
   meals: Meal[];
   favoriteFoodIds: string[];
   settings: AppSettings;
   isMealBuilderOpen: boolean;
-  setMealBuilderOpen: (isOpen: boolean) => void;
+  mealBuilderContext: MealBuilderContext;
+  setMealBuilderOpen: (isOpen: boolean, context?: MealBuilderContext) => void;
   getFoodById: (id: string) => Food | undefined;
   importFoods: (newFoods: Food[]) => void;
   deleteFood: (foodId: string) => DeleteFoodResult;
@@ -70,7 +73,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [meals, setMeals] = useLocalStorage<Meal[]>('meals', []);
   const [favoriteFoodIds, setFavoriteFoodIds] = useLocalStorage<string[]>('favoriteFoodIds', []);
   const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
-  const [isMealBuilderOpen, setMealBuilderOpen] = useState(false);
+  const [isMealBuilderOpen, setIsMealBuilderOpen] = useState(false);
+  const [mealBuilderContext, setMealBuilderContext] = useState<MealBuilderContext>('all');
   const [isMounted, setIsMounted] = useState(false);
   const { locale, setLocale } = useLocale();
 
@@ -153,6 +157,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (data.locale) setLocale(data.locale);
   };
 
+  const handleSetMealBuilderOpen = (isOpen: boolean, context: MealBuilderContext = 'all') => {
+    setIsMealBuilderOpen(isOpen);
+    if (isOpen) {
+      setMealBuilderContext(context);
+    } else {
+      // Reset context when closing
+      setTimeout(() => setMealBuilderContext('all'), 300);
+    }
+  };
+
   // Prevent hydration mismatch by returning default/empty values on server
   // and on the initial client render.
   const value = {
@@ -161,7 +175,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     favoriteFoodIds: isMounted ? favoriteFoodIds : [],
     settings: isMounted ? settings : defaultSettings,
     isMealBuilderOpen,
-    setMealBuilderOpen,
+    mealBuilderContext,
+    setMealBuilderOpen: handleSetMealBuilderOpen,
     getFoodById,
     importFoods,
     deleteFood,

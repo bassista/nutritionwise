@@ -28,7 +28,7 @@ interface MealBuilderProps {
 }
 
 export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuilderProps) {
-  const { foods, addMeal, updateMeal, getFoodById } = useAppContext();
+  const { addMeal, updateMeal, getFoodById, mealBuilderContext } = useAppContext();
   const { toast } = useToast();
   const { t } = useLocale();
 
@@ -199,6 +199,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
         onOpenChange={setFoodSelectorOpen}
         onSelectFood={handleAddFood}
         currentFoodIds={mealFoods.map(mf => mf.foodId)}
+        context={mealBuilderContext}
       />
     </>
   );
