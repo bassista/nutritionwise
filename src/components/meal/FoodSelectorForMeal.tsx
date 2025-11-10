@@ -14,7 +14,7 @@ import { useAppContext } from '@/context/AppContext';
 import type { Food } from '@/lib/types';
 import { Search, Plus } from 'lucide-react';
 import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
 import { useLocale } from '@/context/LocaleContext';
 
 
@@ -62,7 +62,12 @@ export default function FoodSelectorForMeal({
         <ScrollArea className="flex-grow">
           <div className="space-y-2">
             {filteredFoods.map(food => {
-              const placeholder = PlaceHolderImages.find((p) => p.id === food.id) || PlaceHolderImages[0];
+              const placeholder =
+                PlaceHolderImages.find((p) => p.id === food.id) ||
+                ({
+                  imageUrl: `https://picsum.photos/seed/${food.id}/40/40`,
+                  imageHint: food.name.split(' ').slice(0, 2).join(' '),
+                } as ImagePlaceholder);
               return (
                 <div
                   key={food.id}

@@ -15,7 +15,7 @@ import { useAppContext } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import FoodDetailsDialog from './FoodDetailsDialog';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -35,7 +35,11 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
     const [isDetailsOpen, setDetailsOpen] = useState(false);
 
     const placeholder =
-      PlaceHolderImages.find((p) => p.id === food.id) || PlaceHolderImages[0];
+      PlaceHolderImages.find((p) => p.id === food.id) || 
+      ({
+        imageUrl: `https://picsum.photos/seed/${food.id}/400/300`,
+        imageHint: food.name.split(' ').slice(0, 2).join(' '),
+      } as ImagePlaceholder);
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
       e.stopPropagation();
