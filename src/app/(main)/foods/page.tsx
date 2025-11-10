@@ -12,7 +12,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import PaginationControls from '@/components/food/PaginationControls';
-import { getFoodName } from '@/lib/utils';
+import { getFoodName, getCategoryName } from '@/lib/utils';
 import { FoodForm } from '@/components/food/FoodForm';
 import {
   Select,
@@ -38,7 +38,7 @@ export default function FoodsPage() {
   }, [searchTerm, categoryFilter]);
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => f.category).filter(Boolean);
+    const allCategories = foods.map(f => f.category).filter(Boolean) as string[];
     return ['all', ...Array.from(new Set(allCategories))];
   }, [foods]);
 
@@ -110,7 +110,7 @@ export default function FoodsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('All Categories')}</SelectItem>
-                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{getCategoryName(cat, t)}</SelectItem>)}
                 </SelectContent>
               </Select>
             )}

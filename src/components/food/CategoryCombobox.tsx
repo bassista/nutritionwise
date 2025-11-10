@@ -11,7 +11,8 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList
+  CommandList,
+  CommandCreateItem,
 } from "@/components/ui/command"
 import {
   Popover,
@@ -19,6 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { useLocale } from "@/context/LocaleContext"
+import { getCategoryName } from "@/lib/utils"
 
 interface CategoryComboboxProps {
     categories: string[];
@@ -28,9 +30,21 @@ interface CategoryComboboxProps {
 
 export function CategoryCombobox({ categories, value, onChange }: CategoryComboboxProps) {
   const { t } = useLocale();
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState("");
 
-  const frameworks = categories.map(cat => ({ value: cat, label: cat }));
+  const handleSelect = (currentValue: string) => {
+    onChange(currentValue === value ? "" : currentValue);
+    setOpen(false);
+  };
+  
+  const handleCreate = (currentValue: string) => {
+    const newCategoryKey = currentValue.toLowerCase().replace(/\s+/g, '_');
+    onChange(newCategoryKey);
+    setOpen(false);
+  }
+
+  const frameworks = categories.map(cat => ({ value: cat, label: getCategoryName(cat, t) }));
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -42,25 +56,30 @@ export function CategoryCombobox({ categories, value, onChange }: CategoryCombob
           className="w-full justify-between"
         >
           {value
-            ? frameworks.find((framework) => framework.value === value)?.label
+            ? getCategoryName(value, t)
             : t('Select category...')}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-        <Command shouldFilter={false}>
-          <CommandInput placeholder={t('Search or create category...')} />
+        <Command>
+          <CommandInput 
+            placeholder={t('Search or create category...')} 
+            value={search}
+            onValueChange={setSearch}
+          />
           <CommandList>
-            <CommandEmpty>{t('No category found.')}</CommandEmpty>
+            <CommandEmpty>
+                <CommandCreateItem onSelect={() => handleCreate(search)}>
+                  {t('Create "{search}"', { search })}
+                </CommandCreateItem>
+            </CommandEmpty>
             <CommandGroup>
               {frameworks.map((framework) => (
                 <CommandItem
                   key={framework.value}
                   value={framework.value}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue === value ? "" : currentValue)
-                    setOpen(false)
-                  }}
+                  onSelect={handleSelect}
                 >
                   <Check
                     className={cn(

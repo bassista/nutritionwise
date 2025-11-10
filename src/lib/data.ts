@@ -3,7 +3,7 @@ import type { Food } from './types';
 export const defaultFoods: Food[] = [
   {
     id: 'apple',
-    category: 'Fruit',
+    category: 'fruit',
     serving_size_g: 100,
     calories: 52,
     protein: 0.3,
@@ -15,7 +15,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'banana',
-    category: 'Fruit',
+    category: 'fruit',
     serving_size_g: 100,
     calories: 89,
     protein: 1.1,
@@ -27,7 +27,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'chicken-breast',
-    category: 'Meat',
+    category: 'meat',
     serving_size_g: 100,
     calories: 165,
     protein: 31,
@@ -37,7 +37,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'salmon',
-    category: 'Fish',
+    category: 'fish',
     serving_size_g: 100,
     calories: 208,
     protein: 20,
@@ -47,7 +47,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'rice',
-    category: 'Grain',
+    category: 'grain',
     serving_size_g: 100,
     calories: 130,
     protein: 2.7,
@@ -57,7 +57,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'broccoli',
-    category: 'Vegetable',
+    category: 'vegetable',
     serving_size_g: 100,
     calories: 34,
     protein: 2.8,
@@ -68,7 +68,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'spinach',
-    category: 'Vegetable',
+    category: 'vegetable',
     serving_size_g: 100,
     calories: 23,
     protein: 2.9,
@@ -79,7 +79,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'almonds',
-    category: 'Nuts',
+    category: 'nuts',
     serving_size_g: 100,
     calories: 579,
     protein: 21,
@@ -90,7 +90,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'egg',
-    category: 'Dairy & Alternatives',
+    category: 'dairy_and_alternatives',
     serving_size_g: 100,
     calories: 155,
     protein: 13,
@@ -100,7 +100,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'oats',
-    category: 'Grain',
+    category: 'grain',
     serving_size_g: 100,
     calories: 389,
     protein: 16.9,
@@ -111,7 +111,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'beef',
-    category: 'Meat',
+    category: 'meat',
     serving_size_g: 100,
     calories: 250,
     protein: 26,
@@ -121,7 +121,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'potatoes',
-    category: 'Vegetable',
+    category: 'vegetable',
     serving_size_g: 100,
     calories: 77,
     protein: 2,
@@ -132,7 +132,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'greek-yogurt',
-    category: 'Dairy & Alternatives',
+    category: 'dairy_and_alternatives',
     serving_size_g: 100,
     calories: 59,
     protein: 10,
@@ -143,7 +143,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'olive-oil',
-    category: 'Fats & Oils',
+    category: 'fats_and_oils',
     serving_size_g: 100,
     calories: 884,
     protein: 0,
@@ -153,7 +153,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'quinoa',
-    category: 'Grain',
+    category: 'grain',
     serving_size_g: 100,
     calories: 120,
     protein: 4.4,

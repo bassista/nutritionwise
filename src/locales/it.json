@@ -126,5 +126,14 @@
   "All Categories": "Tutte le categorie",
   "Select category...": "Seleziona categoria...",
   "Search or create category...": "Cerca o crea categoria...",
-  "No category found.": "Nessuna categoria trovata."
+  "No category found.": "Nessuna categoria trovata.",
+  "Create \"{search}\"": "Crea \"{search}\"",
+  "category_fruit": "Frutta",
+  "category_meat": "Carne",
+  "category_fish": "Pesce",
+  "category_grain": "Cereali",
+  "category_vegetable": "Verdura",
+  "category_nuts": "Frutta secca",
+  "category_dairy_and_alternatives": "Latticini e alternative",
+  "category_fats_and_oils": "Grassi e Oli"
 }

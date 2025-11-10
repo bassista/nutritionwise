@@ -126,5 +126,14 @@
   "All Categories": "All Categories",
   "Select category...": "Select category...",
   "Search or create category...": "Search or create category...",
-  "No category found.": "No category found."
+  "No category found.": "No category found.",
+  "Create \"{search}\"": "Create \"{search}\"",
+  "category_fruit": "Fruit",
+  "category_meat": "Meat",
+  "category_fish": "Fish",
+  "category_grain": "Grain",
+  "category_vegetable": "Vegetable",
+  "category_nuts": "Nuts",
+  "category_dairy_and_alternatives": "Dairy & Alternatives",
+  "category_fats_and_oils": "Fats & Oils"
 }

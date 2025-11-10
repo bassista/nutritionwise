@@ -10,7 +10,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import PaginationControls from '@/components/food/PaginationControls';
-import { getFoodName } from '@/lib/utils';
+import { getFoodName, getCategoryName } from '@/lib/utils';
 import {
   Select,
   SelectContent,
@@ -38,12 +38,13 @@ export default function FavoritesPage() {
   }, [foods, favoriteFoodIds]);
 
   const categories = useMemo(() => {
-    const allCategories = favoriteFoods.map(f => f.category).filter(Boolean);
+    const allCategories = favoriteFoods.map(f => f.category).filter(Boolean) as string[];
     return ['all', ...Array.from(new Set(allCategories))];
   }, [favoriteFoods]);
 
   const filteredFoods = useMemo(() =>
     favoriteFoods.filter(food => {
+      if (!food) return false;
       const matchesSearch = getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = categoryFilter === 'all' || food.category === categoryFilter;
       return matchesSearch && matchesCategory;
@@ -89,7 +90,7 @@ export default function FavoritesPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('All Categories')}</SelectItem>
-                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{getCategoryName(cat, t)}</SelectItem>)}
                 </SelectContent>
               </Select>
             )}
