@@ -13,11 +13,24 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { Heart, Home, Settings, UtensilsCrossed } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
+
+function SidebarHeaderContent() {
+  const { open } = useSidebar();
+  return (
+    <SidebarHeader>
+      <div className="flex items-center justify-between">
+        {open && <h2 className="text-lg font-semibold px-2">NutritionWise</h2>}
+        <SidebarTrigger />
+      </div>
+    </SidebarHeader>
+  );
+}
 
 export default function MainLayout({
   children,
@@ -38,12 +51,7 @@ export default function MainLayout({
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarHeader>
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold px-2">NutritionWise</h2>
-            <SidebarTrigger />
-          </div>
-        </SidebarHeader>
+        <SidebarHeaderContent />
         <SidebarContent>
           <SidebarMenu>
             {navItems.map((item) => (
