@@ -1,3 +1,76 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "apple",
+      "description": "A ripe red apple",
+      "imageUrl": "https://images.unsplash.com/photo-1731321967733-87167dba4415?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxhcHBsZSUyMGZydWl0fGVufDB8fHx8MTc2MjcyMzQ2NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "apple fruit"
+    },
+    {
+      "id": "chicken-breast",
+      "description": "Grilled chicken breast",
+      "imageUrl": "https://images.unsplash.com/photo-1660808600062-defd9cc275d3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjaGlja2VuJTIwYnJlYXN0fGVufDB8fHx8MTc2MjcyMDAzNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chicken breast"
+    },
+    {
+      "id": "rice",
+      "description": "A bowl of white rice",
+      "imageUrl": "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3aGl0ZSUyMHJpY2V8ZW58MHx8fHwxNzYyNzcyOTM2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "white rice"
+    },
+    {
+      "id": "broccoli",
+      "description": "Fresh broccoli florets",
+      "imageUrl": "https://images.unsplash.com/photo-1757332334626-8dadb145540d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxicm9jY29saSUyMHZlZ2V0YWJsZXxlbnwwfHx8fDE3NjI3MzMzMjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "broccoli vegetable"
+    },
+    {
+      "id": "salmon",
+      "description": "Cooked salmon fillet",
+      "imageUrl": "https://images.unsplash.com/photo-1758157836016-3f3fbc5bf796?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzYWxtb24lMjBmaWxsZXR8ZW58MHx8fHwxNzYyNzA4NzkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "salmon fillet"
+    },
+    {
+      "id": "oats",
+      "description": "A bowl of oatmeal",
+      "imageUrl": "https://images.unsplash.com/photo-1650562075965-4940a2cfbfe4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxvYXRtZWFsJTIwYm93bHxlbnwwfHx8fDE3NjI3MzUwNTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "oatmeal bowl"
+    },
+    {
+      "id": "banana",
+      "description": "A ripe banana",
+      "imageUrl": "https://images.unsplash.com/photo-1556011281-39247e134551?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiYW5hbmElMjBmcnVpdHxlbnwwfHx8fDE3NjI3MjM0NjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "banana fruit"
+    },
+    {
+      "id": "almonds",
+      "description": "A handful of almonds",
+      "imageUrl": "https://images.unsplash.com/photo-1742324015251-fcbb56e0b19a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhbG1vbmRzJTIwbnV0c3xlbnwwfHx8fDE3NjI2Nzg1Mzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "almonds nuts"
+    },
+    {
+      "id": "egg",
+      "description": "A fried egg",
+      "imageUrl": "https://images.unsplash.com/photo-1562918005-50afb98e5d32?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxmcmllZCUyMGVnZ3xlbnwwfHx8fDE3NjI3NzI5Mzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fried egg"
+    },
+    {
+      "id": "spinach",
+      "description": "Fresh spinach leaves",
+      "imageUrl": "https://images.unsplash.com/photo-1565181782289-457ee028de39?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzcGluYWNoJTIwbGVhdmVzfGVufDB8fHx8MTc2Mjc3MjkzNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "spinach leaves"
+    },
+    {
+      "id": "beef",
+      "description": "A grilled steak",
+      "imageUrl": "https://images.unsplash.com/photo-1657143378324-83c1609f32a8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxncmlsbGVkJTIwc3RlYWt8ZW58MHx8fHwxNzYyNzMxMjQ1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "grilled steak"
+    },
+    {
+      "id": "potatoes",
+      "description": "Roasted potatoes",
+      "imageUrl": "https://images.unsplash.com/photo-1761315414483-54b8e53fa44d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxyb2FzdGVkJTIwcG90YXRvZXN8ZW58MHx8fHwxNzYyNzcyOTM2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "roasted potatoes"
+    }
+  ]
 }
