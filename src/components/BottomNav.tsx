@@ -40,13 +40,15 @@ export default function BottomNav() {
           }
 
           return (
-            <Link href={item.href} key={item.href} legacyBehavior>
-              <a className="flex flex-col items-center justify-center text-center w-16">
-                <item.icon className={cn('w-6 h-6 mb-1', isActive ? 'text-primary' : 'text-muted-foreground')} />
-                <span className={cn('text-xs', isActive ? 'text-primary' : 'text-muted-foreground')}>
-                  {item.label}
-                </span>
-              </a>
+            <Link
+              href={item.href}
+              key={item.href}
+              className="flex flex-col items-center justify-center text-center w-16"
+            >
+              <item.icon className={cn('w-6 h-6 mb-1', isActive ? 'text-primary' : 'text-muted-foreground')} />
+              <span className={cn('text-xs', isActive ? 'text-primary' : 'text-muted-foreground')}>
+                {item.label}
+              </span>
             </Link>
           );
         })}
