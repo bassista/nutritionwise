@@ -62,6 +62,9 @@ export default function MainLayout({
       </Sidebar>
       <SidebarInset>
         <div className="flex flex-col min-h-screen">
+          <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden">
+            <SidebarTrigger />
+          </header>
           <main className="flex-grow pb-24 md:pb-8">{children}</main>
           <BottomNav />
           <MealBuilder
