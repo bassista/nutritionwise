@@ -7,11 +7,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/context/AppContext';
 import type { Food } from '@/lib/types';
 import { Upload } from 'lucide-react';
+import { useLocale } from '@/context/LocaleContext';
 
 export default function CsvImporter() {
   const { importFoods, foods } = useAppContext();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLocale();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -26,7 +28,7 @@ export default function CsvImporter() {
         
         const requiredHeaders = ['id', 'name', 'calories', 'protein', 'carbohydrates', 'fat'];
         if (!requiredHeaders.every(h => header.includes(h))) {
-          throw new Error('CSV must contain id, name, calories, protein, carbohydrates, and fat columns.');
+          throw new Error(t('CSV must contain id, name, calories, protein, carbohydrates, and fat columns.'));
         }
 
         const parsedFoods: Food[] = rows.map(row => {
@@ -50,14 +52,14 @@ export default function CsvImporter() {
         const uniqueNewFoodsCount = parsedFoods.filter(f => !existingIds.has(f.id)).length;
 
         toast({
-          title: 'Import Successful',
-          description: `${uniqueNewFoodsCount} new food(s) imported.`,
+          title: t('Import Successful'),
+          description: t('{count} new food(s) imported.', { count: uniqueNewFoodsCount }),
         });
       } catch (error: any) {
         toast({
           variant: 'destructive',
-          title: 'Import Failed',
-          description: error.message || 'An unexpected error occurred during import.',
+          title: t('Import Failed'),
+          description: error.message || t('An unexpected error occurred during import.'),
         });
       } finally {
         // Reset file input
@@ -69,8 +71,8 @@ export default function CsvImporter() {
     reader.onerror = () => {
         toast({
             variant: 'destructive',
-            title: 'File Read Error',
-            description: 'Could not read the selected file.',
+            title: t('File Read Error'),
+            description: t('Could not read the selected file.'),
         });
     }
     reader.readAsText(file);
@@ -80,7 +82,7 @@ export default function CsvImporter() {
     <div>
       <Button onClick={() => fileInputRef.current?.click()} variant="outline">
         <Upload className="mr-2 h-4 w-4" />
-        Import from CSV
+        {t('Import from CSV')}
       </Button>
       <Input
         type="file"

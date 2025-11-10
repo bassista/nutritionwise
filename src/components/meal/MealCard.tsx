@@ -31,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import MealBuilder from './MealBuilder';
+import { useLocale } from '@/context/LocaleContext';
 
 const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
     const totals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
@@ -50,6 +51,7 @@ const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
 export default function MealCard({ meal }: { meal: Meal }) {
   const { getFoodById, deleteMeal } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
+  const { t } = useLocale();
 
   const totalNutrients = useMemo(
     () => calculateTotalNutrients(meal, getFoodById),
@@ -83,26 +85,26 @@ export default function MealCard({ meal }: { meal: Meal }) {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setIsEditing(true)}>
                   <Edit className="mr-2 h-4 w-4" />
-                  <span>Edit</span>
+                  <span>{t('Edit')}</span>
                 </DropdownMenuItem>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                       <Trash2 className="mr-2 h-4 w-4 text-destructive" />
-                      <span className="text-destructive">Delete</span>
+                      <span className="text-destructive">{t('Delete')}</span>
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('Are you sure?')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will permanently delete the "{meal.name}" meal. This action cannot be undone.
+                        {t('This will permanently delete the "{mealName}" meal. This action cannot be undone.', { mealName: meal.name })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
                       <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-                        Delete
+                        {t('Delete')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -125,7 +127,7 @@ export default function MealCard({ meal }: { meal: Meal }) {
           </div>
         </CardContent>
         <CardFooter className="text-xs text-muted-foreground">
-            <p>{meal.foods.length} ingredients</p>
+            <p>{meal.foods.length} {t('ingredients')}</p>
         </CardFooter>
       </Card>
       {isEditing && (

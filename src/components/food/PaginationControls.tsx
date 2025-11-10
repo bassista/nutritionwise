@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocale } from '@/context/LocaleContext';
 
 interface PaginationControlsProps {
   currentPage: number;
@@ -14,6 +15,8 @@ export default function PaginationControls({
   totalPages,
   onPageChange,
 }: PaginationControlsProps) {
+  const { t } = useLocale();
+
   return (
     <div className="flex items-center justify-center space-x-2 py-4 mt-4">
       <Button
@@ -23,10 +26,10 @@ export default function PaginationControls({
         disabled={currentPage === 1}
       >
         <ChevronLeft className="h-4 w-4" />
-        <span>Previous</span>
+        <span>{t('Previous')}</span>
       </Button>
       <span className="text-sm font-medium">
-        Page {currentPage} of {totalPages}
+        {t('Page')} {currentPage} {t('of')} {totalPages}
       </span>
       <Button
         variant="outline"
@@ -34,7 +37,7 @@ export default function PaginationControls({
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >
-        <span>Next</span>
+        <span>{t('Next')}</span>
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>

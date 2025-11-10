@@ -15,6 +15,7 @@ import type { Food } from '@/lib/types';
 import { Search, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useLocale } from '@/context/LocaleContext';
 
 
 interface FoodSelectorProps {
@@ -31,6 +32,7 @@ export default function FoodSelectorForMeal({
   currentFoodIds,
 }: FoodSelectorProps) {
   const { foods } = useAppContext();
+  const { t } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
 
   const availableFoods = foods.filter(food => !currentFoodIds.includes(food.id));
@@ -45,13 +47,13 @@ export default function FoodSelectorForMeal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md flex flex-col h-[80vh]">
         <DialogHeader>
-          <DialogTitle>Add Food to Meal</DialogTitle>
+          <DialogTitle>{t('Add Food to Meal')}</DialogTitle>
         </DialogHeader>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search for a food..."
+            placeholder={t('Search for a food...')}
             className="pl-10 w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

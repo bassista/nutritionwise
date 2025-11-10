@@ -7,9 +7,11 @@ import FoodCard from './FoodCard';
 import PaginationControls from './PaginationControls';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Search } from 'lucide-react';
+import { useLocale } from '@/context/LocaleContext';
 
 export default function FoodList({ foods }: { foods: Food[] }) {
   const { settings } = useAppContext();
+  const { t } = useLocale();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = settings.foodsPerPage > 0 ? settings.foodsPerPage : 8;
 
@@ -22,9 +24,9 @@ export default function FoodList({ foods }: { foods: Food[] }) {
       <div className="mt-8">
         <Alert>
           <Search className="h-4 w-4" />
-          <AlertTitle>No Results</AlertTitle>
+          <AlertTitle>{t('No Results')}</AlertTitle>
           <AlertDescription>
-            No foods match your search. Try a different term.
+            {t('No foods match your search. Try a different term.')}
           </AlertDescription>
         </Alert>
       </div>

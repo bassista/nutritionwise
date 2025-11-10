@@ -6,13 +6,15 @@ import MealCard from '@/components/meal/MealCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { UtensilsCrossed, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLocale } from '@/context/LocaleContext';
 
 export default function MealsPage() {
   const { meals, setMealBuilderOpen } = useAppContext();
+  const { t } = useLocale();
 
   return (
     <div className="flex flex-col h-full">
-      <PageHeader title="My Meals" />
+      <PageHeader title={t('My Meals')} />
       <div className="container mx-auto px-4 flex-grow">
         <div className="py-4 space-y-4">
           {meals.length > 0 ? (
@@ -24,12 +26,12 @@ export default function MealsPage() {
           ) : (
             <div className="text-center mt-8 p-8 border-2 border-dashed rounded-lg">
                 <UtensilsCrossed className="mx-auto h-12 w-12 text-muted-foreground" />
-                <AlertTitle className="mt-4 text-xl font-semibold">No Meals Saved</AlertTitle>
+                <AlertTitle className="mt-4 text-xl font-semibold">{t('No Meals Saved')}</AlertTitle>
                 <AlertDescription className="mt-2 text-muted-foreground">
-                  Create your first meal to see it here.
+                  {t('Create your first meal to see it here.')}
                 </AlertDescription>
                 <Button className="mt-4" onClick={() => setMealBuilderOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" /> Create Meal
+                    <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
                 </Button>
             </div>
           )}

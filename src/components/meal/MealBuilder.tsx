@@ -19,6 +19,7 @@ import { useAppContext } from '@/context/AppContext';
 import type { Meal, MealFood, Food } from '@/lib/types';
 import { Plus, Trash2, Flame, Beef, Wheat, Droplets } from 'lucide-react';
 import FoodSelectorForMeal from './FoodSelectorForMeal';
+import { useLocale } from '@/context/LocaleContext';
 
 interface MealBuilderProps {
   open: boolean;
@@ -29,6 +30,7 @@ interface MealBuilderProps {
 export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuilderProps) {
   const { foods, addMeal, updateMeal, getFoodById } = useAppContext();
   const { toast } = useToast();
+  const { t } = useLocale();
 
   const [mealName, setMealName] = useState('');
   const [mealFoods, setMealFoods] = useState<MealFood[]>([]);
@@ -76,20 +78,20 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
 
   const handleSave = () => {
     if (!mealName.trim()) {
-      toast({ variant: 'destructive', title: 'Meal name is required.' });
+      toast({ variant: 'destructive', title: t('Meal name is required.') });
       return;
     }
     if (mealFoods.length === 0) {
-      toast({ variant: 'destructive', title: 'Add at least one food to the meal.' });
+      toast({ variant: 'destructive', title: t('Add at least one food to the meal.') });
       return;
     }
 
     if (mealToEdit) {
       updateMeal({ id: mealToEdit.id, name: mealName, foods: mealFoods });
-      toast({ title: 'Meal Updated', description: `"${mealName}" has been saved.` });
+      toast({ title: t('Meal Updated'), description: `"${mealName}" ${t('has been saved.')}` });
     } else {
       addMeal({ id: Date.now().toString(), name: mealName, foods: mealFoods });
-      toast({ title: 'Meal Saved', description: `"${mealName}" has been created.` });
+      toast({ title: t('Meal Saved'), description: `"${mealName}" ${t('has been created.')}` });
     }
     onOpenChange(false);
   };
@@ -106,23 +108,23 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="sm:max-w-lg flex flex-col">
           <SheetHeader>
-            <SheetTitle>{mealToEdit ? 'Edit Meal' : 'Create New Meal'}</SheetTitle>
+            <SheetTitle>{mealToEdit ? t('Edit Meal') : t('Create New Meal')}</SheetTitle>
             <SheetDescription>
-              Build your custom meal by adding foods and specifying quantities.
+              {t('Build your custom meal by adding foods and specifying quantities.')}
             </SheetDescription>
           </SheetHeader>
           <div className="space-y-4 py-4 flex-grow flex flex-col min-h-0">
             <div className="space-y-2">
-              <Label htmlFor="meal-name">Meal Name</Label>
+              <Label htmlFor="meal-name">{t('Meal Name')}</Label>
               <Input
                 id="meal-name"
                 value={mealName}
                 onChange={(e) => setMealName(e.target.value)}
-                placeholder="e.g., Post-Workout Lunch"
+                placeholder={t('e.g., Post-Workout Lunch')}
               />
             </div>
             
-            <h3 className="font-semibold">Ingredients</h3>
+            <h3 className="font-semibold">{t('Ingredients')}</h3>
             <ScrollArea className="flex-grow pr-4 -mr-4">
               <div className="space-y-3">
                 {mealFoods.map(({ foodId, grams }) => {
@@ -149,13 +151,13 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                   );
                 })}
                 <Button variant="outline" className="w-full border-dashed" onClick={() => setFoodSelectorOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" /> Add Food
+                  <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
                 </Button>
               </div>
             </ScrollArea>
             
             <div>
-                <h3 className="font-semibold mb-2">Total Nutrients</h3>
+                <h3 className="font-semibold mb-2">{t('Total Nutrients')}</h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm p-3 bg-muted rounded-lg">
                     {nutrientSummary.map(({Icon, value, color}) => (
                         <div key={value} className="flex items-center gap-2">
@@ -168,9 +170,9 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
           </div>
           <SheetFooter>
             <SheetClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{t('Cancel')}</Button>
             </SheetClose>
-            <Button onClick={handleSave}>Save Meal</Button>
+            <Button onClick={handleSave}>{t('Save Meal')}</Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>

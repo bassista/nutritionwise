@@ -17,13 +17,7 @@ import {
 import { Heart, Home, Settings, UtensilsCrossed } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-const navItems = [
-  { href: '/foods', icon: Home, label: 'Foods' },
-  { href: '/meals', icon: UtensilsCrossed, label: 'Meals' },
-  { href: '/favorites', icon: Heart, label: 'Favorites' },
-  { href: '/settings', icon: Settings, label: 'Settings' },
-];
+import { useLocale } from '@/context/LocaleContext';
 
 export default function MainLayout({
   children,
@@ -32,6 +26,14 @@ export default function MainLayout({
 }) {
   const { isMealBuilderOpen, setMealBuilderOpen } = useAppContext();
   const pathname = usePathname();
+  const { t } = useLocale();
+
+  const navItems = [
+    { href: '/foods', icon: Home, label: t('Foods') },
+    { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
+    { href: '/favorites', icon: Heart, label: t('Favorites') },
+    { href: '/settings', icon: Settings, label: t('Settings') },
+  ];
 
   return (
     <SidebarProvider>
