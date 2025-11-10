@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 
 interface PageHeaderProps {
   title: string;
@@ -12,9 +11,6 @@ export function PageHeader({ title, children }: PageHeaderProps) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 border-b">
           <div className="flex items-center gap-4">
-            <div className="hidden md:block">
-              <SidebarTrigger />
-            </div>
             <h1 className="text-xl md:text-2xl font-bold font-headline text-foreground">
               {title}
             </h1>

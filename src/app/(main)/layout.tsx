@@ -37,7 +37,7 @@ export default function MainLayout({
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold px-2">NutritionWise</h2>
@@ -67,6 +67,7 @@ export default function MainLayout({
         <div className="flex flex-col min-h-screen">
           <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden">
             <SidebarTrigger />
+            <h1 className="text-lg font-semibold">NutritionWise</h1>
           </header>
           <main className="flex-grow pb-24 md:pb-8">{children}</main>
           <BottomNav />
