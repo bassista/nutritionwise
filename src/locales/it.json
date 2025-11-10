@@ -110,5 +110,15 @@
   "Name cannot be empty": "Il nome non può essere vuoto",
   "Food Updated": "Alimento aggiornato",
   "The food name has been updated.": "Il nome dell'alimento è stato aggiornato.",
-  "Edit food name": "Modifica nome alimento"
+  "Edit food name": "Modifica nome alimento",
+  "New Food": "Nuovo Alimento",
+  "Edit Food": "Modifica Alimento",
+  "Fill in the details for the food item.": "Compila i dettagli per l'alimento.",
+  "Name (English)": "Nome (Inglese)",
+  "Name (Italian)": "Nome (Italiano)",
+  "Serving Size (g)": "Porzione (g)",
+  "Category": "Categoria",
+  "Food Created": "Alimento Creato",
+  "Food already exists": "Alimento già esistente",
+  "A food with this name already exists. Please choose a different name.": "Un alimento con questo nome esiste già. Scegli un nome diverso."
 }

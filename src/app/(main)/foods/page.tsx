@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import PaginationControls from '@/components/food/PaginationControls';
 import { getFoodName } from '@/lib/utils';
+import { FoodForm } from '@/components/food/FoodForm';
 
 
 export default function FoodsPage() {
@@ -22,6 +23,7 @@ export default function FoodsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = settings.foodsPerPage > 0 ? settings.foodsPerPage : 8;
+  const [isFormOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -61,9 +63,14 @@ export default function FoodsPage() {
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('All Foods')}>
-        <Button onClick={() => setMealBuilderOpen(true)} className="hidden md:inline-flex">
-          <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
-        </Button>
+        <div className="flex gap-2">
+            <Button onClick={() => setFormOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" /> {t('New Food')}
+            </Button>
+            <Button onClick={() => setMealBuilderOpen(true)} className="hidden md:inline-flex">
+            <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
+            </Button>
+        </div>
       </PageHeader>
       <div className="sticky top-16 bg-background/80 backdrop-blur-sm z-10 -mb-4">
         <div className="container mx-auto px-4">
@@ -103,6 +110,10 @@ export default function FoodsPage() {
           )}
         </div>
       </div>
+       <FoodForm
+        open={isFormOpen}
+        onOpenChange={setFormOpen}
+      />
     </div>
   );
 }

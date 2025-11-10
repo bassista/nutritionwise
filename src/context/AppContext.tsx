@@ -17,7 +17,8 @@ interface AppContextType {
   mealBuilderContext: MealBuilderContext;
   setMealBuilderOpen: (isOpen: boolean, context?: MealBuilderContext) => void;
   getFoodById: (id: string) => Food | undefined;
-  importFoods: (newFoods: Partial<Food>[]) => number;
+  importFoods: (foodsFromCsv: Partial<Food>[]) => number;
+  addFood: (food: Food) => void;
   updateFood: (foodId: string, updates: Partial<Food>) => void;
   deleteFood: (foodId: string) => DeleteFoodResult;
   addMeal: (meal: Meal) => void;
@@ -157,6 +158,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     return newFoodsCount;
   };
+
+  const addFood = (food: Food) => {
+    setFoods(prevFoods => [...prevFoods, food]);
+  };
   
   const updateFood = (foodId: string, updates: Partial<Food>) => {
     setFoods(prevFoods =>
@@ -255,6 +260,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setMealBuilderOpen: handleSetMealBuilderOpen,
     getFoodById,
     importFoods,
+    addFood,
     updateFood,
     deleteFood,
     addMeal,

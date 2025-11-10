@@ -67,7 +67,7 @@
   "This will permanently delete the \"{mealName}\" meal. This action cannot be undone.": "This will permanently delete the \"{mealName}\" meal. This action cannot be undone.",
   "ingredients": "ingredients",
   "Import from CSV": "Import from CSV",
-  "CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it').": "CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it').",
+  "CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it').": "The CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it').",
   "Import Successful": "Import Successful",
   "{count} new food(s) imported.": "{count} new food(s) imported.",
   "Import Failed": "Import Failed",
@@ -110,5 +110,15 @@
   "Name cannot be empty": "Name cannot be empty",
   "Food Updated": "Food Updated",
   "The food name has been updated.": "The food name has been updated.",
-  "Edit food name": "Edit food name"
+  "Edit food name": "Edit food name",
+  "New Food": "New Food",
+  "Edit Food": "Edit Food",
+  "Fill in the details for the food item.": "Fill in the details for the food item.",
+  "Name (English)": "Name (English)",
+  "Name (Italian)": "Name (Italian)",
+  "Serving Size (g)": "Serving Size (g)",
+  "Category": "Category",
+  "Food Created": "Food Created",
+  "Food already exists": "Food already exists",
+  "A food with this name already exists. Please choose a different name.": "A food with this name already exists. Please choose a different name."
 }
