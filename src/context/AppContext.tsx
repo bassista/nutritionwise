@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { defaultFoods } from '@/lib/data';
 import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult } from '@/lib/types';
 import { useLocale, type Locale } from './LocaleContext';
@@ -17,7 +17,7 @@ interface AppContextType {
   mealBuilderContext: MealBuilderContext;
   setMealBuilderOpen: (isOpen: boolean, context?: MealBuilderContext) => void;
   getFoodById: (id: string) => Food | undefined;
-  importFoods: (foodsFromCsv: Partial<Food>[]) => number;
+  importFoods: (foodsFromCsv: { [key: string]: string }[]) => number;
   addFood: (food: Food) => void;
   updateFood: (foodId: string, updates: Partial<Food>) => void;
   deleteFood: (foodId: string) => DeleteFoodResult;
@@ -39,36 +39,35 @@ const defaultSettings: AppSettings = {
   foodsPerPage: 8,
 };
 
-const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
-    try {
-      const item = window.localStorage.getItem(key);
-      if (item) {
-        return JSON.parse(item);
-      }
-      window.localStorage.setItem(key, JSON.stringify(initialValue));
-      return initialValue;
-    } catch (error) {
-      console.error(error);
-      return initialValue;
-    }
-  });
+const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
+    const [storedValue, setStoredValue] = useState<T>(() => {
+        if (typeof window === 'undefined') {
+            return initialValue;
+        }
+        try {
+            const item = window.localStorage.getItem(key);
+            return item ? JSON.parse(item) : initialValue;
+        } catch (error) {
+            console.error(error);
+            return initialValue;
+        }
+    });
 
-  useEffect(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(storedValue));
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }, [key, storedValue]);
+    const setValue = (value: T | ((val: T) => T)) => {
+        try {
+            const valueToStore = value instanceof Function ? value(storedValue) : value;
+            setStoredValue(valueToStore);
+            if (typeof window !== 'undefined') {
+                window.localStorage.setItem(key, JSON.stringify(valueToStore));
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-  return [storedValue, setStoredValue];
+    return [storedValue, setValue];
 };
+
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [foods, setFoods] = useLocalStorage<Food[]>('foods', defaultFoods);
