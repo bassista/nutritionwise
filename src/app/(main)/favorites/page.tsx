@@ -44,8 +44,8 @@ export default function FavoritesPage() {
   }, [foods, favoriteFoodIds]);
 
   const categories = useMemo(() => {
-    const allCategories = favoriteFoods.map(f => getCategoryName(f, locale, t)).filter(Boolean);
-    return ['all', ...Array.from(new Set(allCategories))];
+    const allCategories = favoriteFoods.map(f => getCategoryName(f, locale, t));
+    return ['all', ...Array.from(new Set(allCategories.filter(Boolean)))];
   }, [favoriteFoods, locale, t]);
 
   const filteredFoods = useMemo(() =>

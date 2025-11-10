@@ -41,8 +41,8 @@ export default function FoodsPage() {
   }, [searchTerm, categoryFilter]);
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => getCategoryName(f, locale, t)).filter(cat => cat && cat !== t('Uncategorized'));
-    return ['all', ...Array.from(new Set(allCategories))];
+    const allCategories = foods.map(f => getCategoryName(f, locale, t));
+    return ['all', ...Array.from(new Set(allCategories.filter(Boolean)))];
   }, [foods, locale, t]);
 
   const sortedFoods = useMemo(() => 
