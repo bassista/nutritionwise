@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -79,21 +80,21 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
   });
 
   useEffect(() => {
-    if (foodToEdit) {
+    if (open && foodToEdit) {
       form.reset({
-        name_en: typeof foodToEdit.name === 'object' ? foodToEdit.name.en : foodToEdit.name,
-        name_it: typeof foodToEdit.name === 'object' ? foodToEdit.name.it : '',
-        category: foodToEdit.category,
-        serving_size_g: foodToEdit.serving_size_g,
-        calories: foodToEdit.calories,
-        protein: foodToEdit.protein,
-        carbohydrates: foodToEdit.carbohydrates,
-        fat: foodToEdit.fat,
-        fiber: foodToEdit.fiber,
-        sugar: foodToEdit.sugar,
-        sodium: foodToEdit.sodium,
+        name_en: typeof foodToEdit.name === 'object' ? foodToEdit.name.en || '' : foodToEdit.name,
+        name_it: typeof foodToEdit.name === 'object' ? foodToEdit.name.it || '' : '',
+        category: foodToEdit.category || '',
+        serving_size_g: foodToEdit.serving_size_g || 100,
+        calories: foodToEdit.calories || 0,
+        protein: foodToEdit.protein || 0,
+        carbohydrates: foodToEdit.carbohydrates || 0,
+        fat: foodToEdit.fat || 0,
+        fiber: foodToEdit.fiber || 0,
+        sugar: foodToEdit.sugar || 0,
+        sodium: foodToEdit.sodium || 0,
       });
-    } else {
+    } else if(open && !foodToEdit) {
       form.reset({
         name_en: '',
         name_it: '',
@@ -322,3 +323,5 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
     </Dialog>
   );
 }
+
+    
