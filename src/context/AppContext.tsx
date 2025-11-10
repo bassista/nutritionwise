@@ -22,6 +22,7 @@ interface AppContextType {
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   clearAllData: () => void;
   setFavoriteFoodIds: React.Dispatch<React.SetStateAction<string[]>>;
+  setMeals: React.Dispatch<React.SetStateAction<Meal[]>>;
   exportData: () => AppData;
   importData: (data: AppData) => void;
 }
@@ -171,6 +172,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     updateSettings,
     clearAllData,
     setFavoriteFoodIds,
+    setMeals,
     exportData,
     importData,
   };
