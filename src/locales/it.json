@@ -1,3 +1,4 @@
+
 {
   "Foods": "Alimenti",
   "Meals": "Pasti",
@@ -39,6 +40,7 @@
   "of": "di",
   "Next": "Successivo",
   "Add Food to Meal": "Aggiungi alimento al pasto",
+  "Search for a food to add to your current meal.": "Cerca un alimento da aggiungere al tuo pasto attuale.",
   "Create new meal": "Crea nuovo pasto",
   "Create": "Crea",
   "Language": "Lingua",

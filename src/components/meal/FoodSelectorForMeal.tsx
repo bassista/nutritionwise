@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -6,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -46,6 +48,9 @@ export default function FoodSelectorForMeal({
       <DialogContent className="sm:max-w-md flex flex-col h-[80vh]">
         <DialogHeader>
           <DialogTitle>{t('Add Food to Meal')}</DialogTitle>
+           <DialogDescription>
+            {t('Search for a food to add to your current meal.')}
+          </DialogDescription>
         </DialogHeader>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
