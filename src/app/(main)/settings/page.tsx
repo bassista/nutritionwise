@@ -44,8 +44,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Download, Upload } from 'lucide-react';
+import { Download, Upload, Info } from 'lucide-react';
 import { useRef } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const settingsSchema = z.object({
   foodsPerPage: z.coerce
@@ -122,19 +123,19 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('Settings')} />
-      <div className="container mx-auto px-4 flex-grow">
-        <div className="py-4 max-w-2xl mx-auto pb-24 md:pb-4">
-           <Accordion type="single" collapsible className="w-full space-y-4">
-            <AccordionItem value="language" className="border-none">
-              <AccordionTrigger className="bg-card p-4 rounded-lg hover:no-underline">
-                <div>
-                  <h3 className="text-lg font-semibold text-left">{t('Language')}</h3>
-                  <p className="text-sm text-muted-foreground text-left">
+      <div className="container mx-auto px-4 flex-grow overflow-auto pb-24 md:pb-4">
+        <div className="py-4 max-w-2xl mx-auto">
+           <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="language">
+              <AccordionTrigger>
+                <div className="text-left">
+                  <h3 className="text-lg font-semibold">{t('Language')}</h3>
+                  <p className="text-sm text-muted-foreground">
                     {t('Choose your preferred language.')}
                   </p>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="bg-card p-4 rounded-b-lg">
+              <AccordionContent>
                 <Select onValueChange={(value) => setLocale(value as 'en' | 'it')} value={locale}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder={t('Language')} />
@@ -147,16 +148,16 @@ export default function SettingsPage() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="display" className="border-none">
-               <AccordionTrigger className="bg-card p-4 rounded-lg hover:no-underline">
-                 <div>
-                  <h3 className="text-lg font-semibold text-left">{t('Display')}</h3>
-                  <p className="text-sm text-muted-foreground text-left">
+            <AccordionItem value="display">
+               <AccordionTrigger>
+                 <div className="text-left">
+                  <h3 className="text-lg font-semibold">{t('Display')}</h3>
+                  <p className="text-sm text-muted-foreground">
                     {t('Customize how the app displays information.')}
                   </p>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="bg-card p-4 rounded-b-lg">
+              <AccordionContent>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <FormField
@@ -181,72 +182,87 @@ export default function SettingsPage() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="data-management" className="border-none">
-              <AccordionTrigger className="bg-card p-4 rounded-lg hover:no-underline">
-                <div>
-                    <h3 className="text-lg font-semibold text-left">{t('Data Management')}</h3>
-                    <p className="text-sm text-muted-foreground text-left">
+            <AccordionItem value="data-management">
+              <AccordionTrigger>
+                <div className="text-left">
+                    <h3 className="text-lg font-semibold">{t('Data Management')}</h3>
+                    <p className="text-sm text-muted-foreground">
                       {t('Import your food data or reset the application.')}
                     </p>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="bg-card p-4 rounded-b-lg space-y-6">
-                <div>
-                  <h3 className="font-semibold mb-2">{t('Import Data')}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {t('Upload a CSV file with your food data. The file should have columns: `id`, `name`, `calories`, `protein`, `carbohydrates`, `fat`.')}
-                  </p>
-                  <CsvImporter />
-                </div>
-                <Separator />
-                 <div>
-                  <h3 className="font-semibold mb-2">{t('Backup & Restore')}</h3>
-                   <p className="text-sm text-muted-foreground mb-3">
-                    {t('Download all your data to a file, or restore it from a backup.')}
-                  </p>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleExport}>
-                      <Download className="mr-2 h-4 w-4" />
-                      {t('Download Data')}
-                    </Button>
-                     <Button variant="outline" onClick={() => backupFileRef.current?.click()}>
-                      <Upload className="mr-2 h-4 w-4" />
-                      {t('Load from Backup')}
-                    </Button>
-                    <Input
-                      type="file"
-                      ref={backupFileRef}
-                      className="hidden"
-                      accept=".json"
-                      onChange={handleBackupFileChange}
-                    />
-                  </div>
-                </div>
-                <Separator />
-                <div>
-                  <h3 className="font-semibold mb-2 text-destructive">{t('Danger Zone')}</h3>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive">{t('Clear All Data')}</Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>{t('Are you absolutely sure?')}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t('This action cannot be undone. This will permanently delete all your saved meals and favorites, and reset all settings to default.')}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
-                        <AlertDialogAction onClick={clearAllData} className="bg-destructive hover:bg-destructive/90">
-                          {t('Yes, delete everything')}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {t('Reset the app to its initial state.')}
-                  </p>
+              <AccordionContent>
+                <div className="space-y-6">
+                    <div>
+                      <h3 className="font-semibold mb-2">{t('Import Data')}</h3>
+                      <div className='flex items-center gap-2'>
+                        <p className="text-sm text-muted-foreground">
+                          {t('Upload a CSV file with your food data.')}
+                        </p>
+                         <Popover>
+                            <PopoverTrigger asChild>
+                               <Button variant="ghost" size="icon" className="h-5 w-5">
+                                <Info className="h-4 w-4" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 text-sm">
+                              {t('The file should have columns: `id`, `name`, `calories`, `protein`, `carbohydrates`, `fat`.')}
+                            </PopoverContent>
+                          </Popover>
+                      </div>
+
+                      <CsvImporter />
+                    </div>
+                    <Separator />
+                     <div>
+                      <h3 className="font-semibold mb-2">{t('Backup & Restore')}</h3>
+                       <p className="text-sm text-muted-foreground mb-3">
+                        {t('Download all your data to a file, or restore it from a backup.')}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={handleExport}>
+                          <Download className="mr-2 h-4 w-4" />
+                          {t('Download Data')}
+                        </Button>
+                         <Button variant="outline" onClick={() => backupFileRef.current?.click()}>
+                          <Upload className="mr-2 h-4 w-4" />
+                          {t('Load from Backup')}
+                        </Button>
+                        <Input
+                          type="file"
+                          ref={backupFileRef}
+                          className="hidden"
+                          accept=".json"
+                          onChange={handleBackupFileChange}
+                        />
+                      </div>
+                    </div>
+                    <Separator />
+                    <div>
+                      <h3 className="font-semibold mb-2 text-destructive">{t('Danger Zone')}</h3>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive">{t('Clear All Data')}</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t('Are you absolutely sure?')}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t('This action cannot be undone. This will permanently delete all your saved meals and favorites, and reset all settings to default.')}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={clearAllData} className="bg-destructive hover:bg-destructive/90">
+                              {t('Yes, delete everything')}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {t('Reset the app to its initial state.')}
+                      </p>
+                    </div>
                 </div>
               </AccordionContent>
             </AccordionItem>
