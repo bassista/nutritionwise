@@ -19,6 +19,7 @@ interface AppContextType {
   toggleFavoriteFood: (foodId: string) => void;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   clearAllData: () => void;
+  setFavoriteFoodIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -130,6 +131,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     toggleFavoriteFood,
     updateSettings,
     clearAllData,
+    setFavoriteFoodIds,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

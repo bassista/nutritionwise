@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import FoodList from '@/components/food/FoodList';
 import { PageHeader } from '@/components/PageHeader';
@@ -15,7 +15,12 @@ export default function FoodsPage() {
   const { t } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredFoods = foods.filter(food =>
+  const sortedFoods = useMemo(() => 
+    [...foods].sort((a, b) => a.name.localeCompare(b.name)), 
+    [foods]
+  );
+
+  const filteredFoods = sortedFoods.filter(food =>
     food.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

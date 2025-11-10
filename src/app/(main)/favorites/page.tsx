@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import FoodList from '@/components/food/FoodList';
 import { PageHeader } from '@/components/PageHeader';
@@ -8,10 +9,14 @@ import { Heart } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
 
 export default function FavoritesPage() {
-  const { foods, favoriteFoodIds } = useAppContext();
+  const { foods, favoriteFoodIds, setFavoriteFoodIds } = useAppContext();
   const { t } = useLocale();
 
-  const favoriteFoods = foods.filter(food => favoriteFoodIds.includes(food.id));
+  const favoriteFoods = useMemo(() => {
+    const foodMap = new Map(foods.map(f => [f.id, f]));
+    return favoriteFoodIds.map(id => foodMap.get(id)).filter(Boolean);
+  }, [foods, favoriteFoodIds]);
+  
 
   return (
     <div className="flex flex-col h-full">
@@ -19,7 +24,7 @@ export default function FavoritesPage() {
       <div className="container mx-auto px-4 flex-grow">
         <div className="py-4">
           {favoriteFoods.length > 0 ? (
-            <FoodList foods={favoriteFoods} />
+            <FoodList foods={favoriteFoods} reorderable onReorder={setFavoriteFoodIds} />
           ) : (
             <div className="mt-8">
               <Alert>
