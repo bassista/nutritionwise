@@ -1,3 +1,4 @@
+
 "use client";
 
 import BottomNav from '@/components/BottomNav';
@@ -20,6 +21,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
 import { useMemo } from 'react';
+import { SheetTitle } from '@/components/ui/sheet';
 
 function SidebarHeaderContent() {
   const { open } = useSidebar();
@@ -67,6 +69,7 @@ function SidebarNav() {
 
     return (
         <SidebarContent>
+           <SheetTitle className="sr-only">NutritionWise</SheetTitle>
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
