@@ -118,7 +118,7 @@ export default function SettingsPage() {
     <div className="flex flex-col h-full">
       <PageHeader title={t('Settings')} />
       <div className="container mx-auto px-4 flex-grow">
-        <div className="py-4 space-y-8 max-w-2xl mx-auto">
+        <div className="py-4 space-y-8 max-w-2xl mx-auto pb-24 md:pb-4">
            <Card>
              <CardHeader>
               <CardTitle>{t('Language')}</CardTitle>
