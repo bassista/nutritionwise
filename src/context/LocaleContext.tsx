@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import en from '@/locales/en.json';
 import it from '@/locales/it.json';
 
@@ -54,7 +54,7 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     setIsMounted(true);
   }, []);
 
-  const t = (key: string, values?: Record<string, string | number>): string => {
+  const t = useCallback((key: string, values?: Record<string, string | number>): string => {
     const currentLocale = isMounted ? locale : 'en';
     let translation = translations[currentLocale][key] || key;
     if (values) {
@@ -63,7 +63,7 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
         });
     }
     return translation;
-  };
+  }, [isMounted, locale]);
   
   const value = {
     locale: isMounted ? locale : 'en',
