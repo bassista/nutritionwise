@@ -18,60 +18,50 @@ interface LocaleContextType {
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
-    const [storedValue, setStoredValue] = useState(() => {
-      if (typeof window === 'undefined') {
-        return initialValue;
-      }
+    const [storedValue, setStoredValue] = useState<T>(initialValue);
+
+    useEffect(() => {
+      // This effect runs only on the client
       try {
         const item = window.localStorage.getItem(key);
-        return item ? JSON.parse(item) : initialValue;
+        if (item) {
+          setStoredValue(JSON.parse(item));
+        }
       } catch (error) {
         console.error(error);
-        return initialValue;
       }
-    });
-
+    }, [key]);
+  
     const setValue = (value: T | ((val: T) => T)) => {
-        try {
-            const valueToStore = value instanceof Function ? value(storedValue) : value;
-            setStoredValue(valueToStore);
-            if (typeof window !== 'undefined') {
-                window.localStorage.setItem(key, JSON.stringify(valueToStore));
-            }
-        } catch (error) {
-            console.error(error);
+      try {
+        const valueToStore = value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
         }
+      } catch (error) {
+        console.error(error);
+      }
     };
-    
-    useEffect(() => {
-        const valueToStore = storedValue instanceof Function ? storedValue(storedValue) : storedValue;
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      }, [key, storedValue]);
-
+  
     return [storedValue, setValue];
-};
+  };
 
 export const LocaleProvider = ({ children }: { children: ReactNode }) => {
   const [locale, setLocale] = useLocalStorage<Locale>('locale', 'en');
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const t = useCallback((key: string, values?: Record<string, string | number>): string => {
-    const currentLocale = isMounted ? locale : 'en';
-    let translation = translations[currentLocale]?.[key] || key;
+    let translation = translations[locale]?.[key] || key;
     if (values) {
         Object.keys(values).forEach(valueKey => {
             translation = translation.replace(`{${valueKey}}`, String(values[valueKey]));
         });
     }
     return translation;
-  }, [isMounted, locale]);
+  }, [locale]);
   
   const value = {
-    locale: isMounted ? locale : 'en',
+    locale,
     setLocale: setLocale,
     t,
   };
