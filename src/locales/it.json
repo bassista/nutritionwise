@@ -28,8 +28,7 @@
   "Import your food data or reset the application.": "Importa i tuoi dati alimentari o ripristina l'applicazione.",
   "Import Data": "Importa dati",
   "Upload a CSV file with your food data.": "Carica un file CSV con i tuoi dati alimentari.",
-  "The CSV should have an `id` column and a `name_category` column.": "Il CSV deve contenere una colonna `id` e una colonna `name_category`.",
-  "CSV must contain 'id' and 'name_category' columns.": "Il CSV deve contenere le colonne 'id' e 'name_category'.",
+  "The CSV should have an `id` column, name columns (e.g., `name_en`, `name_it`), and nutrient values.": "Il CSV deve avere una colonna `id`, colonne per il nome (es. `name_en`, `name_it`), e i valori nutrizionali.",
   "Danger Zone": "Zona di pericolo",
   "Clear All Data": "Cancella tutti i dati",
   "Are you absolutely sure?": "Sei assolutamente sicuro?",
@@ -126,9 +125,7 @@
   "Filter by category": "Filtra per categoria",
   "All Categories": "Tutte le categorie",
   "Select category...": "Seleziona categoria...",
-  "Search or create category...": "Cerca o crea categoria...",
-  "No category found.": "Nessuna categoria trovata.",
-  "Create \"{search}\"": "Crea \"{search}\"",
   "Edit food": "Modifica alimento",
-  "Name": "Nome"
+  "Name": "Nome",
+  "Uncategorized": "Senza categoria"
 }

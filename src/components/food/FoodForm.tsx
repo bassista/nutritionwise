@@ -28,8 +28,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useLocale } from '@/context/LocaleContext';
 import { Food } from '@/lib/types';
 import { useEffect, useMemo } from 'react';
-import { CategoryCombobox } from './CategoryCombobox';
 import { getCategoryName } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const foodSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
@@ -187,13 +193,23 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
                   control={form.control}
                   name="category"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem>
                       <FormLabel>{t('Category')}</FormLabel>
-                        <CategoryCombobox
-                            categories={categories}
-                            value={field.value}
-                            onChange={field.onChange}
-                        />
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('Select category...')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                           <SelectItem value="">{t('Uncategorized')}</SelectItem>
+                          {categories.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
