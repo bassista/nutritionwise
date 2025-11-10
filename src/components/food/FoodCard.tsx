@@ -81,19 +81,19 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
               <div className="space-y-2 text-sm text-muted-foreground cursor-pointer" onClick={() => setDetailsOpen(true)}>
                  <div className="flex items-center justify-between">
                   <span className="flex items-center">
-                    <Flame className="w-4 h-4 mr-2 text-orange-400" /> {t('Calories')}
+                    <Flame className="w-4 h-4 mr-2 text-orange-400" /> <span className="hidden sm:inline">{t('Calories')}</span>
                   </span>
                   <span>{food.calories} kcal</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center">
-                    <Wheat className="w-4 h-4 mr-2 text-yellow-500" /> {t('Carbohydrates')}
+                    <Wheat className="w-4 h-4 mr-2 text-yellow-500" /> <span className="hidden sm:inline">{t('Carbohydrates')}</span>
                   </span>
                   <span>{food.carbohydrates || 0} g</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center">
-                    <Minus className="w-4 h-4 mr-2 text-pink-400" /> {t('Sugar')}
+                    <Minus className="w-4 h-4 mr-2 text-pink-400" /> <span className="hidden sm:inline">{t('Sugar')}</span>
                   </span>
                   <span>{food.sugar || 0} g</span>
                 </div>
