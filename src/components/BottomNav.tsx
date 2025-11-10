@@ -15,9 +15,9 @@ export default function BottomNav() {
 
   const navItems = [
     { href: '/foods', label: t('Foods') },
-    { href: '/meals', label: t('Meals') },
-    { href: 'create-meal', label: t('Create') },
     { href: '/favorites', label: t('Favorites') },
+    { href: 'create-meal', label: t('Create') },
+    { href: '/meals', label: t('Meals') },
     { href: '/settings', label: t('Settings') },
   ];
   

@@ -40,8 +40,8 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
 
   const navItems = useMemo(() => [
     { href: '/foods', icon: Wheat, label: t('Foods') },
-    { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
     { href: '/favorites', icon: Heart, label: t('Favorites') },
+    { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
     { href: '/settings', icon: Settings, label: t('Settings') },
   ], [t]);
 
@@ -74,8 +74,8 @@ export default function MainLayout({
 
   const navItems = useMemo(() => [
     { href: '/foods', icon: Wheat, label: t('Foods') },
-    { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
     { href: '/favorites', icon: Heart, label: t('Favorites') },
+    { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
     { href: '/settings', icon: Settings, label: t('Settings') },
   ], [t]);
 
