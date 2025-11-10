@@ -28,30 +28,33 @@ const defaultSettings: AppSettings = {
 };
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.error(error);
-      return initialValue;
-    }
-  });
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        window.localStorage.setItem(key, JSON.stringify(storedValue));
-      } catch (error) {
-        console.error(error);
+    // This effect runs only on the client, after the initial render
+    try {
+      const item = window.localStorage.getItem(key);
+      if (item) {
+        setStoredValue(JSON.parse(item));
       }
+    } catch (error) {
+      console.error(error);
     }
-  }, [key, storedValue]);
+  }, [key]);
 
-  return [storedValue, setStoredValue];
+  const setValue: React.Dispatch<React.SetStateAction<T>> = (value) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return [storedValue, setValue];
 };
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -60,6 +63,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [favoriteFoodIds, setFavoriteFoodIds] = useLocalStorage<string[]>('favoriteFoodIds', []);
   const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
   const [isMealBuilderOpen, setMealBuilderOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   const getFoodById = (id: string) => foods.find(f => f.id === id);
 
@@ -96,14 +104,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setMeals([]);
     setFavoriteFoodIds([]);
     setSettings(defaultSettings);
+    // Also clear from localStorage directly
+    if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('foods');
+        window.localStorage.removeItem('meals');
+        window.localStorage.removeItem('favoriteFoodIds');
+        window.localStorage.removeItem('settings');
+    }
   };
 
-
+  // Prevent hydration mismatch by returning default/empty values on server
+  // and on the initial client render.
   const value = {
-    foods,
-    meals,
-    favoriteFoodIds,
-    settings,
+    foods: isMounted ? foods : defaultFoods,
+    meals: isMounted ? meals : [],
+    favoriteFoodIds: isMounted ? favoriteFoodIds : [],
+    settings: isMounted ? settings : defaultSettings,
     isMealBuilderOpen,
     setMealBuilderOpen,
     getFoodById,

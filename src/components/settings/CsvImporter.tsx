@@ -9,7 +9,7 @@ import type { Food } from '@/lib/types';
 import { Upload } from 'lucide-react';
 
 export default function CsvImporter() {
-  const { importFoods } = useAppContext();
+  const { importFoods, foods } = useAppContext();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -45,9 +45,13 @@ export default function CsvImporter() {
         });
 
         importFoods(parsedFoods);
+        
+        const existingIds = new Set(foods.map(f => f.id));
+        const uniqueNewFoodsCount = parsedFoods.filter(f => !existingIds.has(f.id)).length;
+
         toast({
           title: 'Import Successful',
-          description: `${parsedFoods.length} new food(s) imported.`,
+          description: `${uniqueNewFoodsCount} new food(s) imported.`,
         });
       } catch (error: any) {
         toast({
