@@ -47,7 +47,11 @@ export default function MealsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <PageHeader title={t('My Meals')} />
+      <PageHeader title={t('My Meals')}>
+        <Button onClick={() => setMealBuilderOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
+        </Button>
+      </PageHeader>
       <div className="container mx-auto px-4 flex-grow">
         <div className="py-4 space-y-4">
           {meals.length > 0 ? (
