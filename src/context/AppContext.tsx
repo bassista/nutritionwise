@@ -39,15 +39,15 @@ const defaultSettings: AppSettings = {
 };
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] => {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-  useEffect(() => {
-    // This effect runs only on the client, after the initial render
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === 'undefined') {
+      return initialValue;
+    }
     try {
       const item = window.localStorage.getItem(key);
       if (item) {
         const parsed = JSON.parse(item);
-        // Basic migration for food names from string to object
+         // Basic migration for food names from string to object
         if (key === 'foods' && Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0].name === 'string') {
             const migratedFoods = parsed.map((food: any) => {
               if (typeof food.name === 'string') {
@@ -55,32 +55,31 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<R
               }
               return food;
             });
-            setStoredValue(migratedFoods as T);
             window.localStorage.setItem(key, JSON.stringify(migratedFoods));
-            return;
+            return migratedFoods;
         }
-        setStoredValue(parsed);
-      } else {
-        window.localStorage.setItem(key, JSON.stringify(initialValue));
+        return parsed;
       }
+      window.localStorage.setItem(key, JSON.stringify(initialValue));
+      return initialValue;
     } catch (error) {
       console.error(error);
+      return initialValue;
     }
-  }, [key, initialValue]);
-
-  const setValue: React.Dispatch<React.SetStateAction<T>> = (value) => {
+  });
+  
+  useEffect(() => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
       if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        window.localStorage.setItem(key, JSON.stringify(storedValue));
       }
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [key, storedValue]);
 
-  return [storedValue, setValue];
+
+  return [storedValue, setStoredValue];
 };
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -141,12 +140,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             } else {
                 const newFood: Food = {
                     id: csvFood.id,
-                    name: nameObject,
                     calories: 0,
                     protein: 0,
                     carbohydrates: 0,
                     fat: 0,
                     ...newFoodData,
+                    name: nameObject,
                 };
                 currentFoodsMap.set(csvFood.id, newFood);
                 newFoodsCount++;
