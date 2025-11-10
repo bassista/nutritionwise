@@ -40,32 +40,32 @@ const defaultSettings: AppSettings = {
 };
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
-    const [storedValue, setStoredValue] = useState<T>(() => {
-        if (typeof window === 'undefined') {
-            return initialValue;
-        }
-        try {
-            const item = window.localStorage.getItem(key);
-            return item ? JSON.parse(item) : initialValue;
-        } catch (error) {
-            console.error(error);
-            return initialValue;
-        }
-    });
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
 
-    const setValue = (value: T | ((val: T) => T)) => {
-        try {
-            const valueToStore = value instanceof Function ? value(storedValue) : value;
-            setStoredValue(valueToStore);
-            if (typeof window !== 'undefined') {
-                window.localStorage.setItem(key, JSON.stringify(valueToStore));
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
+  useEffect(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      if (item) {
+        setStoredValue(JSON.parse(item));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [key]);
 
-    return [storedValue, setValue];
+  const setValue = (value: T | ((val: T) => T)) => {
+      try {
+          const valueToStore = value instanceof Function ? value(storedValue) : value;
+          setStoredValue(valueToStore);
+          if (typeof window !== 'undefined') {
+              window.localStorage.setItem(key, JSON.stringify(valueToStore));
+          }
+      } catch (error) {
+          console.error(error);
+      }
+  };
+
+  return [storedValue, setValue];
 };
 
 
@@ -76,16 +76,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
   const [isMealBuilderOpen, setIsMealBuilderOpen] = useState(false);
   const [mealBuilderContext, setMealBuilderContext] = useState<MealBuilderContext>('all');
-  const [isMounted, setIsMounted] = useState(false);
   const { locale, setLocale } = useLocale();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  
-  const getFoodById = (id: string) => foods.find(f => f.id === id);
+  const getFoodById = useCallback((id: string) => foods.find(f => f.id === id), [foods]);
 
-  const importFoods = (csvRows: { [key: string]: string }[]): number => {
+  const importFoods = useCallback((csvRows: { [key: string]: string }[]): number => {
     let newFoodsCount = 0;
 
     setFoods(currentFoods => {
@@ -102,8 +97,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                     const [langPart, valuePart] = pair.split('=');
                     if (langPart && valuePart) {
                         const [foodName, catName] = valuePart.split(':');
-                        if (foodName) name[langPart] = foodName.trim();
-                        if (catName) category[langPart] = catName.trim();
+                        if (foodName) name[langPart.trim()] = foodName.trim();
+                        if (catName) category[langPart.trim()] = catName.trim();
                     }
                 });
             }
@@ -146,21 +141,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return newFoodsCount;
-  };
+  }, [setFoods]);
 
-  const addFood = (food: Food) => {
+  const addFood = useCallback((food: Food) => {
     setFoods(prevFoods => [...prevFoods, food]);
-  };
+  }, [setFoods]);
   
-  const updateFood = (foodId: string, updates: Partial<Food>) => {
+  const updateFood = useCallback((foodId: string, updates: Partial<Food>) => {
     setFoods(prevFoods =>
       prevFoods.map(food =>
         food.id === foodId ? { ...food, ...updates } : food
       )
     );
-  };
+  }, [setFoods]);
 
-  const deleteFood = (foodId: string): DeleteFoodResult => {
+  const deleteFood = useCallback((foodId: string): DeleteFoodResult => {
     const conflictingMeals = meals.filter(meal => meal.foods.some(mf => mf.foodId === foodId)).map(meal => meal.name);
     
     if (conflictingMeals.length > 0) {
@@ -171,45 +166,38 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setFavoriteFoodIds(prev => prev.filter(id => id !== foodId));
     
     return { success: true };
-  };
+  }, [meals, setFoods, setFavoriteFoodIds]);
 
-  const addMeal = (meal: Meal) => {
+  const addMeal = useCallback((meal: Meal) => {
     setMeals(prev => [...prev, meal]);
-  };
+  }, [setMeals]);
 
-  const updateMeal = (updatedMeal: Meal) => {
+  const updateMeal = useCallback((updatedMeal: Meal) => {
     setMeals(prev => prev.map(meal => meal.id === updatedMeal.id ? updatedMeal : meal));
-  };
+  }, [setMeals]);
 
-  const deleteMeal = (mealId: string) => {
+  const deleteMeal = useCallback((mealId: string) => {
     setMeals(prev => prev.filter(meal => meal.id !== mealId));
-  };
+  }, [setMeals]);
 
-  const toggleFavoriteFood = (foodId: string) => {
+  const toggleFavoriteFood = useCallback((foodId: string) => {
     setFavoriteFoodIds(prev =>
       prev.includes(foodId) ? prev.filter(id => id !== foodId) : [...prev, foodId]
     );
-  };
+  }, [setFavoriteFoodIds]);
 
-  const updateSettings = (newSettings: Partial<AppSettings>) => {
+  const updateSettings = useCallback((newSettings: Partial<AppSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
-  };
+  }, [setSettings]);
   
-  const clearAllData = () => {
+  const clearAllData = useCallback(() => {
     setFoods(defaultFoods);
     setMeals([]);
     setFavoriteFoodIds([]);
     setSettings(defaultSettings);
-    // Also clear from localStorage directly
-    if (typeof window !== 'undefined') {
-        window.localStorage.setItem('foods', JSON.stringify(defaultFoods));
-        window.localStorage.setItem('meals', JSON.stringify([]));
-        window.localStorage.setItem('favoriteFoodIds', JSON.stringify([]));
-        window.localStorage.setItem('settings', JSON.stringify(defaultSettings));
-    }
-  };
+  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings]);
 
-  const exportData = (): AppData => {
+  const exportData = useCallback((): AppData => {
     return {
       foods,
       meals,
@@ -217,17 +205,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       settings,
       locale,
     };
-  };
+  }, [foods, meals, favoriteFoodIds, settings, locale]);
 
-  const importData = (data: AppData) => {
+  const importData = useCallback((data: AppData) => {
     if (data.foods) setFoods(data.foods);
     if (data.meals) setMeals(data.meals);
     if (data.favoriteFoodIds) setFavoriteFoodIds(data.favoriteFoodIds);
     if (data.settings) setSettings(data.settings);
     if (data.locale) setLocale(data.locale);
-  };
+  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setLocale]);
 
-  const handleSetMealBuilderOpen = (isOpen: boolean, context: MealBuilderContext = 'all') => {
+  const handleSetMealBuilderOpen = useCallback((isOpen: boolean, context: MealBuilderContext = 'all') => {
     setIsMealBuilderOpen(isOpen);
     if (isOpen) {
       setMealBuilderContext(context);
@@ -235,15 +223,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       // Reset context when closing
       setTimeout(() => setMealBuilderContext('all'), 300);
     }
-  };
+  }, []);
 
-  // Prevent hydration mismatch by returning default/empty values on server
-  // and on the initial client render.
   const value = {
-    foods: isMounted ? foods : defaultFoods,
-    meals: isMounted ? meals : [],
-    favoriteFoodIds: isMounted ? favoriteFoodIds : [],
-    settings: isMounted ? settings : defaultSettings,
+    foods,
+    meals,
+    favoriteFoodIds,
+    settings,
     isMealBuilderOpen,
     mealBuilderContext,
     setMealBuilderOpen: handleSetMealBuilderOpen,

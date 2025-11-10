@@ -7,7 +7,7 @@ import it from '@/locales/it.json';
 
 export type Locale = 'en' | 'it';
 
-const translations = { en, it };
+const translations: Record<Locale, Record<string, string>> = { en, it };
 
 interface LocaleContextType {
   locale: Locale;
@@ -18,18 +18,18 @@ interface LocaleContextType {
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
-    const [storedValue, setStoredValue] = useState<T>(() => {
-        if (typeof window === 'undefined') {
-            return initialValue;
-        }
+    const [storedValue, setStoredValue] = useState<T>(initialValue);
+
+    useEffect(() => {
         try {
             const item = window.localStorage.getItem(key);
-            return item ? JSON.parse(item) : initialValue;
+            if (item) {
+                setStoredValue(JSON.parse(item));
+            }
         } catch (error) {
-            console.log(error);
-            return initialValue;
+            console.error(error);
         }
-    });
+    }, [key]);
 
     const setValue = (value: T | ((val: T) => T)) => {
         try {
@@ -56,7 +56,7 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
 
   const t = (key: string, values?: Record<string, string | number>): string => {
     const currentLocale = isMounted ? locale : 'en';
-    let translation = translations[currentLocale][key as keyof typeof translations[Locale]] || key;
+    let translation = translations[currentLocale][key] || key;
     if (values) {
         Object.keys(values).forEach(valueKey => {
             translation = translation.replace(`{${valueKey}}`, String(values[valueKey]));
