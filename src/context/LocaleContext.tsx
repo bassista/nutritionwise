@@ -37,12 +37,6 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<R
     }
   }, [key, storedValue]);
 
-  const isMounted = typeof window !== 'undefined';
-
-  if (!isMounted) {
-    return [initialValue, () => {}];
-  }
-
   return [storedValue, setStoredValue];
 };
 
@@ -55,7 +49,8 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const t = (key: string, values?: Record<string, string | number>): string => {
-    let translation = translations[locale][key as keyof typeof translations[Locale]] || key;
+    const currentLocale = isMounted ? locale : 'en';
+    let translation = translations[currentLocale][key as keyof typeof translations[Locale]] || key;
     if (values) {
         Object.keys(values).forEach(valueKey => {
             translation = translation.replace(`{${valueKey}}`, String(values[valueKey]));

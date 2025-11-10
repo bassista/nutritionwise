@@ -35,17 +35,7 @@ function SidebarHeaderContent() {
 
 function MainLayoutContent({ children }: { children: React.ReactNode }) {
   const { isMealBuilderOpen, setMealBuilderOpen } = useAppContext();
-  const pathname = usePathname();
-  const { t } = useLocale();
-
-  const navItems = useMemo(() => [
-    { href: '/foods', icon: Wheat, label: t('Foods') },
-    { href: '/favorites', icon: Heart, label: t('Favorites') },
-    { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
-    { href: '/settings', icon: Settings, label: t('Settings') },
-  ], [t]);
-
-
+  
   return (
     <SidebarInset>
       <div className="flex flex-col min-h-screen">
@@ -64,25 +54,18 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { t } = useLocale();
-  const pathname = usePathname();
+function SidebarNav() {
+    const { t } = useLocale();
+    const pathname = usePathname();
 
-  const navItems = useMemo(() => [
-    { href: '/foods', icon: Wheat, label: t('Foods') },
-    { href: '/favorites', icon: Heart, label: t('Favorites') },
-    { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
-    { href: '/settings', icon: Settings, label: t('Settings') },
-  ], [t]);
+    const navItems = useMemo(() => [
+      { href: '/foods', icon: Wheat, label: t('Foods') },
+      { href: '/favorites', icon: Heart, label: t('Favorites') },
+      { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
+      { href: '/settings', icon: Settings, label: t('Settings') },
+    ], [t]);
 
-  return (
-    <SidebarProvider>
-      <Sidebar collapsible="icon">
-        <SidebarHeaderContent />
+    return (
         <SidebarContent>
           <SidebarMenu>
             {navItems.map((item) => (
@@ -101,6 +84,19 @@ export default function MainLayout({
             ))}
           </SidebarMenu>
         </SidebarContent>
+    )
+}
+
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <SidebarProvider>
+      <Sidebar collapsible="icon">
+        <SidebarHeaderContent />
+        <SidebarNav />
       </Sidebar>
       <MainLayoutContent>{children}</MainLayoutContent>
     </SidebarProvider>
