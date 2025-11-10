@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
@@ -135,48 +136,50 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
               />
             </div>
             
-            <h3 className="font-semibold">{t('Ingredients')}</h3>
-            <ScrollArea className="flex-grow pr-4 -mr-4">
-              <div className="space-y-3">
-                {mealFoods.map(({ foodId, grams }, index) => {
-                  const food = getFoodById(foodId);
-                  if (!food) return null;
-                  const foodName = getFoodName(food, locale);
-                  return (
-                    <div key={foodId} className="flex items-center gap-2 bg-muted/50 p-2 rounded-md">
-                      <div className="flex flex-col gap-1 mr-2">
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveFood(index, 'up')} disabled={index === 0}>
-                           <ArrowUp className="h-4 w-4" />
-                        </Button>
-                         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveFood(index, 'down')} disabled={index === mealFoods.length - 1}>
-                           <ArrowDown className="h-4 w-4" />
+            <div className="flex-grow flex flex-col min-h-0">
+              <h3 className="font-semibold mb-2">{t('Ingredients')}</h3>
+              <ScrollArea className="flex-grow pr-4 -mr-4">
+                <div className="space-y-3">
+                  {mealFoods.map(({ foodId, grams }, index) => {
+                    const food = getFoodById(foodId);
+                    if (!food) return null;
+                    const foodName = getFoodName(food, locale);
+                    return (
+                      <div key={foodId} className="flex items-center gap-2 bg-muted/50 p-2 rounded-md">
+                        <div className="flex flex-col gap-1 mr-2">
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveFood(index, 'up')} disabled={index === 0}>
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveFood(index, 'down')} disabled={index === mealFoods.length - 1}>
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="flex-grow">
+                          <p className="font-medium text-sm">{foodName}</p>
+                          <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
+                        </div>
+                        <Input
+                          type="number"
+                          value={grams}
+                          onChange={(e) => handleGramsChange(foodId, parseInt(e.target.value))}
+                          className="w-20"
+                          aria-label={`Grams of ${foodName}`}
+                        />
+                        <span className="text-sm text-muted-foreground">g</span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveFood(foodId)}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      <div className="flex-grow">
-                        <p className="font-medium text-sm">{foodName}</p>
-                        <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
-                      </div>
-                      <Input
-                        type="number"
-                        value={grams}
-                        onChange={(e) => handleGramsChange(foodId, parseInt(e.target.value))}
-                        className="w-20"
-                        aria-label={`Grams of ${foodName}`}
-                      />
-                      <span className="text-sm text-muted-foreground">g</span>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveFood(foodId)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  );
-                })}
-                <Button variant="outline" className="w-full border-dashed" onClick={() => setFoodSelectorOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
-                </Button>
-              </div>
-            </ScrollArea>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+              <Button variant="outline" className="w-full border-dashed mt-2" onClick={() => setFoodSelectorOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
+              </Button>
+            </div>
             
-            <div>
+            <div className='pt-2'>
                 <h3 className="font-semibold mb-2">{t('Total Nutrients')}</h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm p-3 bg-muted rounded-lg">
                     {nutrientSummary.map(({Icon, value, color}) => (
