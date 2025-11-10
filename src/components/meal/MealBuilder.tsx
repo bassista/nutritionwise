@@ -178,7 +178,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                 <h3 className="font-semibold mb-2">{t('Total Nutrients')}</h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm p-3 bg-muted rounded-lg">
                     {nutrientSummary.map(({Icon, value, color}) => (
-                        <div key={value} className="flex items-center gap-2">
+                        <div key={color} className="flex items-center gap-2">
                             <Icon className={`h-4 w-4 ${color}`} />
                             <span className="font-medium">{value}</span>
                         </div>
