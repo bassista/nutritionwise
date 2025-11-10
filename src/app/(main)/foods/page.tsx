@@ -33,7 +33,7 @@ export default function FoodsPage() {
               aria-label="Search for a food"
             />
           </div>
-          {foods.length === 0 && (
+          {foods.length === 0 ? (
              <Alert>
                 <Lightbulb className="h-4 w-4" />
                 <AlertTitle>No Foods Found</AlertTitle>
@@ -41,8 +41,9 @@ export default function FoodsPage() {
                   You can import your own food list from a CSV file in the Settings page.
                 </AlertDescription>
               </Alert>
+          ) : (
+            <FoodList foods={filteredFoods} />
           )}
-          <FoodList foods={filteredFoods} />
         </div>
       </div>
     </div>
