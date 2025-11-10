@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import en from '@/locales/en.json';
 import it from '@/locales/it.json';
 
-type Locale = 'en' | 'it';
+export type Locale = 'en' | 'it';
 
 const translations = { en, it };
 

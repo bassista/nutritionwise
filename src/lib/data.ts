@@ -3,7 +3,7 @@ import type { Food } from './types';
 export const defaultFoods: Food[] = [
   {
     id: 'apple',
-    name: 'Apple',
+    name: { en: 'Apple', it: 'Mela' },
     category: 'Fruit',
     serving_size_g: 100,
     calories: 52,
@@ -15,7 +15,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'banana',
-    name: 'Banana',
+    name: { en: 'Banana', it: 'Banana' },
     category: 'Fruit',
     serving_size_g: 100,
     calories: 89,
@@ -27,7 +27,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'chicken-breast',
-    name: 'Chicken Breast',
+    name: { en: 'Chicken Breast', it: 'Petto di Pollo' },
     category: 'Meat',
     serving_size_g: 100,
     calories: 165,
@@ -37,7 +37,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'salmon',
-    name: 'Salmon',
+    name: { en: 'Salmon', it: 'Salmone' },
     category: 'Fish',
     serving_size_g: 100,
     calories: 208,
@@ -47,7 +47,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'rice',
-    name: 'White Rice',
+    name: { en: 'White Rice', it: 'Riso Bianco' },
     category: 'Grain',
     serving_size_g: 100,
     calories: 130,
@@ -57,7 +57,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'broccoli',
-    name: 'Broccoli',
+    name: { en: 'Broccoli', it: 'Broccoli' },
     category: 'Vegetable',
     serving_size_g: 100,
     calories: 34,
@@ -68,7 +68,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'spinach',
-    name: 'Spinach',
+    name: { en: 'Spinach', it: 'Spinaci' },
     category: 'Vegetable',
     serving_size_g: 100,
     calories: 23,
@@ -79,7 +79,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'almonds',
-    name: 'Almonds',
+    name: { en: 'Almonds', it: 'Mandorle' },
     category: 'Nuts',
     serving_size_g: 100,
     calories: 579,
@@ -90,7 +90,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'egg',
-    name: 'Egg',
+    name: { en: 'Egg', it: 'Uovo' },
     category: 'Dairy & Alternatives',
     serving_size_g: 100,
     calories: 155,
@@ -100,7 +100,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'oats',
-    name: 'Oats',
+    name: { en: 'Oats', it: 'Avena' },
     category: 'Grain',
     serving_size_g: 100,
     calories: 389,
@@ -111,7 +111,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'beef',
-    name: 'Ground Beef (85/15)',
+    name: { en: 'Ground Beef (85/15)', it: 'Carne Macinata (85/15)' },
     category: 'Meat',
     serving_size_g: 100,
     calories: 250,
@@ -121,7 +121,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'potatoes',
-    name: 'Potatoes',
+    name: { en: 'Potatoes', it: 'Patate' },
     category: 'Vegetable',
     serving_size_g: 100,
     calories: 77,
@@ -132,7 +132,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'greek-yogurt',
-    name: 'Greek Yogurt',
+    name: { en: 'Greek Yogurt', it: 'Yogurt Greco' },
     category: 'Dairy & Alternatives',
     serving_size_g: 100,
     calories: 59,
@@ -143,7 +143,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'olive-oil',
-    name: 'Olive Oil',
+    name: { en: 'Olive Oil', it: 'Olio d\'oliva' },
     category: 'Fats & Oils',
     serving_size_g: 100,
     calories: 884,
@@ -153,7 +153,7 @@ export const defaultFoods: Food[] = [
   },
   {
     id: 'quinoa',
-    name: 'Quinoa',
+    name: { en: 'Quinoa', it: 'Quinoa' },
     category: 'Grain',
     serving_size_g: 100,
     calories: 120,

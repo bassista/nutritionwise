@@ -43,6 +43,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
+import { getFoodName } from '@/lib/utils';
 
 
 const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
@@ -73,7 +74,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
   ({ meal, reorderable, style, attributes, listeners }, ref) => {
     const { getFoodById, deleteMeal } = useAppContext();
     const [isEditing, setIsEditing] = useState(false);
-    const { t } = useLocale();
+    const { t, locale } = useLocale();
 
     const totalNutrients = useMemo(
       () => calculateTotalNutrients(meal, getFoodById),
@@ -178,7 +179,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
                               const food = getFoodById(foodId);
                               return food ? (
                                   <li key={foodId} className="truncate">
-                                      {food.name} ({grams}g)
+                                      {getFoodName(food, locale)} ({grams}g)
                                   </li>
                               ) : null;
                           })}

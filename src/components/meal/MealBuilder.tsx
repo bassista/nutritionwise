@@ -20,6 +20,7 @@ import type { Meal, MealFood, Food } from '@/lib/types';
 import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown } from 'lucide-react';
 import FoodSelectorForMeal from './FoodSelectorForMeal';
 import { useLocale } from '@/context/LocaleContext';
+import { getFoodName } from '@/lib/utils';
 
 interface MealBuilderProps {
   open: boolean;
@@ -30,7 +31,7 @@ interface MealBuilderProps {
 export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuilderProps) {
   const { addMeal, updateMeal, getFoodById, mealBuilderContext } = useAppContext();
   const { toast } = useToast();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const [mealName, setMealName] = useState('');
   const [mealFoods, setMealFoods] = useState<MealFood[]>([]);
@@ -140,6 +141,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                 {mealFoods.map(({ foodId, grams }, index) => {
                   const food = getFoodById(foodId);
                   if (!food) return null;
+                  const foodName = getFoodName(food, locale);
                   return (
                     <div key={foodId} className="flex items-center gap-2 bg-muted/50 p-2 rounded-md">
                       <div className="flex flex-col gap-1 mr-2">
@@ -151,7 +153,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                         </Button>
                       </div>
                       <div className="flex-grow">
-                        <p className="font-medium text-sm">{food.name}</p>
+                        <p className="font-medium text-sm">{foodName}</p>
                         <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
                       </div>
                       <Input
@@ -159,7 +161,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                         value={grams}
                         onChange={(e) => handleGramsChange(foodId, parseInt(e.target.value))}
                         className="w-20"
-                        aria-label={`Grams of ${food.name}`}
+                        aria-label={`Grams of ${foodName}`}
                       />
                       <span className="text-sm text-muted-foreground">g</span>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveFood(foodId)}>

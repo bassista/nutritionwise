@@ -24,6 +24,7 @@ import { Input } from '../ui/input';
 import { useAppContext } from '@/context/AppContext';
 import { Edit, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getFoodName } from '@/lib/utils';
 
 interface FoodDetailsDialogProps {
   food: Food;
@@ -56,18 +57,21 @@ export default function FoodDetailsDialog({
   open,
   onOpenChange,
 }: FoodDetailsDialogProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { updateFood } = useAppContext();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState(food.name);
+
+  const foodName = getFoodName(food, locale);
+  const [editedName, setEditedName] = useState(foodName);
 
   useEffect(() => {
     if (open) {
-      setEditedName(food.name);
+      const currentName = getFoodName(food, locale);
+      setEditedName(currentName);
       setIsEditing(false);
     }
-  }, [open, food.name]);
+  }, [open, food, locale]);
 
   const handleSave = () => {
     if (editedName.trim() === '') {
@@ -77,7 +81,12 @@ export default function FoodDetailsDialog({
       });
       return;
     }
-    updateFood(food.id, { name: editedName });
+    
+    const newNameObject = typeof food.name === 'object' ? { ...food.name } : { en: food.name };
+    newNameObject[locale] = editedName;
+
+    updateFood(food.id, { name: newNameObject });
+    
     toast({
       title: t('Food Updated'),
       description: t('The food name has been updated.'),
@@ -86,7 +95,7 @@ export default function FoodDetailsDialog({
   };
 
   const handleCancel = () => {
-    setEditedName(food.name);
+    setEditedName(foodName);
     setIsEditing(false);
   };
 
@@ -103,7 +112,7 @@ export default function FoodDetailsDialog({
             />
           ) : (
             <DialogTitle className="text-2xl font-headline flex items-center">
-              {food.name}
+              {foodName}
               <Button variant="ghost" size="icon" className="ml-2 h-7 w-7" onClick={() => setIsEditing(true)}>
                 <Edit className="h-4 w-4" />
               </Button>

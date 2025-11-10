@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { defaultFoods } from '@/lib/data';
 import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult } from '@/lib/types';
 import { useLocale } from './LocaleContext';
+import { getFoodName } from '@/lib/utils';
 
 type MealBuilderContext = 'all' | 'favorites';
 
@@ -45,7 +46,20 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<R
     try {
       const item = window.localStorage.getItem(key);
       if (item) {
-        setStoredValue(JSON.parse(item));
+        const parsed = JSON.parse(item);
+        // Basic migration for food names from string to object
+        if (key === 'foods' && Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0].name === 'string') {
+            const migratedFoods = parsed.map((food: any) => {
+              if (typeof food.name === 'string') {
+                return { ...food, name: { en: food.name } };
+              }
+              return food;
+            });
+            setStoredValue(migratedFoods as T);
+            window.localStorage.setItem(key, JSON.stringify(migratedFoods));
+            return;
+        }
+        setStoredValue(parsed);
       } else {
         window.localStorage.setItem(key, JSON.stringify(initialValue));
       }

@@ -16,6 +16,7 @@ import { useAppContext } from '@/context/AppContext';
 import type { Food } from '@/lib/types';
 import { Search, Plus } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
+import { getFoodName } from '@/lib/utils';
 
 
 interface FoodSelectorProps {
@@ -34,7 +35,7 @@ export default function FoodSelectorForMeal({
   context = 'all',
 }: FoodSelectorProps) {
   const { foods, favoriteFoodIds } = useAppContext();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
 
   const sourceFoods = useMemo(() => {
@@ -49,7 +50,7 @@ export default function FoodSelectorForMeal({
 
   const filteredFoods = searchTerm
     ? availableFoods.filter(food =>
-        food.name.toLowerCase().includes(searchTerm.toLowerCase())
+        getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase())
       )
     : availableFoods;
 
@@ -75,13 +76,14 @@ export default function FoodSelectorForMeal({
         <ScrollArea className="flex-grow">
           <div className="space-y-2">
             {filteredFoods.map(food => {
+              const foodName = getFoodName(food, locale);
               return (
                 <div
                   key={food.id}
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted"
                 >
                   <div className="flex-grow">
-                    <p className="font-medium text-sm">{food.name}</p>
+                    <p className="font-medium text-sm">{foodName}</p>
                     <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
                   </div>
                   <Button

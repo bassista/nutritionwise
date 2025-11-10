@@ -12,11 +12,12 @@ import { useLocale } from '@/context/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import PaginationControls from '@/components/food/PaginationControls';
+import { getFoodName } from '@/lib/utils';
 
 
 export default function FoodsPage() {
   const { foods, deleteFood, setMealBuilderOpen, settings } = useAppContext();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,12 +28,12 @@ export default function FoodsPage() {
   }, [searchTerm]);
 
   const sortedFoods = useMemo(() => 
-    [...foods].sort((a, b) => a.name.localeCompare(b.name)), 
-    [foods]
+    [...foods].sort((a, b) => getFoodName(a, locale).localeCompare(getFoodName(b, locale))), 
+    [foods, locale]
   );
 
   const filteredFoods = sortedFoods.filter(food =>
-    food.name.toLowerCase().includes(searchTerm.toLowerCase())
+    getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredFoods.length / itemsPerPage);

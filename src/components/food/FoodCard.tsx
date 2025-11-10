@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-
+import { getFoodName } from '@/lib/utils';
 
 interface FoodCardProps {
   food: Food;
@@ -40,9 +40,11 @@ interface FoodCardProps {
 const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
   ({ food, reorderable, onDelete, style, attributes, listeners }, ref) => {
     const { favoriteFoodIds, toggleFavoriteFood } = useAppContext();
-    const { t } = useLocale();
+    const { t, locale } = useLocale();
     const isFavorite = favoriteFoodIds.includes(food.id);
     const [isDetailsOpen, setDetailsOpen] = useState(false);
+    
+    const foodName = getFoodName(food, locale);
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -64,7 +66,7 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
                 className="font-semibold leading-tight truncate text-base cursor-pointer"
                 onClick={() => setDetailsOpen(true)}
               >
-                {food.name}
+                {foodName}
               </div>
               {reorderable && (
                 <div
@@ -117,7 +119,7 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
                       <AlertDialogHeader>
                         <AlertDialogTitle>{t('Are you absolutely sure?')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          {t('This will permanently delete the food "{foodName}". This action cannot be undone.', { foodName: food.name })}
+                          {t('This will permanently delete the food "{foodName}". This action cannot be undone.', { foodName: foodName })}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>

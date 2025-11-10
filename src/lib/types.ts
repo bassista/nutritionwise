@@ -10,7 +10,7 @@ export interface NutritionalInfo {
 
 export interface Food extends NutritionalInfo {
   id: string;
-  name: string;
+  name: string | { [key in 'en' | 'it']?: string };
   category?: string;
   serving_size_g?: number;
 }

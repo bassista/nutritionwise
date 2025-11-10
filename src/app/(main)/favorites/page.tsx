@@ -10,10 +10,11 @@ import { useLocale } from '@/context/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import PaginationControls from '@/components/food/PaginationControls';
+import { getFoodName } from '@/lib/utils';
 
 export default function FavoritesPage() {
   const { foods, favoriteFoodIds, setFavoriteFoodIds, setMealBuilderOpen, settings } = useAppContext();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,8 +31,8 @@ export default function FavoritesPage() {
 
   const filteredFoods = useMemo(() =>
     favoriteFoods.filter(food =>
-      food.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ), [favoriteFoods, searchTerm]);
+      getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase())
+    ), [favoriteFoods, searchTerm, locale]);
 
   const totalPages = Math.ceil(filteredFoods.length / itemsPerPage);
   const paginatedFoods = filteredFoods.slice(
