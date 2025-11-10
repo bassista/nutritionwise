@@ -40,9 +40,9 @@ export default function FoodsPage() {
   }, [searchTerm, categoryFilter]);
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => getCategoryName(f, locale)).filter(Boolean);
+    const allCategories = foods.map(f => getCategoryName(f, locale, t)).filter(cat => cat && cat !== t('Uncategorized'));
     return ['all', ...Array.from(new Set(allCategories))];
-  }, [foods, locale]);
+  }, [foods, locale, t]);
 
   const sortedFoods = useMemo(() => 
     [...foods].sort((a, b) => getFoodName(a, locale).localeCompare(getFoodName(b, locale))), 
@@ -52,10 +52,10 @@ export default function FoodsPage() {
   const filteredFoods = useMemo(() =>
     sortedFoods.filter(food => {
       const matchesSearch = getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase());
-      const categoryName = getCategoryName(food, locale);
+      const categoryName = getCategoryName(food, locale, t);
       const matchesCategory = categoryFilter === 'all' || categoryName === categoryFilter;
       return matchesSearch && matchesCategory;
-    }), [sortedFoods, searchTerm, categoryFilter, locale]
+    }), [sortedFoods, searchTerm, categoryFilter, locale, t]
   );
 
   const totalPages = Math.ceil(filteredFoods.length / itemsPerPage);

@@ -36,6 +36,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useFormState } from 'react-hook-form';
+import { cn } from '@/lib/utils';
 
 const foodSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
@@ -64,7 +66,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
   const { t, locale } = useLocale();
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => getCategoryName(f, locale)).filter(cat => cat && cat !== t('Uncategorized'));
+    const allCategories = foods.map(f => getCategoryName(f, locale, t)).filter(cat => cat && cat !== t('Uncategorized'));
     return Array.from(new Set(allCategories));
   }, [foods, locale, t]);
 
@@ -89,7 +91,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
       if (foodToEdit) {
         form.reset({
           name: foodToEdit.name[locale] || foodToEdit.name['en'] || '',
-          category: getCategoryName(foodToEdit, locale) || '',
+          category: getCategoryName(foodToEdit, locale, t) || '',
           serving_size_g: foodToEdit.serving_size_g || 100,
           calories: foodToEdit.calories || 0,
           protein: foodToEdit.protein || 0,
@@ -114,7 +116,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
         });
       }
     }
-  }, [open, foodToEdit, locale, form]);
+  }, [open, foodToEdit, locale, form, t]);
 
 
   function onSubmit(data: FoodFormValues) {

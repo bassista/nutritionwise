@@ -43,18 +43,18 @@ export default function FavoritesPage() {
   }, [foods, favoriteFoodIds]);
 
   const categories = useMemo(() => {
-    const allCategories = favoriteFoods.map(f => getCategoryName(f, locale)).filter(Boolean);
+    const allCategories = favoriteFoods.map(f => getCategoryName(f, locale, t)).filter(Boolean);
     return ['all', ...Array.from(new Set(allCategories))];
-  }, [favoriteFoods, locale]);
+  }, [favoriteFoods, locale, t]);
 
   const filteredFoods = useMemo(() =>
     favoriteFoods.filter(food => {
       if (!food) return false;
       const matchesSearch = getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase());
-      const categoryName = getCategoryName(food, locale);
+      const categoryName = getCategoryName(food, locale, t);
       const matchesCategory = categoryFilter === 'all' || categoryName === categoryFilter;
       return matchesSearch && matchesCategory;
-    }), [favoriteFoods, searchTerm, categoryFilter, locale]);
+    }), [favoriteFoods, searchTerm, categoryFilter, locale, t]);
 
   const totalPages = Math.ceil(filteredFoods.length / itemsPerPage);
   const paginatedFoods = filteredFoods.slice(
