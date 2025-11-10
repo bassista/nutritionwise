@@ -59,7 +59,7 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
           <Card
             className="flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1"
           >
-            <div className="p-4 flex-row items-start justify-between">
+            <div className="p-4 flex items-start justify-between">
                <div
                 className="font-semibold leading-tight truncate text-base cursor-pointer"
                 onClick={() => setDetailsOpen(true)}
