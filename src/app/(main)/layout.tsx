@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Heart, Home, Settings, UtensilsCrossed } from 'lucide-react';
+import { Heart, Wheat, Settings, UtensilsCrossed } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
@@ -39,7 +39,7 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
   const { t } = useLocale();
 
   const navItems = useMemo(() => [
-    { href: '/foods', icon: Home, label: t('Foods') },
+    { href: '/foods', icon: Wheat, label: t('Foods') },
     { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
     { href: '/favorites', icon: Heart, label: t('Favorites') },
     { href: '/settings', icon: Settings, label: t('Settings') },
@@ -73,7 +73,7 @@ export default function MainLayout({
   const pathname = usePathname();
 
   const navItems = useMemo(() => [
-    { href: '/foods', icon: Home, label: t('Foods') },
+    { href: '/foods', icon: Wheat, label: t('Foods') },
     { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
     { href: '/favorites', icon: Heart, label: t('Favorites') },
     { href: '/settings', icon: Settings, label: t('Settings') },

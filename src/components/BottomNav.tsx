@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Heart, UtensilsCrossed, Settings, Plus } from 'lucide-react';
+import { Wheat, Heart, UtensilsCrossed, Settings, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ export default function BottomNav() {
   ];
   
   const navIcons = {
-    [t('Foods')]: Home,
+    [t('Foods')]: Wheat,
     [t('Meals')]: UtensilsCrossed,
     [t('Create')]: Plus,
     [t('Favorites')]: Heart,
@@ -40,7 +40,7 @@ export default function BottomNav() {
       <div className="flex justify-around items-center h-full max-w-lg mx-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
-          const Icon = navIcons[item.label as keyof typeof navIcons] || Home;
+          const Icon = navIcons[item.label as keyof typeof navIcons] || Wheat;
 
           if (item.href === 'create-meal') {
             return (
