@@ -120,5 +120,6 @@
   "Category": "Categoria",
   "Food Created": "Alimento Creato",
   "Food already exists": "Alimento già esistente",
-  "A food with this name already exists. Please choose a different name.": "Un alimento con questo nome esiste già. Scegli un nome diverso."
+  "A food with this name already exists. Please choose a different name.": "Un alimento con questo nome esiste già. Scegli un nome diverso.",
+  "Create New Food": "Crea Nuovo Alimento"
 }

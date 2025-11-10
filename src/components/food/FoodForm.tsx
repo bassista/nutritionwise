@@ -89,7 +89,19 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
         sodium: foodToEdit.sodium,
       });
     } else {
-      form.reset();
+      form.reset({
+        name_en: '',
+        name_it: '',
+        category: '',
+        serving_size_g: 100,
+        calories: 0,
+        protein: 0,
+        carbohydrates: 0,
+        fat: 0,
+        fiber: 0,
+        sugar: 0,
+        sodium: 0,
+      });
     }
   }, [foodToEdit, form, open]);
 
