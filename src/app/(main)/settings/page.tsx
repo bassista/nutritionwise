@@ -206,7 +206,7 @@ export default function SettingsPage() {
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-80 text-sm">
-                              {t('The file should have columns: `id`, `name`, `calories`, `protein`, `carbohydrates`, `fat`.')}
+                              {t("The CSV should have an `id` column, name columns (e.g., `name_en`, `name_it`), and nutrient values.")}
                             </PopoverContent>
                           </Popover>
                       </div>

@@ -17,7 +17,7 @@ interface AppContextType {
   mealBuilderContext: MealBuilderContext;
   setMealBuilderOpen: (isOpen: boolean, context?: MealBuilderContext) => void;
   getFoodById: (id: string) => Food | undefined;
-  importFoods: (newFoods: Partial<Food>[], locale: Locale) => number;
+  importFoods: (newFoods: Partial<Food>[]) => number;
   updateFood: (foodId: string, updates: Partial<Food>) => void;
   deleteFood: (foodId: string) => DeleteFoodResult;
   addMeal: (meal: Meal) => void;
@@ -99,46 +99,54 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   
   const getFoodById = (id: string) => foods.find(f => f.id === id);
 
-  const importFoods = (foodsFromCsv: Partial<Food>[], importLocale: Locale): number => {
-    let updatedCount = 0;
+  const importFoods = (foodsFromCsv: Partial<Food>[]): number => {
     let newFoodsCount = 0;
 
     setFoods(currentFoods => {
         const currentFoodsMap = new Map(currentFoods.map(f => [f.id, f]));
 
-        foodsFromCsv.forEach(csvFood => {
-            if (!csvFood.id || !csvFood.name) return;
+        foodsFromCsv.forEach(csvFoodRow => {
+            const csvFood = csvFoodRow as any;
+            if (!csvFood.id) return;
+
+            const nameObject: { [key in Locale]?: string } = {};
+            if (csvFood.name_en) nameObject.en = csvFood.name_en;
+            if (csvFood.name_it) nameObject.it = csvFood.name_it;
+            
+            // Fallback to 'name' column for backward compatibility or simple cases
+            if (Object.keys(nameObject).length === 0 && csvFood.name) {
+                nameObject.en = csvFood.name; // Assume 'name' is English as a default
+            }
+
+            if (Object.keys(nameObject).length === 0) return;
 
             const existingFood = currentFoodsMap.get(csvFood.id);
-            const csvFoodName = csvFood.name as string; // from CSV, it's always a string
+            
+            const newFoodData: Partial<Food> = { ...csvFood };
+            delete (newFoodData as any).name_en;
+            delete (newFoodData as any).name_it;
+            delete (newFoodData as any).name;
 
             if (existingFood) {
-                // Update existing food
-                const newName = typeof existingFood.name === 'object' ? { ...existingFood.name } : { en: existingFood.name };
-                newName[importLocale] = csvFoodName;
-
-                const updatedFood = {
+                const mergedName = typeof existingFood.name === 'object'
+                    ? { ...existingFood.name, ...nameObject }
+                    : nameObject;
+                
+                const updatedFood: Food = {
                     ...existingFood,
-                    ...csvFood,
-                    name: newName,
+                    ...newFoodData,
+                    name: mergedName,
                 };
                 currentFoodsMap.set(csvFood.id, updatedFood);
-                updatedCount++;
             } else {
-                // Add new food
-                const newName = {
-                    en: csvFoodName, // Use as fallback
-                    [importLocale]: csvFoodName,
-                };
-                
                 const newFood: Food = {
                     id: csvFood.id,
-                    name: newName,
+                    name: nameObject,
                     calories: 0,
                     protein: 0,
                     carbohydrates: 0,
                     fat: 0,
-                    ...csvFood,
+                    ...newFoodData,
                 };
                 currentFoodsMap.set(csvFood.id, newFood);
                 newFoodsCount++;

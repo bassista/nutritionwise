@@ -13,7 +13,7 @@ export default function CsvImporter() {
   const { importFoods } = useAppContext();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -26,27 +26,28 @@ export default function CsvImporter() {
         const rows = text.split('\n').filter(row => row.trim() !== '');
         const header = rows.shift()?.trim().split(',').map(h => h.trim()) || [];
         
-        const requiredHeaders = ['id', 'name', 'calories', 'protein', 'carbohydrates', 'fat'];
-        if (!requiredHeaders.every(h => header.includes(h))) {
-          throw new Error(t('CSV must contain id, name, calories, protein, carbohydrates, and fat columns.'));
+        const hasId = header.includes('id');
+        const hasAnyName = header.includes('name') || header.includes('name_en') || header.includes('name_it');
+
+        if (!hasId || !hasAnyName) {
+          throw new Error(t("CSV must contain an 'id' column and at least one name column (e.g., 'name_en', 'name_it')."));
         }
 
         const parsedFoods: Partial<Food>[] = rows.map(row => {
           const values = row.split(',');
           const foodObject: any = {};
           header.forEach((h, i) => {
-            const key = h as keyof Food;
             const value = values[i]?.trim();
-            if (['calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'serving_size_g'].includes(key as string)) {
-              foodObject[key] = parseFloat(value) || 0;
+             if (['calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'serving_size_g'].includes(h)) {
+              foodObject[h] = parseFloat(value) || 0;
             } else {
-              foodObject[key] = value;
+              foodObject[h] = value;
             }
           });
-          return foodObject as Partial<Food>;
+          return foodObject;
         });
 
-        const newFoodsCount = importFoods(parsedFoods, locale);
+        const newFoodsCount = importFoods(parsedFoods);
 
         toast({
           title: t('Import Successful'),
