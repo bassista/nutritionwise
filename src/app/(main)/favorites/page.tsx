@@ -45,8 +45,6 @@ export default function FavoritesPage() {
 
   const isSearching = searchTerm.trim().length > 0;
 
-  const foodsToShow = isSearching ? paginatedFoods : favoriteFoods;
-
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('Favorite Foods')}>
@@ -69,7 +67,7 @@ export default function FavoritesPage() {
           </div>
           {favoriteFoods.length > 0 ? (
             <FoodList 
-              foods={foodsToShow} 
+              foods={paginatedFoods} 
               reorderable={!isSearching} 
               onReorder={setFavoriteFoodIds} 
               allFoodIds={favoriteFoodIds}
@@ -86,7 +84,7 @@ export default function FavoritesPage() {
             </div>
           )}
 
-          {isSearching && filteredFoods.length > 0 && totalPages > 1 && (
+          {filteredFoods.length > 0 && totalPages > 1 && (
              <PaginationControls
               currentPage={currentPage}
               totalPages={totalPages}
