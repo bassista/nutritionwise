@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
@@ -108,7 +109,7 @@ export default function FavoritesPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('All Categories')}</SelectItem>
-                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                  {categories.filter(cat => cat !== 'all').map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                 </SelectContent>
               </Select>
             )}

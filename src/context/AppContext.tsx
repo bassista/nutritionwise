@@ -83,12 +83,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const getFoodById = useCallback((id: string) => foods.find(f => f.id === id), [foods]);
 
-  const importFoods = useCallback((csvRows: { [key: string]: string }[]): number => {
+  const importFoods = (csvRows: { [key: string]: string }[]): number => {
     const currentFoodsMap = new Map(foods.map(f => [f.id, f]));
     let newFoodsCount = 0;
 
-    csvRows.forEach(row => {
-      if (!row.id) return;
+    for (const row of csvRows) {
+      if (!row.id) continue;
 
       const name: { [key: string]: string } = {};
       const category: { [key: string]: string } = {};
@@ -114,7 +114,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         fiber: parseFloat(row.fiber) || 0,
         sugar: parseFloat(row.sugar) || 0,
         sodium: parseFloat(row.sodium) || 0,
-        serving_size_g: parseInt(row.serving_size_g) || 100,
+        serving_size_g: parseInt(row.serving_size_g, 10) || 100,
       };
 
       if (existingFood) {
@@ -126,21 +126,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         };
         currentFoodsMap.set(row.id, updatedFood);
       } else {
-        if (Object.keys(name).length === 0) return;
+        if (Object.keys(name).length === 0) continue;
         const newFood: Food = {
           id: row.id,
-          name: name,
-          category: category,
+          name,
+          category,
           ...newFoodData,
         };
         currentFoodsMap.set(row.id, newFood);
         newFoodsCount++;
       }
-    });
-
+    }
+    
     setFoods(Array.from(currentFoodsMap.values()));
     return newFoodsCount;
-  }, [foods, setFoods]);
+  };
 
 
   const addFood = useCallback((food: Food) => {
