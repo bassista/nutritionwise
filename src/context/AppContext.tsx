@@ -47,11 +47,14 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((va
       const item = window.localStorage.getItem(key);
       if (item) {
         setStoredValue(JSON.parse(item));
+      } else {
+        setStoredValue(initialValue);
       }
     } catch (error) {
       console.error(error);
+      setStoredValue(initialValue);
     }
-  }, [key]);
+  }, [key, initialValue]);
 
   const setValue = (value: T | ((val: T) => T)) => {
       try {
