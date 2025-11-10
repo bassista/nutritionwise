@@ -5,15 +5,16 @@ import { useAppContext } from '@/context/AppContext';
 import FoodList from '@/components/food/FoodList';
 import { PageHeader } from '@/components/PageHeader';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Lightbulb } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 
 export default function FoodsPage() {
-  const { foods, deleteFood } = useAppContext();
+  const { foods, deleteFood, setMealBuilderOpen } = useAppContext();
   const { t } = useLocale();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +46,11 @@ export default function FoodsPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <PageHeader title={t('All Foods')} />
+      <PageHeader title={t('All Foods')}>
+        <Button onClick={() => setMealBuilderOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
+        </Button>
+      </PageHeader>
       <div className="container mx-auto px-4 flex-grow">
         <div className="py-4 space-y-4">
           <div className="relative">
