@@ -66,9 +66,9 @@ export default function MealsPage() {
           <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
         </Button>
       </PageHeader>
-      <div className="container mx-auto px-4 flex-grow">
-        <div className="py-4 space-y-4">
-          <div className="relative">
+      <div className="sticky top-16 bg-background/80 backdrop-blur-sm z-10 -mb-4">
+        <div className="container mx-auto px-4">
+          <div className="relative py-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
@@ -79,7 +79,10 @@ export default function MealsPage() {
               aria-label={t('Search for a meal...')}
             />
           </div>
-
+        </div>
+      </div>
+      <div className="container mx-auto px-4 flex-grow">
+        <div className="py-4 pt-8 space-y-4">
           {filteredMeals.length > 0 ? (
              <DndContext
               sensors={sensors}
