@@ -19,6 +19,7 @@ import { Heart, Home, Settings, UtensilsCrossed } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
+import { useMemo } from 'react';
 
 function SidebarHeaderContent() {
   const { open } = useSidebar();
@@ -32,21 +33,51 @@ function SidebarHeaderContent() {
   );
 }
 
+function MainLayoutContent({ children }: { children: React.ReactNode }) {
+  const { isMealBuilderOpen, setMealBuilderOpen } = useAppContext();
+  const pathname = usePathname();
+  const { t } = useLocale();
+
+  const navItems = useMemo(() => [
+    { href: '/foods', icon: Home, label: t('Foods') },
+    { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
+    { href: '/favorites', icon: Heart, label: t('Favorites') },
+    { href: '/settings', icon: Settings, label: t('Settings') },
+  ], [t]);
+
+
+  return (
+    <SidebarInset>
+      <div className="flex flex-col min-h-screen">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 md:hidden">
+          <SidebarTrigger />
+          <h1 className="text-lg font-semibold">NutritionWise</h1>
+        </header>
+        <main className="flex-grow pb-24 md:pb-8">{children}</main>
+        <BottomNav />
+        <MealBuilder
+          open={isMealBuilderOpen}
+          onOpenChange={setMealBuilderOpen}
+        />
+      </div>
+    </SidebarInset>
+  );
+}
+
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isMealBuilderOpen, setMealBuilderOpen } = useAppContext();
-  const pathname = usePathname();
   const { t } = useLocale();
+  const pathname = usePathname();
 
-  const navItems = [
+  const navItems = useMemo(() => [
     { href: '/foods', icon: Home, label: t('Foods') },
     { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
     { href: '/favorites', icon: Heart, label: t('Favorites') },
     { href: '/settings', icon: Settings, label: t('Settings') },
-  ];
+  ], [t]);
 
   return (
     <SidebarProvider>
@@ -71,20 +102,7 @@ export default function MainLayout({
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset>
-        <div className="flex flex-col min-h-screen">
-          <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden">
-            <SidebarTrigger />
-            <h1 className="text-lg font-semibold">NutritionWise</h1>
-          </header>
-          <main className="flex-grow pb-24 md:pb-8">{children}</main>
-          <BottomNav />
-          <MealBuilder
-            open={isMealBuilderOpen}
-            onOpenChange={setMealBuilderOpen}
-          />
-        </div>
-      </SidebarInset>
+      <MainLayoutContent>{children}</MainLayoutContent>
     </SidebarProvider>
   );
 }
