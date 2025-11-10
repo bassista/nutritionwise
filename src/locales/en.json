@@ -103,5 +103,7 @@
   "Food Deleted": "Food Deleted",
   "The food has been successfully deleted.": "The food has been successfully deleted.",
   "This will permanently delete the food \"{foodName}\". This action cannot be undone.": "This will permanently delete the food \"{foodName}\". This action cannot be undone.",
-  "Delete food": "Delete food"
+  "Delete food": "Delete food",
+  "Search for a meal...": "Search for a meal...",
+  "No meals match your search.": "No meals match your search."
 }

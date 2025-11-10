@@ -103,5 +103,7 @@
   "Food Deleted": "Alimento eliminato",
   "The food has been successfully deleted.": "L'alimento è stato eliminato con successo.",
   "This will permanently delete the food \"{foodName}\". This action cannot be undone.": "Questo eliminerà in modo permanente l'alimento \"{foodName}\". Questa azione non può essere annullata.",
-  "Delete food": "Elimina alimento"
+  "Delete food": "Elimina alimento",
+  "Search for a meal...": "Cerca un pasto...",
+  "No meals match your search.": "Nessun pasto corrisponde alla tua ricerca."
 }

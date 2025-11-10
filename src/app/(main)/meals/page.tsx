@@ -1,12 +1,14 @@
 
 "use client";
 
+import { useState, useMemo } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { PageHeader } from '@/components/PageHeader';
 import MealCard from '@/components/meal/MealCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { UtensilsCrossed, Plus } from 'lucide-react';
+import { UtensilsCrossed, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useLocale } from '@/context/LocaleContext';
 import {
   DndContext,
@@ -28,6 +30,7 @@ import type { Meal } from '@/lib/types';
 export default function MealsPage() {
   const { meals, setMeals, setMealBuilderOpen } = useAppContext();
   const { t } = useLocale();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -35,6 +38,16 @@ export default function MealsPage() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const filteredMeals = useMemo(
+    () =>
+      meals.filter((meal) =>
+        meal.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [meals, searchTerm]
+  );
+  
+  const isSearching = searchTerm.trim().length > 0;
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -55,16 +68,29 @@ export default function MealsPage() {
       </PageHeader>
       <div className="container mx-auto px-4 flex-grow">
         <div className="py-4 space-y-4">
-          {meals.length > 0 ? (
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder={t('Search for a meal...')}
+              className="pl-10 w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label={t('Search for a meal...')}
+            />
+          </div>
+
+          {filteredMeals.length > 0 ? (
              <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
+              id="meals-dnd-context"
             >
               <SortableContext items={meals.map(m => m.id)} strategy={verticalListSortingStrategy}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {meals.map(meal => (
-                    <MealCard key={meal.id} meal={meal} reorderable />
+                  {filteredMeals.map(meal => (
+                    <MealCard key={meal.id} meal={meal} reorderable={!isSearching} />
                   ))}
                 </div>
               </SortableContext>
@@ -74,11 +100,13 @@ export default function MealsPage() {
                 <UtensilsCrossed className="mx-auto h-12 w-12 text-muted-foreground" />
                 <AlertTitle className="mt-4 text-xl font-semibold">{t('No Meals Saved')}</AlertTitle>
                 <AlertDescription className="mt-2 text-muted-foreground">
-                  {t('Create your first meal to see it here.')}
+                  {isSearching ? t('No meals match your search.') : t('Create your first meal to see it here.')}
                 </AlertDescription>
-                <Button className="mt-4" onClick={() => setMealBuilderOpen(true, 'all')}>
-                    <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
-                </Button>
+                {!isSearching && (
+                  <Button className="mt-4" onClick={() => setMealBuilderOpen(true, 'all')}>
+                      <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
+                  </Button>
+                )}
             </div>
           )}
         </div>
