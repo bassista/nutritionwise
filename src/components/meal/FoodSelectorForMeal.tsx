@@ -13,8 +13,6 @@ import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/AppContext';
 import type { Food } from '@/lib/types';
 import { Search, Plus } from 'lucide-react';
-import Image from 'next/image';
-import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
 import { useLocale } from '@/context/LocaleContext';
 
 
@@ -62,25 +60,11 @@ export default function FoodSelectorForMeal({
         <ScrollArea className="flex-grow">
           <div className="space-y-2">
             {filteredFoods.map(food => {
-              const placeholder =
-                PlaceHolderImages.find((p) => p.id === food.id) ||
-                ({
-                  imageUrl: `https://picsum.photos/seed/${food.id}/40/40`,
-                  imageHint: food.name.split(' ').slice(0, 2).join(' '),
-                } as ImagePlaceholder);
               return (
                 <div
                   key={food.id}
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted"
                 >
-                    <Image 
-                        src={placeholder.imageUrl}
-                        alt={food.name}
-                        width={40}
-                        height={40}
-                        className="rounded-md w-10 h-10 object-cover"
-                        data-ai-hint={placeholder.imageHint}
-                    />
                   <div className="flex-grow">
                     <p className="font-medium text-sm">{food.name}</p>
                     <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>

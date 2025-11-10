@@ -1,6 +1,5 @@
 "use client";
 
-import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -9,16 +8,16 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Flame, GripVertical } from 'lucide-react';
+import { Heart, GripVertical, Flame, Wheat, Minus } from 'lucide-react';
 import type { Food } from '@/lib/types';
 import { useAppContext } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import FoodDetailsDialog from './FoodDetailsDialog';
-import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useLocale } from '@/context/LocaleContext';
 
 interface FoodCardProps {
   food: Food;
@@ -31,15 +30,9 @@ interface FoodCardProps {
 const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
   ({ food, reorderable, style, attributes, listeners }, ref) => {
     const { favoriteFoodIds, toggleFavoriteFood } = useAppContext();
+    const { t } = useLocale();
     const isFavorite = favoriteFoodIds.includes(food.id);
     const [isDetailsOpen, setDetailsOpen] = useState(false);
-
-    const placeholder =
-      PlaceHolderImages.find((p) => p.id === food.id) || 
-      ({
-        imageUrl: `https://picsum.photos/seed/${food.id}/400/300`,
-        imageHint: food.name.split(' ').slice(0, 2).join(' '),
-      } as ImagePlaceholder);
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -53,40 +46,48 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
             className="flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer"
             onClick={() => setDetailsOpen(true)}
           >
-            <CardHeader className="p-0 relative">
-              <Image
-                src={placeholder.imageUrl}
-                alt={food.name}
-                width={400}
-                height={300}
-                className="w-full h-32 object-cover"
-                data-ai-hint={placeholder.imageHint}
-              />
+            <CardHeader className="p-4 flex-row items-start justify-between">
+              <CardTitle className="text-base font-semibold leading-tight truncate">
+                {food.name}
+              </CardTitle>
               {reorderable && (
                 <div
-                  className="absolute top-2 right-2 p-1 bg-gray-900/50 rounded-full cursor-grab active:cursor-grabbing touch-none"
+                  className="p-1 cursor-grab active:cursor-grabbing touch-none"
                   {...attributes}
                   {...listeners}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <GripVertical className="w-5 h-5 text-white" />
+                  <GripVertical className="w-5 h-5 text-muted-foreground" />
                 </div>
               )}
             </CardHeader>
-            <CardContent className="p-3 flex flex-col flex-grow">
-              <CardTitle className="text-base font-semibold leading-tight truncate mb-1">
-                {food.name}
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground flex items-center">
-                <Flame className="w-3 h-3 mr-1 text-orange-400" />
-                {food.calories} kcal / {food.serving_size_g || 100}g
-              </CardDescription>
+            <CardContent className="p-4 pt-0 flex flex-col flex-grow">
+              <div className="space-y-2 text-sm text-muted-foreground">
+                 <div className="flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Flame className="w-4 h-4 mr-2 text-orange-400" /> {t('Calories')}
+                  </span>
+                  <span>{food.calories} kcal</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Wheat className="w-4 h-4 mr-2 text-yellow-500" /> {t('Carbohydrates')}
+                  </span>
+                  <span>{food.carbohydrates || 0} g</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Minus className="w-4 h-4 mr-2 text-pink-400" /> {t('Sugar')}
+                  </span>
+                  <span>{food.sugar || 0} g</span>
+                </div>
+              </div>
               <div className="flex-grow" />
-              <div className="mt-2">
+              <div className="mt-4 flex justify-end">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="w-8 h-8 ml-auto flex items-center justify-center"
+                  className="w-8 h-8"
                   onClick={handleFavoriteClick}
                   aria-label={
                     isFavorite ? 'Remove from favorites' : 'Add to favorites'

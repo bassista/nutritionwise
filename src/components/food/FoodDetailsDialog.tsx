@@ -16,8 +16,6 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import type { Food } from '@/lib/types';
-import Image from 'next/image';
-import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
 import { useLocale } from '@/context/LocaleContext';
 
 interface FoodDetailsDialogProps {
@@ -51,27 +49,12 @@ export default function FoodDetailsDialog({
   open,
   onOpenChange,
 }: FoodDetailsDialogProps) {
-  const placeholder =
-    PlaceHolderImages.find((p) => p.id === food.id) ||
-    ({
-      imageUrl: `https://picsum.photos/seed/${food.id}/400/300`,
-      imageHint: food.name.split(' ').slice(0, 2).join(' '),
-    } as ImagePlaceholder);
   const { t } = useLocale();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
-            <Image
-              src={placeholder.imageUrl}
-              alt={food.name}
-              fill
-              className="object-cover"
-              data-ai-hint={placeholder.imageHint}
-            />
-          </div>
           <DialogTitle className="text-2xl font-headline">{food.name}</DialogTitle>
           <DialogDescription>
             {t('Nutritional values per {serving_size}g serving.', { serving_size: food.serving_size_g || 100 })}
