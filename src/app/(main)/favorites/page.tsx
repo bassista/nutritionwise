@@ -25,7 +25,7 @@ export default function FavoritesPage() {
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('Favorite Foods')}>
-        <Button onClick={handleCreateMeal} className="md:inline-flex">
+        <Button onClick={handleCreateMeal} className="hidden md:inline-flex">
           <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
         </Button>
       </PageHeader>
