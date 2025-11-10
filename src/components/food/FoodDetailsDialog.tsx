@@ -18,6 +18,7 @@ import {
 import type { Food } from '@/lib/types';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useLocale } from '@/context/LocaleContext';
 
 interface FoodDetailsDialogProps {
   food: Food;
@@ -35,7 +36,7 @@ const nutrientOrder: (keyof Food)[] = [
     'sodium',
 ];
 
-const nutrientLabels: Record<string, string> = {
+const nutrientLabelKeys: Record<string, string> = {
     calories: 'Calories (kcal)',
     protein: 'Protein (g)',
     carbohydrates: 'Carbs (g)',
@@ -51,6 +52,7 @@ export default function FoodDetailsDialog({
   onOpenChange,
 }: FoodDetailsDialogProps) {
   const placeholder = PlaceHolderImages.find((p) => p.id === food.id) || PlaceHolderImages[0];
+  const { t } = useLocale();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -67,15 +69,15 @@ export default function FoodDetailsDialog({
           </div>
           <DialogTitle className="text-2xl font-headline">{food.name}</DialogTitle>
           <DialogDescription>
-            Nutritional values per {food.serving_size_g || 100}g serving.
+            {t('Nutritional values per {serving_size}g serving.', { serving_size: food.serving_size_g || 100 })}
           </DialogDescription>
         </DialogHeader>
         <div className="max-h-[50vh] overflow-y-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nutrient</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableHead>{t('Nutrient')}</TableHead>
+                <TableHead className="text-right">{t('Amount')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -84,7 +86,7 @@ export default function FoodDetailsDialog({
                 if (value !== undefined && value !== null) {
                   return (
                     <TableRow key={key}>
-                      <TableCell className="font-medium">{nutrientLabels[key] || key}</TableCell>
+                      <TableCell className="font-medium">{t(nutrientLabelKeys[key] || key)}</TableCell>
                       <TableCell className="text-right">{value}</TableCell>
                     </TableRow>
                   );

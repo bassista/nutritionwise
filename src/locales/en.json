@@ -75,5 +75,15 @@
   "Protein": "Protein",
   "Carbohydrates": "Carbohydrates",
   "Fat": "Fat",
-  "ingredient": "ingredient"
+  "ingredient": "ingredient",
+  "Nutritional values per {serving_size}g serving.": "Nutritional values per {serving_size}g serving.",
+  "Nutrient": "Nutrient",
+  "Amount": "Amount",
+  "Calories (kcal)": "Calories (kcal)",
+  "Protein (g)": "Protein (g)",
+  "Carbs (g)": "Carbs (g)",
+  "Fat (g)": "Fat (g)",
+  "Fiber (g)": "Fiber (g)",
+  "Sugar (g)": "Sugar (g)",
+  "Sodium (mg)": "Sodium (mg)"
 }
