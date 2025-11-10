@@ -5,11 +5,12 @@ import { useAppContext } from '@/context/AppContext';
 import FoodList from '@/components/food/FoodList';
 import { PageHeader } from '@/components/PageHeader';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Heart } from 'lucide-react';
+import { Heart, Plus } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
+import { Button } from '@/components/ui/button';
 
 export default function FavoritesPage() {
-  const { foods, favoriteFoodIds, setFavoriteFoodIds } = useAppContext();
+  const { foods, favoriteFoodIds, setFavoriteFoodIds, setMealBuilderOpen } = useAppContext();
   const { t } = useLocale();
 
   const favoriteFoods = useMemo(() => {
@@ -20,7 +21,11 @@ export default function FavoritesPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <PageHeader title={t('Favorite Foods')} />
+      <PageHeader title={t('Favorite Foods')}>
+        <Button onClick={() => setMealBuilderOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
+        </Button>
+      </PageHeader>
       <div className="container mx-auto px-4 flex-grow">
         <div className="py-4">
           {favoriteFoods.length > 0 ? (
