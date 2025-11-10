@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { defaultFoods } from '@/lib/data';
 import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult } from '@/lib/types';
-import { useLocale } from './LocaleContext';
+import { useLocale, type Locale } from './LocaleContext';
 import { getFoodName } from '@/lib/utils';
 
 type MealBuilderContext = 'all' | 'favorites';
@@ -17,7 +17,7 @@ interface AppContextType {
   mealBuilderContext: MealBuilderContext;
   setMealBuilderOpen: (isOpen: boolean, context?: MealBuilderContext) => void;
   getFoodById: (id: string) => Food | undefined;
-  importFoods: (newFoods: Food[]) => void;
+  importFoods: (newFoods: Partial<Food>[], locale: Locale) => number;
   updateFood: (foodId: string, updates: Partial<Food>) => void;
   deleteFood: (foodId: string) => DeleteFoodResult;
   addMeal: (meal: Meal) => void;
@@ -66,7 +66,7 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, React.Dispatch<R
     } catch (error) {
       console.error(error);
     }
-  }, [key]);
+  }, [key, initialValue]);
 
   const setValue: React.Dispatch<React.SetStateAction<T>> = (value) => {
     try {
@@ -99,10 +99,56 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   
   const getFoodById = (id: string) => foods.find(f => f.id === id);
 
-  const importFoods = (newFoods: Food[]) => {
-    const existingIds = new Set(foods.map(f => f.id));
-    const uniqueNewFoods = newFoods.filter(f => !existingIds.has(f.id));
-    setFoods(prev => [...prev, ...uniqueNewFoods]);
+  const importFoods = (foodsFromCsv: Partial<Food>[], importLocale: Locale): number => {
+    let updatedCount = 0;
+    let newFoodsCount = 0;
+
+    setFoods(currentFoods => {
+        const currentFoodsMap = new Map(currentFoods.map(f => [f.id, f]));
+
+        foodsFromCsv.forEach(csvFood => {
+            if (!csvFood.id || !csvFood.name) return;
+
+            const existingFood = currentFoodsMap.get(csvFood.id);
+            const csvFoodName = csvFood.name as string; // from CSV, it's always a string
+
+            if (existingFood) {
+                // Update existing food
+                const newName = typeof existingFood.name === 'object' ? { ...existingFood.name } : { en: existingFood.name };
+                newName[importLocale] = csvFoodName;
+
+                const updatedFood = {
+                    ...existingFood,
+                    ...csvFood,
+                    name: newName,
+                };
+                currentFoodsMap.set(csvFood.id, updatedFood);
+                updatedCount++;
+            } else {
+                // Add new food
+                const newName = {
+                    en: csvFoodName, // Use as fallback
+                    [importLocale]: csvFoodName,
+                };
+                
+                const newFood: Food = {
+                    id: csvFood.id,
+                    name: newName,
+                    calories: 0,
+                    protein: 0,
+                    carbohydrates: 0,
+                    fat: 0,
+                    ...csvFood,
+                };
+                currentFoodsMap.set(csvFood.id, newFood);
+                newFoodsCount++;
+            }
+        });
+
+        return Array.from(currentFoodsMap.values());
+    });
+
+    return newFoodsCount;
   };
   
   const updateFood = (foodId: string, updates: Partial<Food>) => {

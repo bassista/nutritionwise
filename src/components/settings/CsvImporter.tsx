@@ -10,10 +10,10 @@ import { Upload } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
 
 export default function CsvImporter() {
-  const { importFoods, foods } = useAppContext();
+  const { importFoods } = useAppContext();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -31,29 +31,26 @@ export default function CsvImporter() {
           throw new Error(t('CSV must contain id, name, calories, protein, carbohydrates, and fat columns.'));
         }
 
-        const parsedFoods: Food[] = rows.map(row => {
+        const parsedFoods: Partial<Food>[] = rows.map(row => {
           const values = row.split(',');
           const foodObject: any = {};
           header.forEach((h, i) => {
             const key = h as keyof Food;
-            const value = values[i];
+            const value = values[i]?.trim();
             if (['calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'serving_size_g'].includes(key as string)) {
               foodObject[key] = parseFloat(value) || 0;
             } else {
               foodObject[key] = value;
             }
           });
-          return foodObject as Food;
+          return foodObject as Partial<Food>;
         });
 
-        importFoods(parsedFoods);
-        
-        const existingIds = new Set(foods.map(f => f.id));
-        const uniqueNewFoodsCount = parsedFoods.filter(f => !existingIds.has(f.id)).length;
+        const newFoodsCount = importFoods(parsedFoods, locale);
 
         toast({
           title: t('Import Successful'),
-          description: t('{count} new food(s) imported.', { count: uniqueNewFoodsCount }),
+          description: t('{count} new food(s) imported.', { count: newFoodsCount }),
         });
       } catch (error: any) {
         toast({
