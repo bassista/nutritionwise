@@ -39,7 +39,10 @@ export default function MainLayout({
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <SidebarTrigger />
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold px-2">NutritionWise</h2>
+            <SidebarTrigger />
+          </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
