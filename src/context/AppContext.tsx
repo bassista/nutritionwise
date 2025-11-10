@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
@@ -47,14 +48,11 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((va
       const item = window.localStorage.getItem(key);
       if (item) {
         setStoredValue(JSON.parse(item));
-      } else {
-        setStoredValue(initialValue);
       }
     } catch (error) {
       console.error(error);
-      setStoredValue(initialValue);
     }
-  }, [key, initialValue]);
+  }, [key]);
 
   const setValue = (value: T | ((val: T) => T)) => {
       try {
@@ -85,66 +83,62 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const importFoods = useCallback((csvRows: { [key: string]: string }[]): number => {
     let newFoodsCount = 0;
+    const currentFoodsMap = new Map(foods.map(f => [f.id, f]));
 
-    setFoods(currentFoods => {
-        const currentFoodsMap = new Map(currentFoods.map(f => [f.id, f]));
+    csvRows.forEach(row => {
+        if (!row.id) return;
 
-        csvRows.forEach(row => {
-            if (!row.id) return;
+        const name: { [key: string]: string } = {};
+        const category: { [key: string]: string } = {};
 
-            const name: { [key: string]: string } = {};
-            const category: { [key: string]: string } = {};
+        if (row.name_category) {
+            row.name_category.split(';').forEach(pair => {
+                const [langPart, valuePart] = pair.split('=');
+                if (langPart && valuePart) {
+                    const [foodName, catName] = valuePart.split(':');
+                    if (foodName) name[langPart.trim()] = foodName.trim();
+                    if (catName) category[langPart.trim()] = catName.trim();
+                }
+            });
+        }
+        
+        const existingFood = currentFoodsMap.get(row.id);
 
-            if (row.name_category) {
-                row.name_category.split(';').forEach(pair => {
-                    const [langPart, valuePart] = pair.split('=');
-                    if (langPart && valuePart) {
-                        const [foodName, catName] = valuePart.split(':');
-                        if (foodName) name[langPart.trim()] = foodName.trim();
-                        if (catName) category[langPart.trim()] = catName.trim();
-                    }
-                });
-            }
+        const newFoodData: Omit<Food, 'id' | 'name' | 'category'> = {
+            calories: parseFloat(row.calories) || 0,
+            protein: parseFloat(row.protein) || 0,
+            carbohydrates: parseFloat(row.carbohydrates) || 0,
+            fat: parseFloat(row.fat) || 0,
+            fiber: parseFloat(row.fiber) || 0,
+            sugar: parseFloat(row.sugar) || 0,
+            sodium: parseFloat(row.sodium) || 0,
+            serving_size_g: parseInt(row.serving_size_g) || 100,
+        };
 
-            const existingFood = currentFoodsMap.get(row.id);
-
-            const newFoodData: Omit<Food, 'id' | 'name' | 'category'> = {
-                calories: parseFloat(row.calories) || 0,
-                protein: parseFloat(row.protein) || 0,
-                carbohydrates: parseFloat(row.carbohydrates) || 0,
-                fat: parseFloat(row.fat) || 0,
-                fiber: parseFloat(row.fiber) || 0,
-                sugar: parseFloat(row.sugar) || 0,
-                sodium: parseFloat(row.sodium) || 0,
-                serving_size_g: parseInt(row.serving_size_g) || 100,
+        if (existingFood) {
+            const updatedFood: Food = {
+                ...existingFood,
+                ...newFoodData,
+                name: { ...existingFood.name, ...name },
+                category: { ...existingFood.category, ...category },
             };
-
-            if (existingFood) {
-                const updatedFood: Food = {
-                    ...existingFood,
-                    ...newFoodData,
-                    name: { ...existingFood.name, ...name },
-                    category: { ...existingFood.category, ...category },
-                };
-                currentFoodsMap.set(row.id, updatedFood);
-            } else {
-                if (Object.keys(name).length === 0) return; // Cannot create a food without a name
-                const newFood: Food = {
-                    id: row.id,
-                    ...newFoodData,
-                    name: name,
-                    category: category,
-                };
-                currentFoodsMap.set(row.id, newFood);
-                newFoodsCount++;
-            }
-        });
-
-        return Array.from(currentFoodsMap.values());
+            currentFoodsMap.set(row.id, updatedFood);
+        } else {
+            if (Object.keys(name).length === 0) return; // Cannot create a food without a name
+            const newFood: Food = {
+                id: row.id,
+                ...newFoodData,
+                name: name,
+                category: category,
+            };
+            currentFoodsMap.set(row.id, newFood);
+            newFoodsCount++;
+        }
     });
 
+    setFoods(Array.from(currentFoodsMap.values()));
     return newFoodsCount;
-  }, [setFoods]);
+  }, [foods, setFoods]);
 
   const addFood = useCallback((food: Food) => {
     setFoods(prevFoods => [...prevFoods, food]);
@@ -263,3 +257,5 @@ export const useAppContext = () => {
   }
   return context;
 };
+
+    
