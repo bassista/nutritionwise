@@ -77,7 +77,6 @@ export default function MainLayout({
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SheetTitle className="sr-only">Menu</SheetTitle>
         <SidebarHeaderContent />
         <SidebarNav />
       </Sidebar>
