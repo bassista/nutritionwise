@@ -29,9 +29,10 @@ interface FoodListProps {
   reorderable?: boolean;
   onReorder?: (foodIds: string[]) => void;
   onDeleteFood?: (foodId: string) => void;
+  allFoodIds?: string[]; // The complete list of IDs for reordering
 }
 
-export default function FoodList({ foods, reorderable = false, onReorder, onDeleteFood }: FoodListProps) {
+export default function FoodList({ foods, reorderable = false, onReorder, onDeleteFood, allFoodIds }: FoodListProps) {
   const { t } = useLocale();
 
   const sensors = useSensors(
@@ -43,13 +44,16 @@ export default function FoodList({ foods, reorderable = false, onReorder, onDele
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const allFoodIds = (onReorder as any).allFoodIds as string[];
-      const oldIndex = allFoodIds.findIndex((id) => id === active.id);
-      const newIndex = allFoodIds.findIndex((id) => id === over.id);
+    const reorderableIds = allFoodIds || foods.map(f => f.id);
 
-      const reorderedIds = arrayMove(allFoodIds, oldIndex, newIndex);
-      onReorder?.(reorderedIds);
+    if (over && active.id !== over.id) {
+      const oldIndex = reorderableIds.findIndex((id) => id === active.id);
+      const newIndex = reorderableIds.findIndex((id) => id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newOrder = arrayMove(reorderableIds, oldIndex, newIndex);
+        onReorder?.(newOrder);
+      }
     }
   }
 
@@ -68,13 +72,14 @@ export default function FoodList({ foods, reorderable = false, onReorder, onDele
   }
   
   if (reorderable) {
+    const dndIds = allFoodIds || foods.map(f => f.id);
     return (
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={foods.map(f => f.id)} strategy={rectSortingStrategy}>
+        <SortableContext items={dndIds} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {foods.map(food => (
               <FoodCardWrapper key={food.id} food={food} reorderable={true} />
