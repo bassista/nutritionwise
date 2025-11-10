@@ -64,9 +64,9 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
   const { t, locale } = useLocale();
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => getCategoryName(f, locale)).filter(Boolean);
+    const allCategories = foods.map(f => getCategoryName(f, locale)).filter(cat => cat && cat !== t('Uncategorized'));
     return Array.from(new Set(allCategories));
-  }, [foods, locale]);
+  }, [foods, locale, t]);
 
   const form = useForm<FoodFormValues>({
     resolver: zodResolver(foodSchema),
@@ -118,11 +118,13 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
 
 
   function onSubmit(data: FoodFormValues) {
+    const categoryValue = data.category === 'uncategorized' ? '' : data.category;
+    
     if (foodToEdit) {
       const updatedFood: Food = {
         ...foodToEdit,
         name: { ...foodToEdit.name, [locale]: data.name },
-        category: { ...foodToEdit.category, [locale]: data.category || ''},
+        category: { ...foodToEdit.category, [locale]: categoryValue || ''},
         serving_size_g: data.serving_size_g,
         calories: data.calories,
         protein: data.protein,
@@ -135,7 +137,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
       updateFood(foodToEdit.id, updatedFood);
       toast({ title: t('Food Updated') });
     } else {
-      const foodId = (data.name || '').toLowerCase().replace(/\s+/g, '-');
+       const foodId = (data.name || '').toLowerCase().replace(/\s+/g, '-');
       if (foods.some(f => f.id === foodId)) {
           toast({
               variant: "destructive",
@@ -147,7 +149,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
       const newFood: Food = {
           id: foodId,
           name: { [locale]: data.name },
-          category: { [locale]: data.category || '' },
+          category: { [locale]: categoryValue || '' },
           serving_size_g: data.serving_size_g,
           calories: data.calories,
           protein: data.protein,
@@ -202,7 +204,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                           <SelectItem value="">{t('Uncategorized')}</SelectItem>
+                           <SelectItem value="uncategorized">{t('Uncategorized')}</SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category} value={category}>
                               {category}
