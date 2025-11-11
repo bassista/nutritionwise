@@ -19,6 +19,6 @@ cp -r public .next/standalone/public
 
 echo "✅ Build completata. Pronto per Docker!"
 
-docker build --no-cache -t bassista/nutritionwise:latest .
+docker build --no-cache -t bassista/nutritionwise:dev .
 
-docker push bassista/nutritionwise:latest
+docker push bassista/nutritionwise:dev
