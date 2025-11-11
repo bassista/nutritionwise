@@ -166,7 +166,7 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
                       <Trash2 className="w-5 h-5 text-muted-foreground hover:text-destructive" />
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                     <AlertDialogHeader>
                       <AlertDialogTitle>{t('Are you absolutely sure?')}</AlertDialogTitle>
                       <AlertDialogDescription>
