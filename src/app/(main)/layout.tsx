@@ -38,6 +38,7 @@ function SidebarHeaderContent() {
 function SidebarNav() {
     const { t } = useLocale();
     const pathname = usePathname();
+    const { isMobile, setOpenMobile } = useSidebar();
 
     const navItems = useMemo(() => [
       { href: '/diary', icon: BookOpen, label: t('Diary') },
@@ -46,6 +47,12 @@ function SidebarNav() {
       { href: '/favorites', icon: Heart, label: t('Favorites') },
       { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
     ], [t]);
+    
+    const handleLinkClick = () => {
+      if (isMobile) {
+        setOpenMobile(false);
+      }
+    };
 
     return (
         <SidebarContent>
@@ -56,6 +63,7 @@ function SidebarNav() {
                   asChild
                   isActive={pathname === item.href}
                   tooltip={item.label}
+                  onClick={handleLinkClick}
                 >
                   <Link href={item.href}>
                     <item.icon />
@@ -86,9 +94,7 @@ export default function MainLayout({
         <div className="flex flex-col min-h-screen">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
             <SidebarTrigger />
-            <div className='flex-1 flex justify-between items-center'>
-              <h1 className="text-lg font-semibold md:hidden">NutritionWise</h1>
-              <div></div>
+            <div className='flex-1 flex justify-end items-center'>
               <Button asChild variant="ghost" size="icon" className="h-8 w-8">
                   <Link href="/settings" aria-label={t('Settings')}>
                     <Settings />
