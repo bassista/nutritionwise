@@ -71,7 +71,7 @@ export default function ScannerPage() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { foods, toggleFavoriteFood } = useAppContext();
+  const { foods, toggleFavoriteFood, favoriteFoodIds } = useAppContext();
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -164,15 +164,19 @@ export default function ScannerPage() {
               description: `${t('Scanned barcode: {barcode}', { barcode: detectedBarcode })}`,
             });
             
-            // Check if food exists locally first
             const localFood = foods.find(f => f.id === detectedBarcode);
             if (localFood) {
-              if (fromFavorites) {
-                toggleFavoriteFood(localFood.id);
-                router.push('/favorites');
-              } else {
-                setScannedBarcode(detectedBarcode);
-              }
+                if (fromFavorites) {
+                    const isAlreadyFavorite = favoriteFoodIds.includes(localFood.id);
+                    if (isAlreadyFavorite) {
+                        setScannedBarcode(detectedBarcode);
+                    } else {
+                        toggleFavoriteFood(localFood.id);
+                        router.push('/favorites');
+                    }
+                } else {
+                    setScannedBarcode(detectedBarcode);
+                }
             } else {
               // If not, fetch from API
               setIsFetching(true);
@@ -204,7 +208,7 @@ export default function ScannerPage() {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isScanning, hasCameraPermission, t, toast, foods, fromFavorites, router, toggleFavoriteFood]);
+  }, [isScanning, hasCameraPermission, t, toast, foods, fromFavorites, router, toggleFavoriteFood, favoriteFoodIds]);
 
   const handleScanAgain = () => {
     setScannedBarcode(null);
@@ -312,5 +316,3 @@ export default function ScannerPage() {
     </div>
   );
 }
-
-    
