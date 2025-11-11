@@ -67,7 +67,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted 
   const { t, locale } = useLocale();
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => getCategoryName(f, locale, t)).filter(cat => cat && cat !== t('Uncategorized'));
+    const allCategories = foods.map(f => getCategoryName(f, locale, t)).filter(Boolean);
     return Array.from(new Set(allCategories));
   }, [foods, locale, t]);
 
@@ -355,5 +355,3 @@ export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted 
     </Dialog>
   );
 }
-
-    
