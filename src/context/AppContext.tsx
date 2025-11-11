@@ -319,30 +319,31 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const exportFoodsToCsv = useCallback((): string => {
     const headers = [
-      'id', 'name_category', 'serving_size_g', 'calories', 'protein',
-      'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium'
+      'id','serving_size_g','calories','protein','carbohydrates','fat','fiber','sugar','sodium','name_category'
     ];
 
     const rows = foods.map(food => {
-      const nameCategoryPairs = Object.keys(food.name).map(lang => {
+      const allLangs = new Set([...Object.keys(food.name), ...Object.keys(food.category)]);
+      
+      const nameCategoryPairs = Array.from(allLangs).map(lang => {
         const name = food.name[lang] || '';
         const category = food.category?.[lang] || '';
         return `${lang}=${name}:${category}`;
       }).join(';');
       
-      const row = [
+      const rowData = [
         food.id,
-        `"${nameCategoryPairs}"`,
-        food.serving_size_g || 0,
+        food.serving_size_g || 100,
         food.calories || 0,
         food.protein || 0,
         food.carbohydrates || 0,
         food.fat || 0,
         food.fiber || 0,
         food.sugar || 0,
-        food.sodium || 0
+        food.sodium || 0,
+        `"${nameCategoryPairs}"`
       ];
-      return row.join(',');
+      return rowData.join(',');
     });
 
     return [headers.join(','), ...rows].join('\n');

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef } from 'react';
@@ -31,12 +32,19 @@ export default function CsvImporter() {
         }
 
         const parsedFoods: { [key: string]: string }[] = rows.map(row => {
-          const values = row.split(',');
-          const foodObject: { [key: string]: string } = {};
-          header.forEach((h, i) => {
-            foodObject[h] = values[i]?.trim();
-          });
-          return foodObject;
+            // This regex handles quoted fields that may contain commas
+            const values = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+            const foodObject: { [key: string]: string } = {};
+            
+            header.forEach((h, i) => {
+                let value = values[i]?.trim() || '';
+                // Remove quotes from start and end if they exist
+                if (value.startsWith('"') && value.endsWith('"')) {
+                    value = value.substring(1, value.length - 1);
+                }
+                foodObject[h] = value;
+            });
+            return foodObject;
         });
 
         const newFoodsCount = importFoods(parsedFoods);
