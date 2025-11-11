@@ -82,11 +82,11 @@ export default function ScannerPage() {
     let detector: BarcodeDetector | undefined;
     let animationFrameId: number;
 
-    if (!('BarcodeDetector' in window)) {
+    if (typeof window.BarcodeDetector === 'undefined') {
       toast({
-        variant: 'destructive',
-        title: 'Scanner Not Supported',
-        description: t('The Barcode Detector API is not supported in this browser.'),
+          variant: 'destructive',
+          title: 'Scanner Not Supported',
+          description: t('The Barcode Detector API is not supported in this browser.'),
       });
       setIsScanning(false);
       return;
@@ -97,8 +97,8 @@ export default function ScannerPage() {
     } catch (e) {
        toast({
         variant: 'destructive',
-        title: 'Scanner Not Supported',
-        description: t('The Barcode Detector API is not supported in this browser.'),
+        title: 'Scanner Init Failed',
+        description: t('Could not initialize the barcode scanner.'),
       });
       setIsScanning(false);
       return;
@@ -234,3 +234,5 @@ export default function ScannerPage() {
     </div>
   );
 }
+
+    

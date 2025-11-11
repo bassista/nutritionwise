@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/select";
 
 const foodSchema = z.object({
-  id: z.string().optional(),
+  id: z.string().min(1, { message: "Barcode (EAN) is required." }),
   name: z.string().min(1, { message: "Name is required." }),
   category: z.string().optional(),
   serving_size_g: z.coerce.number().min(0),
