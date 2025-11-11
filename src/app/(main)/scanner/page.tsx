@@ -214,7 +214,7 @@ export default function ScannerPage() {
                     <div>
                       <p>{t('Scanned barcode: {barcode}', { barcode: scannedBarcode })}</p>
                       <div className="flex gap-2 mt-4">
-                        <Button onClick={() => setFormOpen(true)} className="flex-1">{t('Add New Food')}</Button>
+                        <Button onClick={() => setFormOpen(true)} className="flex-1">{t('Add')}</Button>
                          <Button onClick={handleScanAgain} variant="outline" className="flex-1">{t('Scan Again')}</Button>
                       </div>
                     </div>

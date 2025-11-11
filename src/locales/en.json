@@ -142,5 +142,8 @@
   "A food with barcode {barcode} is already in your list: {foodName}.": "A food with barcode {barcode} is already in your list: {foodName}.",
   "View Food": "View Food",
   "Scan Again": "Scan Again",
-  "Add New Food": "Add New Food"
+  "Add New Food": "Add New Food",
+  "Scan complete": "Scan complete",
+  "Scan Result": "Scan Result",
+  "Add": "Add"
 }
