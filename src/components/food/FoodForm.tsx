@@ -201,7 +201,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
                     <FormItem>
                       <FormLabel>{t('Unique ID (optional)')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder={t('e.g., barcode or custom ID')} disabled={!!foodToEdit} />
+                        <Input {...field} placeholder={t('e.g., barcode or custom ID')} disabled={!!foodToEdit || !!foodToCreate?.id} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

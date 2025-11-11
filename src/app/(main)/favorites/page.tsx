@@ -92,7 +92,7 @@ export default function FavoritesPage() {
       <PageHeader title={t('Favorite Foods')}>
         <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href="/scanner">
+              <Link href="/scanner?from=favorites">
                 <ScanLine className="mr-2 h-4 w-4" /> {t('Scan')}
               </Link>
             </Button>
