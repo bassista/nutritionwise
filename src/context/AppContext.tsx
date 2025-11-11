@@ -37,6 +37,7 @@ interface AppContextType {
   addLogEntry: (date: string, mealType: MealType, item: { type: 'food' | 'meal', itemId: string, grams?: number }) => void;
   removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
   updateNutritionalGoals: (goals: NutritionalGoals) => void;
+  exportFoodsToCsv: () => string;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -316,6 +317,37 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (data.dailyLogs) setDailyLogs(data.dailyLogs);
   }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setLocale, setDailyLogs]);
 
+  const exportFoodsToCsv = useCallback((): string => {
+    const headers = [
+      'id', 'name_category', 'serving_size_g', 'calories', 'protein',
+      'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium'
+    ];
+
+    const rows = foods.map(food => {
+      const nameCategoryPairs = Object.keys(food.name).map(lang => {
+        const name = food.name[lang] || '';
+        const category = food.category?.[lang] || '';
+        return `${lang}=${name}:${category}`;
+      }).join(';');
+      
+      const row = [
+        food.id,
+        `"${nameCategoryPairs}"`,
+        food.serving_size_g || 0,
+        food.calories || 0,
+        food.protein || 0,
+        food.carbohydrates || 0,
+        food.fat || 0,
+        food.fiber || 0,
+        food.sugar || 0,
+        food.sodium || 0
+      ];
+      return row.join(',');
+    });
+
+    return [headers.join(','), ...rows].join('\n');
+  }, [foods]);
+
   const handleSetMealBuilderOpen = useCallback((isOpen: boolean, context: MealBuilderContext = 'all') => {
     setIsMealBuilderOpen(isOpen);
     if (isOpen) {
@@ -354,6 +386,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     addLogEntry,
     removeLogEntry,
     updateNutritionalGoals,
+    exportFoodsToCsv,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -366,7 +399,3 @@ export const useAppContext = () => {
   }
   return context;
 };
-
-    
-
-    

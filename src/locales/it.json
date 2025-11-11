@@ -27,7 +27,7 @@
   "Data Management": "Gestione dati",
   "Import your food data or reset the application.": "Importa i tuoi dati alimentari o ripristina l'applicazione.",
   "Import Data": "Importa dati",
-  "Upload a CSV file with your food data.": "Carica un file CSV con i tuoi dati alimentari.",
+  "Upload a CSV file with your food data.": "Carica o scarica un file CSV con i tuoi dati alimentari.",
   "The CSV should have an `id` column, a `name_category` column, and nutrient values.": "Il CSV deve avere una colonna `id`, una colonna `name_category` e i valori nutrizionali.",
   "Danger Zone": "Zona di pericolo",
   "Clear All Data": "Cancella tutti i dati",
@@ -187,5 +187,9 @@
   "Your average daily nutrient intake compared to your goals.": "La tua assunzione media giornaliera di nutrienti rispetto ai tuoi obiettivi.",
   "No Data for Analysis": "Nessun dato da analizzare",
   "Start logging your meals in the diary to see your analytics.": "Inizia a registrare i tuoi pasti nel diario per vedere le tue statistiche.",
-  "Not enough data": "Dati insufficienti"
+  "Not enough data": "Dati insufficienti",
+  "CSV Food Data": "Dati Alimenti CSV",
+  "Download Foods (CSV)": "Scarica Alimenti (CSV)",
+  "CSV Exported": "CSV Esportato",
+  "Your food data has been downloaded as a CSV file.": "I tuoi dati alimentari sono stati scaricati come file CSV."
 }

@@ -70,7 +70,7 @@ const nutritionalGoalsSchema = z.object({
 });
 
 export default function SettingsPage() {
-  const { settings, updateSettings, clearAllData, exportData, importData, updateNutritionalGoals } = useAppContext();
+  const { settings, updateSettings, clearAllData, exportData, importData, updateNutritionalGoals, exportFoodsToCsv } = useAppContext();
   const { toast } = useToast();
   const { t, setLocale, locale } = useLocale();
   const backupFileRef = useRef<HTMLInputElement>(null);
@@ -149,6 +149,23 @@ export default function SettingsPage() {
     };
     reader.readAsText(file);
   }, [importData, toast, t]);
+
+  const handleCsvExport = () => {
+    const csvString = exportFoodsToCsv();
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `nutrition-wise-foods-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+     toast({
+      title: t('CSV Exported'),
+      description: t('Your food data has been downloaded as a CSV file.'),
+    });
+  }
 
   const goalsFields: {name: keyof NutritionalGoals, label: string}[] = [
       { name: 'calories', label: t('Calories (kcal)')},
@@ -270,10 +287,10 @@ export default function SettingsPage() {
               <AccordionContent>
                 <div className="space-y-6">
                     <div>
-                      <h3 className="font-semibold mb-2">{t('Import Data')}</h3>
+                      <h3 className="font-semibold mb-2">{t('CSV Food Data')}</h3>
                       <div className='flex items-center gap-2'>
                         <p className="text-sm text-muted-foreground">
-                          {t('Upload a CSV file with your food data.')}
+                          {t('Upload or download a CSV file with your food data.')}
                         </p>
                          <Popover>
                             <PopoverTrigger asChild>
@@ -286,8 +303,14 @@ export default function SettingsPage() {
                             </PopoverContent>
                           </Popover>
                       </div>
+                      <div className="flex gap-2 mt-2">
+                        <CsvImporter />
+                        <Button onClick={handleCsvExport} variant="outline">
+                            <Download className="mr-2 h-4 w-4" />
+                            {t('Download Foods (CSV)')}
+                        </Button>
+                      </div>
 
-                      <CsvImporter />
                     </div>
                     <Separator />
                      <div>
@@ -348,5 +371,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-
-    

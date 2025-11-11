@@ -27,7 +27,7 @@
   "Data Management": "Data Management",
   "Import your food data or reset the application.": "Import your food data or reset the application.",
   "Import Data": "Import Data",
-  "Upload a CSV file with your food data.": "Upload a CSV file with your food data.",
+  "Upload a CSV file with your food data.": "Upload or download a CSV file with your food data.",
   "The CSV should have an `id` column, a `name_category` column, and nutrient values.": "The CSV should have an `id` column, a `name_category` column, and nutrient values.",
   "Danger Zone": "Danger Zone",
   "Clear All Data": "Clear All Data",
@@ -187,5 +187,9 @@
   "Your average daily nutrient intake compared to your goals.": "Your average daily nutrient intake compared to your goals.",
   "No Data for Analysis": "No Data for Analysis",
   "Start logging your meals in the diary to see your analytics.": "Start logging your meals in the diary to see your analytics.",
-  "Not enough data": "Not enough data"
+  "Not enough data": "Not enough data",
+  "CSV Food Data": "CSV Food Data",
+  "Download Foods (CSV)": "Download Foods (CSV)",
+  "CSV Exported": "CSV Exported",
+  "Your food data has been downloaded as a CSV file.": "Your food data has been downloaded as a CSV file."
 }
