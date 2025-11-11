@@ -13,7 +13,8 @@ import { Progress } from '@/components/ui/progress';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
-import FoodSelectorForMeal from '@/components/meal/FoodSelectorForMeal'; // Re-using this for adding food
+import FoodSelectorForMeal from '@/components/meal/FoodSelectorForMeal';
+import LogFoodDialog from '@/components/diary/LogFoodDialog';
 import { Food, Meal, LoggedItem, MealType } from '@/lib/types';
 import { getFoodName } from '@/lib/utils';
 
@@ -66,6 +67,8 @@ export default function DiaryPage() {
     const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
     
     const [isFoodSelectorOpen, setFoodSelectorOpen] = useState(false);
+    const [isLogFoodDialogOpen, setLogFoodDialogOpen] = useState(false);
+    const [foodToLog, setFoodToLog] = useState<Food | null>(null);
     const [mealTypeToAdd, setMealTypeToAdd] = useState<MealType | null>(null);
 
     const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
@@ -87,12 +90,24 @@ export default function DiaryPage() {
     };
 
     const handleSelectFood = (food: Food) => {
-        if (mealTypeToAdd) {
-            addLogEntry(selectedDateString, mealTypeToAdd, { type: 'food', itemId: food.id, grams: food.serving_size_g || 100 });
-        }
+        setFoodToLog(food);
         setFoodSelectorOpen(false);
+        setLogFoodDialogOpen(true);
+    };
+    
+    const handleLogFood = (food: Food, grams: number) => {
+        if (mealTypeToAdd) {
+            addLogEntry(selectedDateString, mealTypeToAdd, { type: 'food', itemId: food.id, grams });
+        }
+        setLogFoodDialogOpen(false);
+        setFoodToLog(null);
         setMealTypeToAdd(null);
     };
+
+    const handleLogDialogClose = () => {
+        setLogFoodDialogOpen(false);
+        setFoodToLog(null);
+    }
 
     const nutrientProgress = [
         { name: t('Calories'), value: totalNutrients.calories, goal: goals.calories, unit: 'kcal' },
@@ -192,6 +207,14 @@ export default function DiaryPage() {
                 onSelectFood={handleSelectFood}
                 currentFoodIds={[]}
               />
+              {foodToLog && (
+                <LogFoodDialog
+                    open={isLogFoodDialogOpen}
+                    onOpenChange={handleLogDialogClose}
+                    food={foodToLog}
+                    onLog={handleLogFood}
+                />
+              )}
         </div>
     );
 }

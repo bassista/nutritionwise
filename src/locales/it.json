@@ -167,5 +167,8 @@
   "Nothing logged for this day yet.": "Niente registrato per questo giorno.",
   "Add Food to {mealType}": "Aggiungi Cibo a {mealType}",
   "Add Meal to {mealType}": "Aggiungi Pasto a {mealType}",
-  "Total": "Totale"
+  "Total": "Totale",
+  "Nothing logged yet.": "Niente registrato per ora.",
+  "Log Food": "Registra Cibo",
+  "Quantity": "Quantità"
 }

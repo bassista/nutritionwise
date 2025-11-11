@@ -167,5 +167,8 @@
   "Nothing logged for this day yet.": "Nothing logged for this day yet.",
   "Add Food to {mealType}": "Add Food to {mealType}",
   "Add Meal to {mealType}": "Add Meal to {mealType}",
-  "Total": "Total"
+  "Total": "Total",
+  "Nothing logged yet.": "Nothing logged yet.",
+  "Log Food": "Log Food",
+  "Quantity": "Quantity"
 }
