@@ -94,12 +94,17 @@ export default function MainLayout({
         <div className="flex flex-col min-h-screen">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
             <SidebarTrigger />
-            <div className='flex-1 flex justify-end items-center'>
-              <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                  <Link href="/settings" aria-label={t('Settings')}>
-                    <Settings />
-                  </Link>
-              </Button>
+            <div className="flex-1 flex items-center justify-between">
+              <div className="flex-1 text-center md:hidden">
+                <h1 className="text-xl font-bold font-headline">NutritionWise</h1>
+              </div>
+              <div className="flex justify-end flex-1">
+                <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                    <Link href="/settings" aria-label={t('Settings')}>
+                      <Settings />
+                    </Link>
+                </Button>
+              </div>
             </div>
           </header>
           <main className="flex-grow pb-24 md:pb-8">{children}</main>
