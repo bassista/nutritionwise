@@ -167,6 +167,7 @@ export default function FavoritesPage() {
         open={isFormOpen}
         onOpenChange={handleFormOpenChange}
         foodToEdit={foodToEdit}
+        autoFavorite={true}
       />
     </div>
   );

@@ -59,10 +59,11 @@ interface FoodFormProps {
   foodToEdit?: Food;
   foodToCreate?: Partial<Food>;
   onSubmitted?: () => void;
+  autoFavorite?: boolean;
 }
 
-export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmitted }: FoodFormProps) {
-  const { addFood, updateFood, foods } = useAppContext();
+export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmitted, autoFavorite = false }: FoodFormProps) {
+  const { addFood, updateFood, foods, toggleFavoriteFood } = useAppContext();
   const { toast } = useToast();
   const { t, locale } = useLocale();
 
@@ -171,6 +172,9 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
           sodium: data.sodium,
       };
       addFood(newFood);
+      if (autoFavorite) {
+        toggleFavoriteFood(newFood.id);
+      }
       toast({ title: t('Food Created') });
     }
     onOpenChange(false);

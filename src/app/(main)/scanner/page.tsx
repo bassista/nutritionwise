@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { useLocale } from '@/context/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
@@ -70,6 +70,7 @@ export default function ScannerPage() {
   const { t, locale } = useLocale();
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { foods } = useAppContext();
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -79,6 +80,8 @@ export default function ScannerPage() {
   const [isFormOpen, setFormOpen] = useState(false);
   const [foodToCreate, setFoodToCreate] = useState<Partial<Food> | undefined>(undefined);
   const [isFetching, setIsFetching] = useState(false);
+  
+  const fromFavorites = useMemo(() => searchParams.get('from') === 'favorites', [searchParams]);
 
   const existingFood = scannedBarcode ? foods.find(f => f.id === scannedBarcode) : undefined;
 
@@ -215,7 +218,8 @@ export default function ScannerPage() {
   };
 
   const handleFormSubmitted = () => {
-    router.push('/foods');
+    const destination = fromFavorites ? '/favorites' : '/foods';
+    router.push(destination);
   };
   
   const handleOpenForm = () => {
@@ -298,6 +302,7 @@ export default function ScannerPage() {
         onOpenChange={setFormOpen}
         foodToCreate={foodToCreate}
         onSubmitted={handleFormSubmitted}
+        autoFavorite={fromFavorites}
       />
     </div>
   );
