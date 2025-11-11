@@ -22,6 +22,7 @@ import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
 import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import { SheetTitle } from '@/components/ui/sheet';
 
 function SidebarHeaderContent() {
   const { open } = useSidebar();
@@ -89,6 +90,9 @@ export default function MainLayout({
     <SidebarProvider>
       <Sidebar collapsible="icon">
         <SidebarHeaderContent />
+        <div className="sr-only">
+          <SheetTitle>Navigation Menu</SheetTitle>
+        </div>
         <SidebarNav />
       </Sidebar>
       <SidebarInset>
