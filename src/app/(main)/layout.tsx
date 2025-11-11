@@ -32,9 +32,6 @@ function SidebarHeaderContent() {
         {open && <h2 className="text-lg font-semibold px-2">NutritionWise</h2>}
         <SidebarTrigger />
       </div>
-      <div className="sr-only">
-        <SheetTitle>Navigation Menu</SheetTitle>
-      </div>
     </SidebarHeader>
   );
 }
