@@ -172,7 +172,17 @@
   "Log Food": "Registra Cibo",
   "Quantity": "Quantità",
   "Unique ID (optional)": "ID Univoco (opzionale)",
-  "e.g., barcode or custom ID": "es. codice a barre o ID personalizzato"
+  "e.g., barcode or custom ID": "es. codice a barre o ID personalizzato",
+  "Analytics": "Statistiche",
+  "Last 7 Days": "Ultimi 7 giorni",
+  "Last 30 Days": "Ultimi 30 giorni",
+  "Nutrient Trend": "Andamento nutrienti",
+  "Calorie and macronutrient intake over the last {days} days.": "Assunzione di calorie e macronutrienti negli ultimi {days} giorni.",
+  "Avg. Macro Distribution": "Distribuzione media macro",
+  "Average daily macronutrient calorie distribution.": "Distribuzione calorica media giornaliera dei macronutrienti.",
+  "Average Daily Intake": "Assunzione media giornaliera",
+  "Your average daily nutrient intake compared to your goals.": "La tua assunzione media giornaliera di nutrienti rispetto ai tuoi obiettivi.",
+  "No Data for Analysis": "Nessun dato da analizzare",
+  "Start logging your meals in the diary to see your analytics.": "Inizia a registrare i tuoi pasti nel diario per vedere le tue statistiche.",
+  "Not enough data": "Dati insufficienti"
 }
-
-    

@@ -172,7 +172,17 @@
   "Log Food": "Log Food",
   "Quantity": "Quantity",
   "Unique ID (optional)": "Unique ID (optional)",
-  "e.g., barcode or custom ID": "e.g., barcode or custom ID"
+  "e.g., barcode or custom ID": "e.g., barcode or custom ID",
+  "Analytics": "Analytics",
+  "Last 7 Days": "Last 7 Days",
+  "Last 30 Days": "Last 30 Days",
+  "Nutrient Trend": "Nutrient Trend",
+  "Calorie and macronutrient intake over the last {days} days.": "Calorie and macronutrient intake over the last {days} days.",
+  "Avg. Macro Distribution": "Avg. Macro Distribution",
+  "Average daily macronutrient calorie distribution.": "Average daily macronutrient calorie distribution.",
+  "Average Daily Intake": "Average Daily Intake",
+  "Your average daily nutrient intake compared to your goals.": "Your average daily nutrient intake compared to your goals.",
+  "No Data for Analysis": "No Data for Analysis",
+  "Start logging your meals in the diary to see your analytics.": "Start logging your meals in the diary to see your analytics.",
+  "Not enough data": "Not enough data"
 }
-
-    

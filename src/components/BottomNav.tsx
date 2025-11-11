@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Wheat, Heart, UtensilsCrossed, Settings, Plus, BookOpen } from 'lucide-react';
+import { Wheat, Heart, UtensilsCrossed, Plus, BookOpen, LineChart } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -16,19 +16,19 @@ export default function BottomNav() {
 
   const navItems = [
     { href: '/diary', label: t('Diary') },
-    { href: '/foods', label: t('Foods') },
+    { href: '/analytics', label: t('Analytics') },
     { href: 'create-meal', label: t('Create') },
-    { href: '/favorites', label: t('Favorites') },
+    { href: '/foods', label: t('Foods') },
     { href: '/meals', label: t('Meals') },
   ];
   
   const navIcons = {
     [t('Diary')]: BookOpen,
+    [t('Analytics')]: LineChart,
     [t('Foods')]: Wheat,
     [t('Meals')]: UtensilsCrossed,
     [t('Create')]: Plus,
     [t('Favorites')]: Heart,
-    [t('Settings')]: Settings,
   };
 
   const handleCreateMealClick = () => {
