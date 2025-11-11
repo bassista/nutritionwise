@@ -120,14 +120,26 @@
   "Food Created": "Alimento Creato",
   "Food already exists": "Alimento già esistente",
   "A food with this name already exists. Please choose a different name.": "Un alimento con questo nome esiste già. Scegli un nome diverso.",
-  "A food with this ID already exists. Please choose a different name.": "Un alimento con questo ID esiste già. Scegli un nome diverso.",
+  "A food with this ID already exists. Please choose a different name or ID.": "Un alimento con questo ID esiste già. Scegli un nome o un ID diverso.",
   "Create New Food": "Crea Nuovo Alimento",
   "Filter by category": "Filtra per categoria",
   "All Categories": "Tutte le categorie",
   "Select category...": "Seleziona categoria...",
   "Edit food": "Modifica alimento",
   "Name": "Nome",
-  "Uncategorized": "Senza categoria"
+  "Uncategorized": "Senza categoria",
+  "Scanner": "Scanner",
+  "Scan": "Scansiona",
+  "Barcode Scanner": "Scanner Codici a Barre",
+  "Align a barcode within the frame to scan it.": "Allinea un codice a barre nella cornice per scansionarlo.",
+  "Camera Access Required": "Accesso Fotocamera Richiesto",
+  "Please allow camera access to use this feature.": "Per favore, consenti l'accesso alla fotocamera per usare questa funzione.",
+  "Barcode detected!": "Codice a barre rilevato!",
+  "Scanned barcode: {barcode}": "Codice a barre scansionato: {barcode}",
+  "The Barcode Detector API is not supported in this browser.": "L'API Barcode Detector non è supportata in questo browser.",
+  "Barcode (EAN)": "Codice a Barre (EAN)",
+  "Food with this barcode already exists": "Alimento con questo codice a barre già esistente",
+  "A food with barcode {barcode} is already in your list: {foodName}.": "Un alimento con il codice a barre {barcode} è già nella tua lista: {foodName}.",
+  "View Food": "Vedi Alimento",
+  "Scan Again": "Scansiona di Nuovo"
 }
-
-    

@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Heart, Wheat, Settings, UtensilsCrossed } from 'lucide-react';
+import { Heart, Wheat, Settings, UtensilsCrossed, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
@@ -41,6 +41,7 @@ function SidebarNav() {
 
     const navItems = useMemo(() => [
       { href: '/foods', icon: Wheat, label: t('Foods') },
+      { href: '/scanner', icon: ScanLine, label: t('Scanner') },
       { href: '/favorites', icon: Heart, label: t('Favorites') },
       { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
       { href: '/settings', icon: Settings, label: t('Settings') },

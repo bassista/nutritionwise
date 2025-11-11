@@ -120,14 +120,26 @@
   "Food Created": "Food Created",
   "Food already exists": "Food already exists",
   "A food with this name already exists. Please choose a different name.": "A food with this name already exists. Please choose a different name.",
-  "A food with this ID already exists. Please choose a different name.": "A food with this ID already exists. Please choose a different name.",
+  "A food with this ID already exists. Please choose a different name or ID.": "A food with this ID already exists. Please choose a different name or ID.",
   "Create New Food": "Create New Food",
   "Filter by category": "Filter by category",
   "All Categories": "All Categories",
   "Select category...": "Select category...",
   "Edit food": "Edit food",
   "Name": "Name",
-  "Uncategorized": "Uncategorized"
+  "Uncategorized": "Uncategorized",
+  "Scanner": "Scanner",
+  "Scan": "Scan",
+  "Barcode Scanner": "Barcode Scanner",
+  "Align a barcode within the frame to scan it.": "Align a barcode within the frame to scan it.",
+  "Camera Access Required": "Camera Access Required",
+  "Please allow camera access to use this feature.": "Please allow camera access to use this feature.",
+  "Barcode detected!": "Barcode detected!",
+  "Scanned barcode: {barcode}": "Scanned barcode: {barcode}",
+  "The Barcode Detector API is not supported in this browser.": "The Barcode Detector API is not supported in this browser.",
+  "Barcode (EAN)": "Barcode (EAN)",
+  "Food with this barcode already exists": "Food with this barcode already exists",
+  "A food with barcode {barcode} is already in your list: {foodName}.": "A food with barcode {barcode} is already in your list: {foodName}.",
+  "View Food": "View Food",
+  "Scan Again": "Scan Again"
 }
-
-    

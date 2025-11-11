@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/select";
 
 const foodSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, { message: "Name is required." }),
   category: z.string().optional(),
   serving_size_g: z.coerce.number().min(0),
@@ -56,9 +57,11 @@ interface FoodFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   foodToEdit?: Food;
+  barcode?: string;
+  onSubmitted?: () => void;
 }
 
-export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
+export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted }: FoodFormProps) {
   const { addFood, updateFood, foods } = useAppContext();
   const { toast } = useToast();
   const { t, locale } = useLocale();
@@ -71,6 +74,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
   const form = useForm<FoodFormValues>({
     resolver: zodResolver(foodSchema),
     defaultValues: {
+      id: '',
       name: '',
       category: '',
       serving_size_g: 100,
@@ -88,6 +92,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
     if (open) {
       if (foodToEdit) {
         form.reset({
+          id: foodToEdit.id,
           name: foodToEdit.name[locale] || foodToEdit.name['en'] || '',
           category: getCategoryName(foodToEdit, locale, t) || '',
           serving_size_g: foodToEdit.serving_size_g || 100,
@@ -101,6 +106,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
         });
       } else {
         form.reset({
+          id: barcode || '',
           name: '',
           category: '',
           serving_size_g: 100,
@@ -114,7 +120,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
         });
       }
     }
-  }, [open, foodToEdit, locale, form, t]);
+  }, [open, foodToEdit, barcode, locale, form, t]);
 
 
   function onSubmit(data: FoodFormValues) {
@@ -123,6 +129,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
     if (foodToEdit) {
       const updatedFood: Food = {
         ...foodToEdit,
+        id: data.id || foodToEdit.id,
         name: { ...foodToEdit.name, [locale]: data.name },
         category: { ...foodToEdit.category, [locale]: categoryValue || ''},
         serving_size_g: data.serving_size_g,
@@ -137,19 +144,19 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
       updateFood(foodToEdit.id, updatedFood);
       toast({ title: t('Food Updated') });
     } else {
-       const foodId = (data.name || '').toLowerCase().replace(/\s+/g, '-');
+      const foodId = data.id || data.name.toLowerCase().replace(/\s+/g, '-');
       if (foods.some(f => f.id === foodId)) {
           toast({
               variant: "destructive",
               title: t('Food already exists'),
-              description: t('A food with this ID already exists. Please choose a different name.'),
+              description: t('A food with this ID already exists. Please choose a different name or ID.'),
           });
           return;
       }
       const newFood: Food = {
           id: foodId,
-          name: { [locale]: data.name },
-          category: { [locale]: categoryValue || '' },
+          name: { [locale]: data.name, en: data.name },
+          category: { [locale]: categoryValue || '', en: categoryValue || '' },
           serving_size_g: data.serving_size_g,
           calories: data.calories,
           protein: data.protein,
@@ -163,6 +170,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
       toast({ title: t('Food Created') });
     }
     onOpenChange(false);
+    onSubmitted?.();
   }
 
   return (
@@ -178,6 +186,19 @@ export function FoodForm({ open, onOpenChange, foodToEdit }: FoodFormProps) {
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <ScrollArea className="h-96 p-1">
               <div className="space-y-4 p-3">
+                 <FormField
+                  control={form.control}
+                  name="id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Barcode (EAN)')}</FormLabel>
+                      <FormControl>
+                        <Input {...field} disabled={!!foodToEdit} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="name"

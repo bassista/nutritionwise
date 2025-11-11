@@ -6,7 +6,7 @@ import { useAppContext } from '@/context/AppContext';
 import FoodList from '@/components/food/FoodList';
 import { PageHeader } from '@/components/PageHeader';
 import { Input } from '@/components/ui/input';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, ScanLine } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Lightbulb } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from 'next/link';
 
 
 export default function FoodsPage() {
@@ -102,6 +103,11 @@ export default function FoodsPage() {
     <div className="flex flex-col h-full">
       <PageHeader title={t('All Foods')}>
         <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link href="/scanner">
+                <ScanLine className="mr-2 h-4 w-4" /> {t('Scan')}
+              </Link>
+            </Button>
             <Button onClick={handleNewFood}>
                 <Plus className="mr-2 h-4 w-4" /> {t('New Food')}
             </Button>
@@ -131,7 +137,7 @@ export default function FoodsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('All Categories')}</SelectItem>
-                  {categories.map(cat => cat !== 'all' && <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                  {categories.filter(cat => cat !== 'all').map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                 </SelectContent>
               </Select>
             )}

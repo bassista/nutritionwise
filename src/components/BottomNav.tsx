@@ -1,6 +1,7 @@
+
 "use client";
 
-import { Wheat, Heart, UtensilsCrossed, Settings, Plus } from 'lucide-react';
+import { Wheat, Heart, UtensilsCrossed, Settings, Plus, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ export default function BottomNav() {
     [t('Create')]: Plus,
     [t('Favorites')]: Heart,
     [t('Settings')]: Settings,
+    [t('Scanner')]: ScanLine,
   };
 
   const handleCreateMealClick = () => {
