@@ -120,7 +120,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted 
         });
       }
     }
-  }, [open, foodToEdit, barcode, locale, form, t]);
+  }, [open, foodToEdit, barcode, form, locale, t]);
 
 
   function onSubmit(data: FoodFormValues) {
@@ -355,3 +355,5 @@ export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted 
     </Dialog>
   );
 }
+
+    
