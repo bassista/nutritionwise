@@ -57,11 +57,11 @@ interface FoodFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   foodToEdit?: Food;
-  barcode?: string;
+  foodToCreate?: Partial<Food>;
   onSubmitted?: () => void;
 }
 
-export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted }: FoodFormProps) {
+export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmitted }: FoodFormProps) {
   const { addFood, updateFood, foods } = useAppContext();
   const { toast } = useToast();
   const { t, locale } = useLocale();
@@ -71,21 +71,23 @@ export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted 
     return Array.from(new Set(allCategories));
   }, [foods, locale, t]);
 
+  const defaultValues: FoodFormValues = {
+    id: '',
+    name: '',
+    category: '',
+    serving_size_g: 100,
+    calories: 0,
+    protein: 0,
+    carbohydrates: 0,
+    fat: 0,
+    fiber: 0,
+    sugar: 0,
+    sodium: 0,
+  };
+
   const form = useForm<FoodFormValues>({
     resolver: zodResolver(foodSchema),
-    defaultValues: {
-      id: '',
-      name: '',
-      category: '',
-      serving_size_g: 100,
-      calories: 0,
-      protein: 0,
-      carbohydrates: 0,
-      fat: 0,
-      fiber: 0,
-      sugar: 0,
-      sodium: 0,
-    },
+    defaultValues,
   });
 
   useEffect(() => {
@@ -104,23 +106,25 @@ export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted 
           sugar: foodToEdit.sugar || 0,
           sodium: foodToEdit.sodium || 0,
         });
-      } else {
+      } else if (foodToCreate) {
         form.reset({
-          id: barcode || '',
-          name: '',
-          category: '',
-          serving_size_g: 100,
-          calories: 0,
-          protein: 0,
-          carbohydrates: 0,
-          fat: 0,
-          fiber: 0,
-          sugar: 0,
-          sodium: 0,
+          id: foodToCreate.id || '',
+          name: foodToCreate.name?.[locale] || foodToCreate.name?.['en'] || '',
+          category: foodToCreate.category?.[locale] || foodToCreate.category?.['en'] || '',
+          serving_size_g: foodToCreate.serving_size_g || 100,
+          calories: foodToCreate.calories || 0,
+          protein: foodToCreate.protein || 0,
+          carbohydrates: foodToCreate.carbohydrates || 0,
+          fat: foodToCreate.fat || 0,
+          fiber: foodToCreate.fiber || 0,
+          sugar: foodToCreate.sugar || 0,
+          sodium: foodToCreate.sodium || 0,
         });
+      } else {
+        form.reset(defaultValues);
       }
     }
-  }, [open, foodToEdit, barcode, form, locale, t]);
+  }, [open, foodToEdit, foodToCreate, form, locale, t]);
 
 
   function onSubmit(data: FoodFormValues) {
@@ -155,8 +159,8 @@ export function FoodForm({ open, onOpenChange, foodToEdit, barcode, onSubmitted 
       }
       const newFood: Food = {
           id: foodId,
-          name: { [locale]: data.name, en: data.name },
-          category: { [locale]: categoryValue || '', en: categoryValue || '' },
+          name: { en: data.name, [locale]: data.name },
+          category: { en: categoryValue || '', [locale]: categoryValue || '' },
           serving_size_g: data.serving_size_g,
           calories: data.calories,
           protein: data.protein,
