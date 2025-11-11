@@ -2,7 +2,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult } from '@/lib/types';
+import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult, DailyLog, NutritionalGoals, MealType, LoggedItem } from '@/lib/types';
 import { useLocale, type Locale } from './LocaleContext';
 import { getFoodName } from '@/lib/utils';
 import { defaultFoods } from '@/lib/data';
@@ -14,10 +14,12 @@ interface AppContextType {
   meals: Meal[];
   favoriteFoodIds: string[];
   settings: AppSettings;
+  dailyLogs: DailyLog;
   isMealBuilderOpen: boolean;
   mealBuilderContext: MealBuilderContext;
   setMealBuilderOpen: (isOpen: boolean, context?: MealBuilderContext) => void;
   getFoodById: (id: string) => Food | undefined;
+  getMealById: (id: string) => Meal | undefined;
   importFoods: (foodsFromCsv: { [key: string]: string }[]) => number;
   addFood: (food: Food) => void;
   updateFood: (foodId: string, updates: Partial<Food>) => void;
@@ -32,12 +34,26 @@ interface AppContextType {
   setMeals: React.Dispatch<React.SetStateAction<Meal[]>>;
   exportData: () => AppData;
   importData: (data: AppData) => void;
+  addLogEntry: (date: string, mealType: MealType, item: { type: 'food' | 'meal', itemId: string, grams?: number }) => void;
+  removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
+  updateNutritionalGoals: (goals: NutritionalGoals) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const defaultGoals: NutritionalGoals = {
+  calories: 2000,
+  protein: 100,
+  carbohydrates: 250,
+  fat: 65,
+  fiber: 30,
+  sugar: 50,
+  sodium: 2300,
+};
+
 const defaultSettings: AppSettings = {
   foodsPerPage: 8,
+  nutritionalGoals: defaultGoals,
 };
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
@@ -48,7 +64,11 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((va
     try {
       const item = window.localStorage.getItem(key);
       if (item) {
-        setStoredValue(JSON.parse(item));
+        const parsedItem = JSON.parse(item);
+        if (key === 'settings' && !parsedItem.nutritionalGoals) {
+            parsedItem.nutritionalGoals = defaultGoals;
+        }
+        setStoredValue(parsedItem);
       }
     } catch (error) {
       console.error(error);
@@ -76,11 +96,58 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [meals, setMeals] = useLocalStorage<Meal[]>('meals', []);
   const [favoriteFoodIds, setFavoriteFoodIds] = useLocalStorage<string[]>('favoriteFoodIds', []);
   const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
+  const [dailyLogs, setDailyLogs] = useLocalStorage<DailyLog>('dailyLogs', {});
   const [isMealBuilderOpen, setIsMealBuilderOpen] = useState(false);
   const [mealBuilderContext, setMealBuilderContext] = useState<MealBuilderContext>('all');
   const { locale, setLocale } = useLocale();
 
   const getFoodById = useCallback((id: string) => foods.find(f => f.id === id), [foods]);
+  const getMealById = useCallback((id: string) => meals.find(m => m.id === id), [meals]);
+
+  const addLogEntry = useCallback((date: string, mealType: MealType, item: { type: 'food' | 'meal', itemId: string, grams?: number }) => {
+    const newLogItem: LoggedItem = {
+      ...item,
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+    };
+
+    setDailyLogs(prevLogs => {
+      const newLogs = { ...prevLogs };
+      if (!newLogs[date]) {
+        newLogs[date] = {};
+      }
+      if (!newLogs[date][mealType]) {
+        newLogs[date][mealType] = [];
+      }
+      newLogs[date][mealType]!.push(newLogItem);
+      return newLogs;
+    });
+  }, [setDailyLogs]);
+
+  const removeLogEntry = useCallback((date: string, mealType: MealType, logId: string) => {
+    setDailyLogs(prevLogs => {
+      const newLogs = { ...prevLogs };
+      if (newLogs[date] && newLogs[date][mealType]) {
+        newLogs[date][mealType] = newLogs[date][mealType]!.filter(item => item.id !== logId);
+        // Clean up empty arrays/objects
+        if (newLogs[date][mealType]!.length === 0) {
+          delete newLogs[date][mealType];
+        }
+        if (Object.keys(newLogs[date]).length === 0) {
+          delete newLogs[date];
+        }
+      }
+      return newLogs;
+    });
+  }, [setDailyLogs]);
+
+  const updateSettings = useCallback((newSettings: Partial<AppSettings>) => {
+    setSettings(prev => ({ ...prev, ...newSettings }));
+  }, [setSettings]);
+
+  const updateNutritionalGoals = useCallback((goals: NutritionalGoals) => {
+    updateSettings({ nutritionalGoals: goals });
+  }, [updateSettings]);
 
   const importFoods = useCallback((csvRows: { [key: string]: string }[]): number => {
     const foodsMap = new Map(foods.map(f => [f.id, f]));
@@ -163,8 +230,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setFoods(prev => prev.filter(f => f.id !== foodId));
     setFavoriteFoodIds(prev => prev.filter(id => id !== foodId));
     
+    // Also remove from any diary logs
+    setDailyLogs(prevLogs => {
+      const newLogs = JSON.parse(JSON.stringify(prevLogs));
+      Object.keys(newLogs).forEach(date => {
+        Object.keys(newLogs[date]).forEach(mealType => {
+          newLogs[date][mealType as MealType] = newLogs[date][mealType as MealType]!.filter(
+            (item: LoggedItem) => !(item.type === 'food' && item.itemId === foodId)
+          );
+          if (newLogs[date][mealType as MealType]!.length === 0) {
+            delete newLogs[date][mealType as MealType];
+          }
+        });
+        if (Object.keys(newLogs[date]).length === 0) {
+          delete newLogs[date];
+        }
+      });
+      return newLogs;
+    });
+
     return { success: true };
-  }, [meals, setFoods, setFavoriteFoodIds]);
+  }, [meals, setFoods, setFavoriteFoodIds, setDailyLogs]);
 
   const addMeal = useCallback((meal: Meal) => {
     setMeals(prev => [...prev, meal]);
@@ -176,24 +262,39 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const deleteMeal = useCallback((mealId: string) => {
     setMeals(prev => prev.filter(meal => meal.id !== mealId));
-  }, [setMeals]);
+    // Also remove from any diary logs
+     setDailyLogs(prevLogs => {
+      const newLogs = JSON.parse(JSON.stringify(prevLogs));
+      Object.keys(newLogs).forEach(date => {
+        Object.keys(newLogs[date]).forEach(mealType => {
+          newLogs[date][mealType as MealType] = newLogs[date][mealType as MealType]!.filter(
+            (item: LoggedItem) => !(item.type === 'meal' && item.itemId === mealId)
+          );
+           if (newLogs[date][mealType as MealType]!.length === 0) {
+            delete newLogs[date][mealType as MealType];
+          }
+        });
+         if (Object.keys(newLogs[date]).length === 0) {
+          delete newLogs[date];
+        }
+      });
+      return newLogs;
+    });
+  }, [setMeals, setDailyLogs]);
 
   const toggleFavoriteFood = useCallback((foodId: string) => {
     setFavoriteFoodIds(prev =>
       prev.includes(foodId) ? prev.filter(id => id !== foodId) : [...prev, foodId]
     );
   }, [setFavoriteFoodIds]);
-
-  const updateSettings = useCallback((newSettings: Partial<AppSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
-  }, [setSettings]);
   
   const clearAllData = useCallback(() => {
     setFoods(defaultFoods);
     setMeals([]);
     setFavoriteFoodIds([]);
     setSettings(defaultSettings);
-  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings]);
+    setDailyLogs({});
+  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setDailyLogs]);
 
   const exportData = useCallback((): AppData => {
     return {
@@ -202,8 +303,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       favoriteFoodIds,
       settings,
       locale,
+      dailyLogs,
     };
-  }, [foods, meals, favoriteFoodIds, settings, locale]);
+  }, [foods, meals, favoriteFoodIds, settings, locale, dailyLogs]);
 
   const importData = useCallback((data: AppData) => {
     if (data.foods) setFoods(data.foods);
@@ -211,7 +313,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (data.favoriteFoodIds) setFavoriteFoodIds(data.favoriteFoodIds);
     if (data.settings) setSettings(data.settings);
     if (data.locale) setLocale(data.locale);
-  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setLocale]);
+    if (data.dailyLogs) setDailyLogs(data.dailyLogs);
+  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setLocale, setDailyLogs]);
 
   const handleSetMealBuilderOpen = useCallback((isOpen: boolean, context: MealBuilderContext = 'all') => {
     setIsMealBuilderOpen(isOpen);
@@ -223,15 +326,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const value = {
+  const value: AppContextType = {
     foods,
     meals,
     favoriteFoodIds,
     settings,
+    dailyLogs,
     isMealBuilderOpen,
     mealBuilderContext,
     setMealBuilderOpen: handleSetMealBuilderOpen,
     getFoodById,
+    getMealById,
     importFoods,
     addFood,
     updateFood,
@@ -246,6 +351,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setMeals,
     exportData,
     importData,
+    addLogEntry,
+    removeLogEntry,
+    updateNutritionalGoals,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -258,5 +366,7 @@ export const useAppContext = () => {
   }
   return context;
 };
+
+    
 
     

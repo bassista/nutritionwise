@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from 'react';
-import type { Meal } from '@/lib/types';
+import type { Meal, MealType } from '@/lib/types';
 import { useAppContext } from '@/context/AppContext';
 import {
   Card,
@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { MoreVertical, Trash2, Edit, Flame, Beef, Wheat, Droplets, GripVertical } from 'lucide-react';
+import { MoreVertical, Trash2, Edit, Flame, Beef, Wheat, Droplets, GripVertical, CalendarPlus } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,10 +44,11 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 import { getFoodName } from '@/lib/utils';
+import { formatISO, startOfToday } from 'date-fns';
 
 
 const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
-    const totals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
+    const totals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 };
     meal.foods.forEach(mealFood => {
         const food = getFoodById(mealFood.foodId);
         if (food) {
@@ -56,6 +57,9 @@ const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
             totals.protein += (food.protein || 0) * factor;
             totals.carbohydrates += (food.carbohydrates || 0) * factor;
             totals.fat += (food.fat || 0) * factor;
+            totals.fiber += (food.fiber || 0) * factor;
+            totals.sugar += (food.sugar || 0) * factor;
+            totals.sodium += (food.sodium || 0) * factor;
         }
     });
     return totals;
@@ -72,7 +76,7 @@ interface MealCardProps {
 
 const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
   ({ meal, reorderable, style, attributes, listeners }, ref) => {
-    const { getFoodById, deleteMeal } = useAppContext();
+    const { getFoodById, deleteMeal, addLogEntry } = useAppContext();
     const [isEditing, setIsEditing] = useState(false);
     const { t, locale } = useLocale();
 
@@ -83,6 +87,12 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
 
     const handleDelete = () => {
       deleteMeal(meal.id);
+    };
+
+     const handleAddToDiary = (e: React.MouseEvent, mealType: MealType) => {
+        e.stopPropagation();
+        const today = formatISO(startOfToday(), { representation: 'date' });
+        addLogEntry(today, mealType, { type: 'meal', itemId: meal.id });
     };
     
     const nutrientDisplay = [
@@ -118,6 +128,22 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                     <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'breakfast')}>
+                        <CalendarPlus className="mr-2 h-4 w-4" />
+                        <span>{t('Add to Breakfast')}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => handleAddTo-diary(e, 'lunch')}>
+                        <CalendarPlus className="mr-2 h-4 w-4" />
+                        <span>{t('Add to Lunch')}</span>
+                    </DropdownMenuItem>
+                     <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'dinner')}>
+                        <CalendarPlus className="mr-2 h-4 w-4" />
+                        <span>{t('Add to Dinner')}</span>
+                    </DropdownMenuItem>
+                     <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'snack')}>
+                        <CalendarPlus className="mr-2 h-4 w-4" />
+                        <span>{t('Add to Snack')}</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setIsEditing(true)}>
                       <Edit className="mr-2 h-4 w-4" />
                       <span>{t('Edit')}</span>

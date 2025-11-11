@@ -16,12 +16,11 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Heart, Wheat, Settings, UtensilsCrossed, ScanLine } from 'lucide-react';
+import { Heart, Wheat, Settings, UtensilsCrossed, ScanLine, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
 import { useMemo } from 'react';
-import { SheetTitle } from '@/components/ui/sheet';
 
 function SidebarHeaderContent() {
   const { open } = useSidebar();
@@ -40,6 +39,7 @@ function SidebarNav() {
     const pathname = usePathname();
 
     const navItems = useMemo(() => [
+      { href: '/diary', icon: BookOpen, label: t('Diary') },
       { href: '/foods', icon: Wheat, label: t('Foods') },
       { href: '/scanner', icon: ScanLine, label: t('Scanner') },
       { href: '/favorites', icon: Heart, label: t('Favorites') },
@@ -85,7 +85,7 @@ export default function MainLayout({
         <div className="flex flex-col min-h-screen">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
             <SidebarTrigger />
-            <h1 className="text-lg font-semibold">NutritionWise</h1>
+            <h1 className="text-lg font-semibold md:hidden">NutritionWise</h1>
           </header>
           <main className="flex-grow pb-24 md:pb-8">{children}</main>
           <BottomNav />

@@ -46,8 +46,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Download, Upload, Info } from 'lucide-react';
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { NutritionalGoals } from '@/lib/types';
+
 
 const settingsSchema = z.object({
   foodsPerPage: z.coerce
@@ -57,24 +59,51 @@ const settingsSchema = z.object({
     .max(50, 'Must be 50 or less'),
 });
 
+const nutritionalGoalsSchema = z.object({
+    calories: z.coerce.number().min(0, "Cannot be negative"),
+    protein: z.coerce.number().min(0, "Cannot be negative"),
+    carbohydrates: z.coerce.number().min(0, "Cannot be negative"),
+    fat: z.coerce.number().min(0, "Cannot be negative"),
+    fiber: z.coerce.number().min(0, "Cannot be negative"),
+    sugar: z.coerce.number().min(0, "Cannot be negative"),
+    sodium: z.coerce.number().min(0, "Cannot be negative"),
+});
+
 export default function SettingsPage() {
-  const { settings, updateSettings, clearAllData, exportData, importData } = useAppContext();
+  const { settings, updateSettings, clearAllData, exportData, importData, updateNutritionalGoals } = useAppContext();
   const { toast } = useToast();
   const { t, setLocale, locale } = useLocale();
   const backupFileRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<z.infer<typeof settingsSchema>>({
+  const displayForm = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       foodsPerPage: settings.foodsPerPage,
     },
   });
 
-  function onSubmit(values: z.infer<typeof settingsSchema>) {
+  const goalsForm = useForm<z.infer<typeof nutritionalGoalsSchema>>({
+    resolver: zodResolver(nutritionalGoalsSchema),
+    defaultValues: settings.nutritionalGoals,
+  });
+
+  useEffect(() => {
+    goalsForm.reset(settings.nutritionalGoals);
+  }, [settings.nutritionalGoals, goalsForm]);
+
+  function onDisplaySubmit(values: z.infer<typeof settingsSchema>) {
     updateSettings(values);
     toast({
       title: t('Settings Saved'),
       description: t('Your preferences have been updated.'),
+    });
+  }
+
+  function onGoalsSubmit(values: z.infer<typeof nutritionalGoalsSchema>) {
+    updateNutritionalGoals(values);
+    toast({
+        title: t('Goals Saved'),
+        description: t('Your nutritional goals have been updated.'),
     });
   }
 
@@ -121,12 +150,22 @@ export default function SettingsPage() {
     reader.readAsText(file);
   }, [importData, toast, t]);
 
+  const goalsFields: {name: keyof NutritionalGoals, label: string}[] = [
+      { name: 'calories', label: t('Calories (kcal)')},
+      { name: 'protein', label: t('Protein (g)')},
+      { name: 'carbohydrates', label: t('Carbs (g)')},
+      { name: 'fat', label: t('Fat (g)')},
+      { name: 'fiber', label: t('Fiber (g)')},
+      { name: 'sugar', label: t('Sugar (g)')},
+      { name: 'sodium', label: t('Sodium (mg)')},
+  ];
+
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('Settings')} />
       <div className="container mx-auto px-4 flex-grow overflow-auto pb-24 md:pb-4">
         <div className="py-4 max-w-2xl mx-auto">
-           <Accordion type="single" collapsible className="w-full">
+           <Accordion type="single" collapsible className="w-full" defaultValue="language">
             <AccordionItem value="language">
               <AccordionTrigger>
                 <div className="text-left">
@@ -148,6 +187,42 @@ export default function SettingsPage() {
                 </Select>
               </AccordionContent>
             </AccordionItem>
+            
+            <AccordionItem value="goals">
+               <AccordionTrigger>
+                 <div className="text-left">
+                  <h3 className="text-lg font-semibold">{t('Nutritional Goals')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t('Set your daily nutritional targets.')}
+                  </p>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Form {...goalsForm}>
+                  <form onSubmit={goalsForm.handleSubmit(onGoalsSubmit)} className="space-y-8">
+                     <div className="grid grid-cols-2 gap-4">
+                        {goalsFields.map(goal => (
+                             <FormField
+                              key={goal.name}
+                              control={goalsForm.control}
+                              name={goal.name}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{goal.label}</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        ))}
+                    </div>
+                    <Button type="submit">{t('Save Goals')}</Button>
+                  </form>
+                </Form>
+              </AccordionContent>
+            </AccordionItem>
 
             <AccordionItem value="display">
                <AccordionTrigger>
@@ -159,10 +234,10 @@ export default function SettingsPage() {
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <Form {...displayForm}>
+                  <form onSubmit={displayForm.handleSubmit(onDisplaySubmit)} className="space-y-8">
                     <FormField
-                      control={form.control}
+                      control={displayForm.control}
                       name="foodsPerPage"
                       render={({ field }) => (
                         <FormItem>

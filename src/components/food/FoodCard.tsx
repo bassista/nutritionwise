@@ -5,8 +5,8 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, GripVertical, Flame, Wheat, Minus, Trash2, Edit } from 'lucide-react';
-import type { Food } from '@/lib/types';
+import { Heart, GripVertical, Flame, Wheat, Minus, Trash2, Edit, PlusCircle, CalendarPlus } from 'lucide-react';
+import type { Food, MealType } from '@/lib/types';
 import { useAppContext } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 import React from 'react';
@@ -24,7 +24,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { getFoodName } from '@/lib/utils';
+import { formatISO, startOfToday } from 'date-fns';
 
 interface FoodCardProps {
   food: Food;
@@ -38,7 +45,7 @@ interface FoodCardProps {
 
 const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
   ({ food, reorderable, onDelete, onEdit, style, attributes, listeners }, ref) => {
-    const { favoriteFoodIds, toggleFavoriteFood } = useAppContext();
+    const { favoriteFoodIds, toggleFavoriteFood, addLogEntry } = useAppContext();
     const { t, locale } = useLocale();
     const isFavorite = favoriteFoodIds.includes(food.id);
     
@@ -60,6 +67,12 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
 
     const handleDeleteClick = (e: React.MouseEvent) => {
       e.stopPropagation();
+    };
+
+    const handleAddToDiary = (e: React.MouseEvent, mealType: MealType) => {
+        e.stopPropagation();
+        const today = formatISO(startOfToday(), { representation: 'date' });
+        addLogEntry(today, mealType, { type: 'food', itemId: food.id, grams: food.serving_size_g || 100 });
     };
 
     return (
@@ -108,6 +121,27 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
             </div>
             <div className="flex-grow" />
             <div className="mt-4 flex justify-end gap-1">
+               <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="w-8 h-8" onClick={(e) => e.stopPropagation()}>
+                    <CalendarPlus className="w-5 h-5 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'breakfast')}>
+                    {t('Add to Breakfast')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'lunch')}>
+                    {t('Add to Lunch')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'dinner')}>
+                    {t('Add to Dinner')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'snack')}>
+                    {t('Add to Snack')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               {onEdit && (
                 <Button
                   variant="ghost"

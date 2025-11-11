@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Wheat, Heart, UtensilsCrossed, Settings, Plus, ScanLine } from 'lucide-react';
+import { Wheat, Heart, UtensilsCrossed, Settings, Plus, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -15,20 +15,20 @@ export default function BottomNav() {
   const { t } = useLocale();
 
   const navItems = [
+    { href: '/diary', label: t('Diary') },
     { href: '/foods', label: t('Foods') },
-    { href: '/favorites', label: t('Favorites') },
     { href: 'create-meal', label: t('Create') },
     { href: '/meals', label: t('Meals') },
     { href: '/settings', label: t('Settings') },
   ];
   
   const navIcons = {
+    [t('Diary')]: BookOpen,
     [t('Foods')]: Wheat,
     [t('Meals')]: UtensilsCrossed,
     [t('Create')]: Plus,
     [t('Favorites')]: Heart,
     [t('Settings')]: Settings,
-    [t('Scanner')]: ScanLine,
   };
 
   const handleCreateMealClick = () => {
@@ -58,6 +58,9 @@ export default function BottomNav() {
               </div>
             );
           }
+          
+          // Favorites is not on the main bottom bar anymore
+          if (item.href === '/favorites') return null;
 
           return (
             <Link
