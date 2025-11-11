@@ -16,9 +16,9 @@ export default function BottomNav() {
 
   const navItems = [
     { href: '/diary', label: t('Diary') },
-    { href: '/analytics', label: t('Analytics') },
-    { href: 'create-meal', label: t('Create') },
     { href: '/foods', label: t('Foods') },
+    { href: 'create-meal', label: t('Create') },
+    { href: '/favorites', label: t('Favorites') },
     { href: '/meals', label: t('Meals') },
   ];
   
@@ -59,7 +59,7 @@ export default function BottomNav() {
             );
           }
           
-          if (item.href === '/settings') return null;
+          if (item.href === '/settings' || item.href === '/analytics') return null;
 
           return (
             <Link
