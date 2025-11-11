@@ -170,5 +170,9 @@
   "Total": "Total",
   "Nothing logged yet.": "Nothing logged yet.",
   "Log Food": "Log Food",
-  "Quantity": "Quantity"
+  "Quantity": "Quantity",
+  "Unique ID (optional)": "Unique ID (optional)",
+  "e.g., barcode or custom ID": "e.g., barcode or custom ID"
 }
+
+    

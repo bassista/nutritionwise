@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/select";
 
 const foodSchema = z.object({
-  id: z.string().min(1, { message: "Barcode (EAN) is required." }),
+  id: z.string().optional(),
   name: z.string().min(1, { message: "Name is required." }),
   category: z.string().optional(),
   serving_size_g: z.coerce.number().min(0),
@@ -199,9 +199,9 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
                   name="id"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('Barcode (EAN)')}</FormLabel>
+                      <FormLabel>{t('Unique ID (optional)')}</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={!!foodToEdit} />
+                        <Input {...field} placeholder={t('e.g., barcode or custom ID')} disabled={!!foodToEdit} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -363,3 +363,5 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
     </Dialog>
   );
 }
+
+    

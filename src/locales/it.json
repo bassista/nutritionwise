@@ -170,5 +170,9 @@
   "Total": "Totale",
   "Nothing logged yet.": "Niente registrato per ora.",
   "Log Food": "Registra Cibo",
-  "Quantity": "Quantità"
+  "Quantity": "Quantità",
+  "Unique ID (optional)": "ID Univoco (opzionale)",
+  "e.g., barcode or custom ID": "es. codice a barre o ID personalizzato"
 }
+
+    
