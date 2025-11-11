@@ -11,7 +11,7 @@ export function PageHeader({ title, children }: PageHeaderProps) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 border-b">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl md:text-2xl font-bold font-headline text-foreground">
+            <h1 className="text-xl md:text-2xl font-bold font-headline text-foreground hidden md:block">
               {title}
             </h1>
           </div>
