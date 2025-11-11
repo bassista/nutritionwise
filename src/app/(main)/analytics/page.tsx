@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { subDays, format, parseISO } from 'date-fns';
+import { subDays, format, parseISO, eachDayOfInterval, differenceInDays } from 'date-fns';
 import { useLocale } from '@/context/LocaleContext';
 import { LoggedItem, MealType, Food, Meal, AnalysisPeriod } from '@/lib/types';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -53,14 +53,24 @@ export default function AnalyticsPage() {
     const [period, setPeriod] = useState<AnalysisPeriod>('last7days');
 
     const analysisData = useMemo(() => {
-        const days = period === 'last7days' ? 7 : 30;
         const endDate = new Date();
-        const startDate = subDays(endDate, days - 1);
-        const data = [];
-        let totalNutrientsOverPeriod = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, count: 0 };
+        let startDate: Date;
+        let days: number;
 
-        for (let i = 0; i < days; i++) {
-            const date = subDays(endDate, i);
+        if (period === 'all') {
+            const allDates = Object.keys(dailyLogs).sort();
+            startDate = allDates.length > 0 ? parseISO(allDates[0]) : endDate;
+            days = differenceInDays(endDate, startDate) + 1;
+        } else {
+            days = period === 'last7days' ? 7 : 30;
+            startDate = subDays(endDate, days - 1);
+        }
+
+        const dateInterval = eachDayOfInterval({ start: startDate, end: endDate });
+
+        let totalNutrientsOverPeriod = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, count: 0 };
+        
+        const data = dateInterval.map(date => {
             const dateString = format(date, 'yyyy-MM-dd');
             const log = dailyLogs[dateString];
             
@@ -84,11 +94,11 @@ export default function AnalyticsPage() {
                 }
             }
             
-            data.push({
+            return {
                 date: format(date, 'MMM d'),
                 ...dailyTotals
-            });
-        }
+            };
+        });
         
         const avgNutrients = {
             calories: totalNutrientsOverPeriod.count > 0 ? totalNutrientsOverPeriod.calories / totalNutrientsOverPeriod.count : 0,
@@ -104,9 +114,10 @@ export default function AnalyticsPage() {
         ].filter(item => item.value > 0);
         
         return {
-            lineChartData: data.reverse(),
+            lineChartData: data,
             avgNutrients,
-            macroDistribution
+            macroDistribution,
+            days,
         };
     }, [period, dailyLogs, getFoodById, getMealById, t]);
     
@@ -118,6 +129,11 @@ export default function AnalyticsPage() {
     };
 
     const noData = Object.keys(dailyLogs).length === 0;
+
+    const periodDescription = () => {
+        if (period === 'all') return t('over all time.');
+        return t('over the last {days} days.', {days: analysisData.days });
+    };
 
     if (noData) {
         return (
@@ -141,16 +157,17 @@ export default function AnalyticsPage() {
             <PageHeader title={t('Analytics')} />
             <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
                  <Tabs defaultValue="last7days" onValueChange={(value) => setPeriod(value as AnalysisPeriod)}>
-                    <TabsList className="grid w-full grid-cols-2">
+                    <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="last7days">{t('Last 7 Days')}</TabsTrigger>
                         <TabsTrigger value="last30days">{t('Last 30 Days')}</TabsTrigger>
+                        <TabsTrigger value="all">{t('All Time')}</TabsTrigger>
                     </TabsList>
                     <TabsContent value={period}>
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-4">
                             <Card className="lg:col-span-2">
                                 <CardHeader>
                                     <CardTitle>{t('Nutrient Trend')}</CardTitle>
-                                    <CardDescription>{t('Calorie and macronutrient intake over the last {days} days.', {days: period === 'last7days' ? 7 : 30})}</CardDescription>
+                                    <CardDescription>{t('Calorie and macronutrient intake')} {periodDescription()}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <ChartContainer config={chartConfig} className="h-64 w-full">

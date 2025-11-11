@@ -71,4 +71,4 @@ export type DeleteFoodResult = {
   conflictingMeals?: string[];
 };
 
-export type AnalysisPeriod = 'last7days' | 'last30days';
+export type AnalysisPeriod = 'last7days' | 'last30days' | 'all';
