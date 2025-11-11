@@ -71,7 +71,7 @@ export default function ScannerPage() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { foods } = useAppContext();
+  const { foods, toggleFavoriteFood } = useAppContext();
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -150,7 +150,7 @@ export default function ScannerPage() {
     }
 
     const scan = async () => {
-      if (videoRef.current && videoRef.current.readyState === 4 && detector && isScanning) {
+      if (videoRef.current && !videoRef.current.paused && videoRef.current.videoWidth > 0 && videoRef.current.readyState >= 3 && detector && isScanning) {
         try {
           const barcodes = await detector.detect(videoRef.current);
           if (barcodes.length > 0) {
@@ -167,7 +167,12 @@ export default function ScannerPage() {
             // Check if food exists locally first
             const localFood = foods.find(f => f.id === detectedBarcode);
             if (localFood) {
-              setScannedBarcode(detectedBarcode);
+              if (fromFavorites) {
+                toggleFavoriteFood(localFood.id);
+                router.push('/favorites');
+              } else {
+                setScannedBarcode(detectedBarcode);
+              }
             } else {
               // If not, fetch from API
               setIsFetching(true);
@@ -199,7 +204,7 @@ export default function ScannerPage() {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isScanning, hasCameraPermission, t, toast, foods]);
+  }, [isScanning, hasCameraPermission, t, toast, foods, fromFavorites, router, toggleFavoriteFood]);
 
   const handleScanAgain = () => {
     setScannedBarcode(null);
@@ -307,3 +312,5 @@ export default function ScannerPage() {
     </div>
   );
 }
+
+    
