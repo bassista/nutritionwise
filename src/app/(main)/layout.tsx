@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
 import { useMemo } from 'react';
+import { Button } from '@/components/ui/button';
 
 function SidebarHeaderContent() {
   const { open } = useSidebar();
@@ -44,7 +45,6 @@ function SidebarNav() {
       { href: '/scanner', icon: ScanLine, label: t('Scanner') },
       { href: '/favorites', icon: Heart, label: t('Favorites') },
       { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
-      { href: '/settings', icon: Settings, label: t('Settings') },
     ], [t]);
 
     return (
@@ -75,6 +75,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const { isMealBuilderOpen, setMealBuilderOpen } = useAppContext();
+  const { t } = useLocale();
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
@@ -85,7 +86,15 @@ export default function MainLayout({
         <div className="flex flex-col min-h-screen">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
             <SidebarTrigger />
-            <h1 className="text-lg font-semibold md:hidden">NutritionWise</h1>
+            <div className='flex-1 flex justify-between items-center'>
+              <h1 className="text-lg font-semibold md:hidden">NutritionWise</h1>
+              <div></div>
+              <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                  <Link href="/settings" aria-label={t('Settings')}>
+                    <Settings />
+                  </Link>
+              </Button>
+            </div>
           </header>
           <main className="flex-grow pb-24 md:pb-8">{children}</main>
           <BottomNav />

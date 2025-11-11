@@ -6,7 +6,7 @@ import { useAppContext } from '@/context/AppContext';
 import FoodList from '@/components/food/FoodList';
 import { PageHeader } from '@/components/PageHeader';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Heart, Plus, Search } from 'lucide-react';
+import { Heart, Plus, Search, ScanLine } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { FoodForm } from '@/components/food/FoodForm';
 import { Food } from '@/lib/types';
+import Link from 'next/link';
 
 
 export default function FavoritesPage() {
@@ -79,14 +80,29 @@ export default function FavoritesPage() {
     }
   }
 
+  const handleNewFood = () => {
+    setFoodToEdit(undefined);
+    setFormOpen(true);
+  };
+
   const isSearching = searchTerm.trim().length > 0;
 
   return (
     <div className="flex flex-col h-full">
       <PageHeader title={t('Favorite Foods')}>
-        <Button onClick={handleCreateMeal} className="hidden md:inline-flex">
-          <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
-        </Button>
+        <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link href="/scanner">
+                <ScanLine className="mr-2 h-4 w-4" /> {t('Scan')}
+              </Link>
+            </Button>
+            <Button onClick={handleNewFood}>
+                <Plus className="mr-2 h-4 w-4" /> {t('New Food')}
+            </Button>
+            <Button onClick={handleCreateMeal} className="hidden md:inline-flex">
+            <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
+            </Button>
+        </div>
       </PageHeader>
       <div className="sticky top-16 bg-background/80 backdrop-blur-sm z-10 -mb-4">
         <div className="container mx-auto px-4">

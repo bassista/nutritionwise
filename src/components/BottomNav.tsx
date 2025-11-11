@@ -18,8 +18,8 @@ export default function BottomNav() {
     { href: '/diary', label: t('Diary') },
     { href: '/foods', label: t('Foods') },
     { href: 'create-meal', label: t('Create') },
+    { href: '/favorites', label: t('Favorites') },
     { href: '/meals', label: t('Meals') },
-    { href: '/settings', label: t('Settings') },
   ];
   
   const navIcons = {
@@ -59,8 +59,7 @@ export default function BottomNav() {
             );
           }
           
-          // Favorites is not on the main bottom bar anymore
-          if (item.href === '/favorites') return null;
+          if (item.href === '/settings') return null;
 
           return (
             <Link
