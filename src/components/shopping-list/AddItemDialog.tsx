@@ -52,12 +52,14 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
         <DialogHeader>
           <DialogTitle>{t('Add to Shopping List')}</DialogTitle>
           <DialogDescription>
-            <div className="flex border-b mt-4">
-              <button onClick={() => setActiveTab('search')} className={`flex-1 pb-2 text-sm font-medium ${activeTab === 'search' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}>{t('Search Food')}</button>
-              <button onClick={() => setActiveTab('manual')} className={`flex-1 pb-2 text-sm font-medium ${activeTab === 'manual' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}>{t('Add Manually')}</button>
-            </div>
+            {t('Search for a food or add an item manually.')}
           </DialogDescription>
         </DialogHeader>
+
+        <div className="flex border-b">
+            <button onClick={() => setActiveTab('search')} className={`flex-1 pb-2 text-sm font-medium ${activeTab === 'search' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}>{t('Search Food')}</button>
+            <button onClick={() => setActiveTab('manual')} className={`flex-1 pb-2 text-sm font-medium ${activeTab === 'manual' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}>{t('Add Manually')}</button>
+        </div>
         
         <div className="py-2">
           <Input

@@ -189,7 +189,7 @@
   "Start logging your meals in the diary to see your analytics.": "Start logging your meals in the diary to see your analytics.",
   "Not enough data": "Not enough data",
   "CSV Food Data": "CSV Food Data",
-  "Download Foods (CSV)": "Download Foods (CSV)",
+  "Download Foods (CSV)": "Download in CSV",
   "CSV Exported": "CSV Exported",
   "Your food data has been downloaded as a CSV file.": "Your food data has been downloaded as a CSV file.",
   "Hydration": "Hydration",
@@ -206,7 +206,6 @@
   "Your hydration settings have been updated.": "Your hydration settings have been updated.",
   "Water Intake": "Water Intake",
   "Today's Progress": "Today's Progress",
-  "Add a glass": "Add a glass",
   "glasses": "glasses",
   "glass": "glass",
   "Time to Hydrate!": "Time to Hydrate!",
@@ -230,5 +229,6 @@
   "Add \"{item}\"": "Add \"{item}\"",
   "Close": "Close",
   "Ingredients Added": "Ingredients Added",
-  "The ingredients for \"{mealName}\" have been added to your shopping list.": "The ingredients for \"{mealName}\" have been added to your shopping list."
+  "The ingredients for \"{mealName}\" have been added to your shopping list.": "The ingredients for \"{mealName}\" have been added to your shopping list.",
+  "Search for a food or add an item manually.": "Search for a food or add an item manually."
 }
