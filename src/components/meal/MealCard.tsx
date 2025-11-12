@@ -44,9 +44,10 @@ import { ScrollArea } from '../ui/scroll-area';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
-import { getFoodName } from '@/lib/utils';
+import { getFoodName, cn } from '@/lib/utils';
 import { formatISO, startOfToday } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { calculateMealScore } from '@/lib/scoring';
 
 
 const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
@@ -78,7 +79,7 @@ interface MealCardProps {
 
 const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
   ({ meal, reorderable, style, attributes, listeners }, ref) => {
-    const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList } = useAppContext();
+    const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList, settings } = useAppContext();
     const [isEditing, setIsEditing] = useState(false);
     const { t, locale } = useLocale();
     const { toast } = useToast();
@@ -86,6 +87,11 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
     const totalNutrients = useMemo(
       () => calculateTotalNutrients(meal, getFoodById),
       [meal, getFoodById]
+    );
+
+    const mealScore = useMemo(
+        () => calculateMealScore(totalNutrients, settings.nutritionalGoals),
+        [totalNutrients, settings.nutritionalGoals]
     );
 
     const handleDelete = () => {
@@ -120,9 +126,24 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
         <div ref={ref} style={style} className="h-full">
         <Card className="flex flex-col h-full">
           <CardHeader>
-            <div className="flex justify-between items-start">
-              <CardTitle className="text-lg font-bold">{meal.name}</CardTitle>
-              <div className="flex items-center">
+            <div className="flex justify-between items-start gap-2">
+               <div className='flex-grow'>
+                    <CardTitle className="text-lg font-bold">{meal.name}</CardTitle>
+               </div>
+              <div className="flex items-center flex-shrink-0">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <div className={cn("flex items-center justify-center w-10 h-10 rounded-full text-white font-bold text-lg", mealScore.color)}>
+                                {mealScore.grade}
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{t('Meal Score')}: {mealScore.percentage}%</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+
                 {reorderable && (
                    <div
                     className="p-1 cursor-grab active:cursor-grabbing touch-none"

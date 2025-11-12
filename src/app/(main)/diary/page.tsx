@@ -16,9 +16,10 @@ import { Plus, Trash2 } from 'lucide-react';
 import FoodSelectorForMeal from '@/components/meal/FoodSelectorForMeal';
 import LogFoodDialog from '@/components/diary/LogFoodDialog';
 import { Food, Meal, LoggedItem, MealType } from '@/lib/types';
-import { getFoodName } from '@/lib/utils';
+import { getFoodName, cn } from '@/lib/utils';
 import WaterTracker from '@/components/diary/WaterTracker';
-
+import { calculateMealScore, calculateDailyScore } from '@/lib/scoring';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const calculateTotalNutrients = (
     items: LoggedItem[], 
@@ -87,6 +88,10 @@ export default function DiaryPage() {
     const totalNutrients = useMemo(() => {
         return calculateTotalNutrients(allLoggedItems, getFoodById, getMealById);
     }, [allLoggedItems, getFoodById, getMealById]);
+    
+    const dailyScore = useMemo(() => {
+        return calculateDailyScore(totalNutrients, goals);
+    }, [totalNutrients, goals]);
 
     const handleAddFoodClick = (mealType: MealType) => {
         setMealTypeToAdd(mealType);
@@ -153,7 +158,23 @@ export default function DiaryPage() {
                     <div className="md:col-span-2 space-y-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle>{t('Daily Summary')} - {format(selectedDate, 'PPP', { locale: locale === 'it' ? it : undefined })}</CardTitle>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <CardTitle>{t('Daily Summary')} - {format(selectedDate, 'PPP', { locale: locale === 'it' ? it : undefined })}</CardTitle>
+                                    </div>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <div className={cn("flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-xl", dailyScore.color)}>
+                                                    {dailyScore.grade}
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>{t('Daily Score')}: {dailyScore.percentage}%</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {nutrientProgress.map(n => (
@@ -169,9 +190,32 @@ export default function DiaryPage() {
                         </Card>
 
                         <Accordion type="multiple" defaultValue={mealTypes} className="w-full">
-                            {mealTypes.map(mealType => (
+                            {mealTypes.map(mealType => {
+                                const mealItems = todaysLog[mealType] || [];
+                                const mealNutrients = calculateTotalNutrients(mealItems, getFoodById, getMealById);
+                                const mealScore = calculateMealScore(mealNutrients, goals);
+
+                                return (
                                 <AccordionItem value={mealType} key={mealType}>
-                                    <AccordionTrigger className="text-lg font-semibold">{mealTypeTranslations[mealType]}</AccordionTrigger>
+                                    <AccordionTrigger>
+                                        <div className="flex justify-between items-center w-full">
+                                            <span className="text-lg font-semibold">{mealTypeTranslations[mealType]}</span>
+                                            {mealItems.length > 0 && (
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger onClick={(e) => e.stopPropagation()}>
+                                                            <div className={cn("flex items-center justify-center w-8 h-8 rounded-full text-white font-bold text-sm mr-2", mealScore.color)}>
+                                                                {mealScore.grade}
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>{t('Meal Score')}: {mealScore.percentage}%</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            )}
+                                        </div>
+                                    </AccordionTrigger>
                                     <AccordionContent>
                                         <div className="space-y-3">
                                             {todaysLog[mealType] && todaysLog[mealType]!.length > 0 ? (
@@ -201,7 +245,8 @@ export default function DiaryPage() {
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
-                            ))}
+                                )
+                            })}
                         </Accordion>
                     </div>
                 </div>

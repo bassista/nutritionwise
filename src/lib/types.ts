@@ -112,3 +112,9 @@ export type DeleteFoodResult = {
 };
 
 export type AnalysisPeriod = 'last7days' | 'last30days' | 'all';
+
+export interface Score {
+    grade: string;
+    percentage: number;
+    color: string;
+}
