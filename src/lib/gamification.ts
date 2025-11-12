@@ -176,3 +176,5 @@ export function evaluateAchievements(data: EvaluationData, badges: Badge[], earn
 
     return newAchievements;
 }
+
+    
