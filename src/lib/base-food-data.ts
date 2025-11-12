@@ -1,0 +1,31 @@
+
+export const baseFoodDataCsv = `id,serving_size_g,calories,protein,carbohydrates,fat,fiber,sugar,sodium,name_category
+pasta-secca,100,355,12.5,71.7,1.5,3.2,3.2,6,"en=Dry Pasta:Cereals and Derivatives;it=Pasta Secca:Cereali e Derivati"
+pane-bianco,100,266,8.7,56.4,1.1,2.3,3.5,530,"en=White Bread:Cereals and Derivatives;it=Pane Bianco:Cereali e Derivati"
+riso-bianco,100,360,6.6,79.3,0.6,0.9,0.1,5,"en=White Rice:Cereals and Derivatives;it=Riso Bianco:Cereali e Derivati"
+patate,100,77,2,17.5,0.1,2.2,0.8,6,"en=Potatoes:Vegetables;it=Patate:Verdure"
+carote,100,41,0.9,9.6,0.2,2.8,4.7,69,"en=Carrots:Vegetables;it=Carote:Verdure"
+pomodori,100,18,0.9,3.9,0.2,1.2,2.6,5,"en=Tomatoes:Vegetables;it=Pomodori:Verdure"
+insalata-lattuga,100,15,1.4,2.9,0.2,1.3,0.8,28,"en=Lettuce:Vegetables;it=Insalata:Verdure"
+zucchine,100,17,1.2,3.1,0.3,1,2.5,8,"en=Zucchini:Vegetables;it=Zucchine:Verdure"
+mela,100,52,0.3,13.8,0.2,2.4,10.4,1,"en=Apple:Fruit;it=Mela:Frutta"
+banana,100,89,1.1,22.8,0.3,2.6,12.2,1,"en=Banana:Fruit;it=Banana:Frutta"
+arancia,100,47,0.9,11.8,0.1,2.4,9.4,0,"en=Orange:Fruit;it=Arancia:Frutta"
+petto-di-pollo,100,165,31,0,3.6,0,0,74,"en=Chicken Breast:Meat;it=Petto di Pollo:Carne"
+carne-di-manzo-macinata,100,250,26,0,15,0,0,72,"en=Ground Beef:Meat;it=Carne di Manzo Macinata:Carne"
+salmone,100,208,20,0,13,0,0,59,"en=Salmon:Fish;it=Salmone:Pesce"
+tonno-in-scatola,100,184,29,0,6.1,0,0,333,"en=Canned Tuna:Fish;it=Tonno in Scatola:Pesce"
+uova,100,155,13,1.1,11,0,1.1,124,"en=Eggs:Dairy & Eggs;it=Uova:Latticini e Uova"
+latte-intero,100,61,3.2,4.8,3.3,0,5.1,44,"en=Whole Milk:Dairy & Eggs;it=Latte Intero:Latticini e Uova"
+yogurt-bianco,100,59,10,3.6,0.4,0,3.6,36,"en=Plain Yogurt:Dairy & Eggs;it=Yogurt Bianco:Latticini e Uova"
+formaggio-cheddar,100,404,23,3.1,33,0,0.5,653,"en=Cheddar Cheese:Dairy & Eggs;it=Formaggio Cheddar:Latticini e Uova"
+mandorle,100,579,21,22,49,12,4.4,1,"en=Almonds:Nuts & Seeds;it=Mandorle:Frutta a Guscio e Semi"
+noci,100,654,15,14,65,7,2.6,2,"en=Walnuts:Nuts & Seeds;it=Noci:Frutta a Guscio e Semi"
+olio-doliva,100,884,0,0,100,0,0,2,"en=Olive Oil:Oils & Fats;it=Olio d'Oliva:Oli e Grassi"
+fagioli-neri,100,132,8.9,23.7,0.5,8.7,0.3,1,"en=Black Beans:Legumes;it=Fagioli Neri:Legumi"
+lenticchie,100,116,9,20,0.4,8,1.8,2,"en=Lentils:Legumes;it=Lenticchie:Legumi"
+cioccolato-fondente,100,598,7.8,61.2,42.6,10.9,47.9,20,"en=Dark Chocolate:Sweets & Snacks;it=Cioccolato Fondente:Dolci e Snack"
+biscotti,100,488,6.8,69.3,21,2.8,32.3,392,"en=Cookies:Sweets & Snacks;it=Biscotti:Dolci e Snack"
+`;
+
+    

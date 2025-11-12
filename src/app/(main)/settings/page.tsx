@@ -56,6 +56,7 @@ import { useRef, useCallback, useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NutritionalGoals, HydrationSettings } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
+import { baseFoodDataCsv } from '@/lib/base-food-data';
 
 
 const settingsSchema = z.object({
@@ -236,13 +237,11 @@ export default function SettingsPage() {
 
   const handleLoadBaseFoods = async () => {
     setIsLoadingBaseFoods(true);
+    // Use a short timeout to allow the UI to update to the loading state
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     try {
-        const response = await fetch('https://cors-anywhere.herokuapp.com/https://pastebin.com/raw/XwRp3Vhd');
-        if (!response.ok) {
-            throw new Error('Failed to fetch base food data');
-        }
-        const text = await response.text();
-        
+        const text = baseFoodDataCsv;
         const rows = text.split('\n').filter(row => row.trim() !== '');
         const header = rows.shift()?.trim().split(',').map(h => h.trim()) || [];
         
@@ -297,7 +296,7 @@ export default function SettingsPage() {
     <>
       <PageHeader title={t('Settings')} />
       <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto space-y-4">
            <Accordion type="single" collapsible className="w-full" defaultValue="language">
             <AccordionItem value="language">
               <AccordionTrigger>
@@ -538,7 +537,7 @@ export default function SettingsPage() {
                       <h3 className="font-semibold mb-2">{t('CSV Food Data')}</h3>
                       <div className='flex items-center gap-2'>
                         <p className="text-sm text-muted-foreground">
-                          {t('Upload or download a CSV file with your food data.')}
+                          {t('Upload a CSV file with your food data.')}
                         </p>
                          <Popover>
                             <PopoverTrigger asChild>
@@ -620,5 +619,4 @@ export default function SettingsPage() {
   );
 }
 
-    
     
