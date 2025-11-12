@@ -15,19 +15,19 @@ export default function BottomNav() {
   const { t } = useLocale();
 
   const navItems = [
-    { href: '/diary', label: t('Diary') },
-    { href: '/foods', label: t('Foods') },
-    { href: '/favorites', label: t('Favorites') },
-    { href: '/meals', label: t('Meals') },
-    { href: '/shopping-list', label: t('Shopping Lists') },
+    { href: '/diary', labelKey: 'Diary' },
+    { href: '/foods', labelKey: 'Foods' },
+    { href: '/favorites', labelKey: 'Favorites' },
+    { href: '/meals', labelKey: 'Meals' },
+    { href: '/shopping-list', labelKey: 'Shopping Lists' },
   ];
   
   const navIcons: Record<string, React.ElementType> = {
-    [t('Diary')]: BookOpen,
-    [t('Foods')]: Wheat,
-    [t('Favorites')]: Heart,
-    [t('Meals')]: UtensilsCrossed,
-    [t('Shopping Lists')]: ShoppingCart,
+    'Diary': BookOpen,
+    'Foods': Wheat,
+    'Favorites': Heart,
+    'Meals': UtensilsCrossed,
+    'Shopping Lists': ShoppingCart,
   };
 
 
@@ -36,7 +36,7 @@ export default function BottomNav() {
       <div className="flex justify-around items-center h-full max-w-lg mx-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
-          const Icon = navIcons[item.label] || Wheat;
+          const Icon = navIcons[item.labelKey] || Wheat;
           
           return (
             <Link
@@ -46,7 +46,7 @@ export default function BottomNav() {
             >
               <Icon className={cn('w-6 h-6 mb-1', isActive ? 'text-primary' : 'text-muted-foreground')} />
               <span className={cn('text-xs', isActive ? 'text-primary' : 'text-muted-foreground')}>
-                {item.label}
+                {t(item.labelKey)}
               </span>
             </Link>
           );
