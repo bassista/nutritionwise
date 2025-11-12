@@ -77,7 +77,7 @@ export const FoodProvider = ({ children }: { children: ReactNode }) => {
 
             const existingFood = foodsMap.get(row.id);
             if (existingFood) {
-                foodsMap.set(row.id, { ...existingFood, ...newFoodData, name: { ...existingFood.name, ...name }, category: { ...existingFood.category, ...category } });
+                foodsMap.set(row.id, { ...existingFood, ...newFoodData, name: name, category: category });
             } else {
                 if(Object.keys(name).length === 0) return;
                 foodsMap.set(row.id, { id: row.id, name, category, ...newFoodData });
