@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -16,12 +16,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
-import type { Meal } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
+import type { Meal, MealFood, Food } from '@/lib/types';
 import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown } from 'lucide-react';
 import FoodSelectorForMeal from './FoodSelectorForMeal';
 import { useLocale } from '@/context/LocaleContext';
 import { getFoodName } from '@/lib/utils';
-import { useMealManagement } from '@/hooks/useMealManagement';
 
 interface MealBuilderProps {
   open: boolean;
@@ -30,27 +30,90 @@ interface MealBuilderProps {
 }
 
 export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuilderProps) {
-  const { getFoodById, mealBuilderContext } = useAppContext();
+  const { addMeal, updateMeal, getFoodById, mealBuilderContext } = useAppContext();
+  const { toast } = useToast();
   const { t, locale } = useLocale();
+
+  const [mealName, setMealName] = useState('');
+  const [mealFoods, setMealFoods] = useState<MealFood[]>([]);
   const [isFoodSelectorOpen, setFoodSelectorOpen] = useState(false);
 
-  const {
-    mealName, setMealName,
-    mealFoods, handleAddFood, handleRemoveFood, handleGramsChange, moveFood,
-    totalNutrients,
-    handleSave,
-  } = useMealManagement(mealToEdit, onOpenChange);
+  useEffect(() => {
+    if (open) {
+      if (mealToEdit) {
+        setMealName(mealToEdit.name);
+        setMealFoods(mealToEdit.foods);
+      } else {
+        setMealName('');
+        setMealFoods([]);
+      }
+    }
+  }, [open, mealToEdit]);
+
+  const handleAddFood = (food: Food) => {
+    if (!mealFoods.some(mf => mf.foodId === food.id)) {
+      setMealFoods(prev => [...prev, { foodId: food.id, grams: food.serving_size_g || 100 }]);
+    }
+    setFoodSelectorOpen(false);
+  };
+
+  const handleRemoveFood = (foodId: string) => {
+    setMealFoods(prev => prev.filter(mf => mf.foodId !== foodId));
+  };
+
+  const handleGramsChange = (foodId: string, grams: number) => {
+    setMealFoods(prev => prev.map(mf => (mf.foodId === foodId ? { ...mf, grams: isNaN(grams) ? 0 : grams } : mf)));
+  };
+
+  const moveFood = (index: number, direction: 'up' | 'down') => {
+    const newMealFoods = [...mealFoods];
+    const item = newMealFoods[index];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= newMealFoods.length) return;
+    newMealFoods.splice(index, 1);
+    newMealFoods.splice(newIndex, 0, item);
+    setMealFoods(newMealFoods);
+  };
   
+  const totalNutrients = useMemo(() => {
+    return mealFoods.reduce((acc, mealFood) => {
+      const food = getFoodById(mealFood.foodId);
+      if (food) {
+        const factor = mealFood.grams / (food.serving_size_g || 100);
+        acc.calories += (food.calories || 0) * factor;
+        acc.protein += (food.protein || 0) * factor;
+        acc.carbohydrates += (food.carbohydrates || 0) * factor;
+        acc.fat += (food.fat || 0) * factor;
+      }
+      return acc;
+    }, { calories: 0, protein: 0, carbohydrates: 0, fat: 0 });
+  }, [mealFoods, getFoodById]);
+
   const nutrientSummary = [
-      { Icon: Flame, value: totalNutrients.calories.toFixed(0) + ' kcal', color: 'text-orange-400' },
-      { Icon: Beef, value: totalNutrients.protein.toFixed(1) + ' g', color: 'text-blue-400' },
-      { Icon: Wheat, value: totalNutrients.carbohydrates.toFixed(1) + ' g', color: 'text-yellow-400' },
-      { Icon: Droplets, value: totalNutrients.fat.toFixed(1) + ' g', color: 'text-purple-400' }
+    { Icon: Flame, value: totalNutrients.calories.toFixed(0) + ' kcal', color: 'text-orange-400' },
+    { Icon: Beef, value: totalNutrients.protein.toFixed(1) + ' g', color: 'text-blue-400' },
+    { Icon: Wheat, value: totalNutrients.carbohydrates.toFixed(1) + ' g', color: 'text-yellow-400' },
+    { Icon: Droplets, value: totalNutrients.fat.toFixed(1) + ' g', color: 'text-purple-400' }
   ];
 
-  const handleSelectFood = (food) => {
-    handleAddFood(food);
-    setFoodSelectorOpen(false);
+  const handleSave = () => {
+    if (!mealName.trim()) {
+      toast({ variant: 'destructive', title: t('Meal name is required.') });
+      return;
+    }
+    if (mealFoods.length === 0) {
+      toast({ variant: 'destructive', title: t('Add at least one food to the meal.') });
+      return;
+    }
+
+    if (mealToEdit) {
+      updateMeal({ id: mealToEdit.id, name: mealName, foods: mealFoods });
+      toast({ title: t('Meal Updated'), description: `"${mealName}" ${t('has been saved.')}` });
+    } else {
+      addMeal({ id: Date.now().toString(), name: mealName, foods: mealFoods });
+      toast({ title: t('Meal Saved'), description: `"${mealName}" ${t('has been created.')}` });
+    }
+    onOpenChange(false);
   };
 
   return (
@@ -141,12 +204,10 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
       <FoodSelectorForMeal
         open={isFoodSelectorOpen}
         onOpenChange={setFoodSelectorOpen}
-        onSelectFood={handleSelectFood}
+        onSelectFood={handleAddFood}
         currentFoodIds={mealFoods.map(mf => mf.foodId)}
         context={mealBuilderContext}
       />
     </>
   );
 }
-
-    
