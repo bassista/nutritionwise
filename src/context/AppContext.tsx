@@ -2,11 +2,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult, DailyLog, NutritionalGoals, MealType, LoggedItem, HydrationSettings, ShoppingList, ShoppingListItem } from '@/lib/types';
+import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult, DailyLog, NutritionalGoals, MealType, LoggedItem, HydrationSettings, ShoppingList, ShoppingListItem, UserAchievement, Badge } from '@/lib/types';
 import { useLocale, type Locale } from './LocaleContext';
 import { getFoodName } from '@/lib/utils';
 import { defaultFoods } from '@/lib/data';
 import { scheduleWaterReminders, cancelWaterReminders, requestNotificationPermission } from '@/lib/notifications';
+import { evaluateAchievements, allBadges } from '@/lib/gamification';
+import { useToast } from '@/hooks/use-toast';
 
 type MealBuilderContext = 'all' | 'favorites';
 
@@ -17,6 +19,7 @@ interface AppContextType {
   settings: AppSettings;
   dailyLogs: DailyLog;
   shoppingLists: ShoppingList[];
+  userAchievements: UserAchievement[];
   isMealBuilderOpen: boolean;
   mealBuilderContext: MealBuilderContext;
   setMealBuilderOpen: (isOpen: boolean, context?: MealBuilderContext) => void;
@@ -134,9 +137,33 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
   const [dailyLogs, setDailyLogs] = useLocalStorage<DailyLog>('dailyLogs', {});
   const [shoppingLists, setShoppingLists] = useLocalStorage<ShoppingList[]>('shoppingLists', defaultShoppingLists);
+  const [userAchievements, setUserAchievements] = useLocalStorage<UserAchievement[]>('userAchievements', []);
   const [isMealBuilderOpen, setIsMealBuilderOpen] = useState(false);
   const [mealBuilderContext, setMealBuilderContext] = useState<MealBuilderContext>('all');
   const { locale, setLocale, t } = useLocale();
+  const { toast } = useToast();
+
+  // Gamification check
+  useEffect(() => {
+    const earnedBadgeIds = new Set(userAchievements.map(a => a.badgeId));
+    const newAchievements = evaluateAchievements({ dailyLogs, settings }, allBadges, earnedBadgeIds);
+    
+    if (newAchievements.length > 0) {
+      const updatedAchievements = [...userAchievements, ...newAchievements];
+      setUserAchievements(updatedAchievements);
+      
+      newAchievements.forEach(achievement => {
+        const badge = allBadges.find(b => b.id === achievement.badgeId);
+        if (badge) {
+          toast({
+            title: `${t('Achievement Unlocked!')} 🎉`,
+            description: t(badge.name),
+          });
+          // Here you could also send a system notification if permission is granted
+        }
+      });
+    }
+  }, [dailyLogs, settings, userAchievements, setUserAchievements, t, toast]);
 
   const getFoodById = useCallback((id: string) => foods.find(f => f.id === id), [foods]);
   const getMealById = useCallback((id: string) => meals.find(m => m.id === id), [meals]);
@@ -355,11 +382,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const clearAllData = useCallback(() => {
     setFoods(defaultFoods); setMeals([]); setFavoriteFoodIds([]);
     setSettings(defaultSettings); setDailyLogs({}); setShoppingLists(defaultShoppingLists);
-  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setDailyLogs, setShoppingLists]);
+    setUserAchievements([]);
+  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setDailyLogs, setShoppingLists, setUserAchievements]);
 
   const exportData = useCallback((): AppData => ({
-    foods, meals, favoriteFoodIds, settings, locale, dailyLogs, shoppingLists
-  }), [foods, meals, favoriteFoodIds, settings, locale, dailyLogs, shoppingLists]);
+    foods, meals, favoriteFoodIds, settings, locale, dailyLogs, shoppingLists, userAchievements
+  }), [foods, meals, favoriteFoodIds, settings, locale, dailyLogs, shoppingLists, userAchievements]);
 
   const importData = useCallback((data: AppData) => {
     if (data.foods) setFoods(data.foods); if (data.meals) setMeals(data.meals);
@@ -367,7 +395,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (data.settings) setSettings(data.settings); if (data.locale) setLocale(data.locale);
     if (data.dailyLogs) setDailyLogs(data.dailyLogs);
     if (data.shoppingLists) setShoppingLists(data.shoppingLists);
-  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setLocale, setDailyLogs, setShoppingLists]);
+    if (data.userAchievements) setUserAchievements(data.userAchievements);
+  }, [setFoods, setMeals, setFavoriteFoodIds, setSettings, setLocale, setDailyLogs, setShoppingLists, setUserAchievements]);
 
   const exportFoodsToCsv = useCallback((): string => {
     const headers = ['id','serving_size_g','calories','protein','carbohydrates','fat','fiber','sugar','sodium','name_category'];
@@ -387,7 +416,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const value: AppContextType = {
-    foods, meals, favoriteFoodIds, settings, dailyLogs, shoppingLists,
+    foods, meals, favoriteFoodIds, settings, dailyLogs, shoppingLists, userAchievements,
     isMealBuilderOpen, mealBuilderContext, setMealBuilderOpen: handleSetMealBuilderOpen,
     getFoodById, getMealById, importFoods, addFood, updateFood, deleteFood, addMeal, updateMeal, deleteMeal,
     toggleFavoriteFood, updateSettings, clearAllData, setFavoriteFoodIds, setMeals, exportData, importData,

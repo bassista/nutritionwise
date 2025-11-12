@@ -230,5 +230,16 @@
   "Close": "Close",
   "Ingredients Added": "Ingredients Added",
   "The ingredients for \"{mealName}\" have been added to your shopping list.": "The ingredients for \"{mealName}\" have been added to your shopping list.",
-  "Search for a food or add an item manually.": "Search for a food or add an item manually."
+  "Search for a food or add an item manually.": "Search for a food or add an item manually.",
+  "Achievements": "Achievements",
+  "Achievement Unlocked!": "Achievement Unlocked!",
+  "First Meal Logged": "First Meal Logged",
+  "Log your first meal to start your journey.": "Log your first meal to start your journey.",
+  "7-Day Streak": "7-Day Streak",
+  "Log a meal every day for 7 days in a row.": "Log a meal every day for 7 days in a row.",
+  "Hydration Goal": "Hydration Goal",
+  "Reach your daily water intake goal for the first time.": "Reach your daily water intake goal for the first time.",
+  "Earned on": "Earned on",
+  "Locked": "Locked",
+  "Keep using the app to unlock this achievement!": "Keep using the app to unlock this achievement!"
 }

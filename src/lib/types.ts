@@ -83,6 +83,18 @@ export interface ShoppingList {
     isDeletable: boolean;
 }
 
+export interface Badge {
+    id: string;
+    name: string;
+    description: string;
+}
+
+export interface UserAchievement {
+    badgeId: string;
+    date: string; // ISO string
+}
+
+
 export interface AppData {
   foods: Food[];
   meals: Meal[];
@@ -91,6 +103,7 @@ export interface AppData {
   locale: 'en' | 'it';
   dailyLogs: DailyLog;
   shoppingLists: ShoppingList[];
+  userAchievements: UserAchievement[];
 }
 
 export type DeleteFoodResult = {
