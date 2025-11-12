@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { useLocale } from '@/context/LocaleContext';
@@ -14,56 +14,8 @@ import { getFoodName } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Food } from '@/lib/types';
 import Spinner from '@/components/ui/spinner';
-
-
-// Polyfill for BarcodeDetector if it's not available
-interface BarcodeDetector {
-  new (options?: { formats: string[] }): BarcodeDetector;
-  detect(image: ImageBitmapSource): Promise<any[]>;
-  getSupportedFormats(): Promise<string[]>;
-}
-
-declare global {
-  interface Window {
-    BarcodeDetector: BarcodeDetector;
-  }
-}
-
-async function fetchFoodData(barcode: string): Promise<Partial<Food> | null> {
-  try {
-    const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    if (data.status !== 1 || !data.product) return null;
-
-    const product = data.product;
-    const nutriments = product.nutriments;
-
-    const food: Partial<Food> = {
-      id: barcode,
-      name: { en: product.product_name_en || product.product_name || '' },
-      category: { en: product.categories?.split(',')[0]?.trim() || '' },
-      serving_size_g: product.serving_size ? parseInt(product.serving_size, 10) : 100,
-      calories: nutriments['energy-kcal_100g'] || 0,
-      protein: nutriments.proteins_100g || 0,
-      carbohydrates: nutriments.carbohydrates_100g || 0,
-      fat: nutriments.fat_100g || 0,
-      fiber: nutriments.fiber_100g || 0,
-      sugar: nutriments.sugars_100g || 0,
-      sodium: nutriments.sodium_100g ? nutriments.sodium_100g * 1000 : 0, // convert g to mg
-    };
-    
-    if (product.product_name_it) {
-        food.name!.it = product.product_name_it;
-    }
-
-    return food;
-  } catch (error) {
-    console.error("Failed to fetch food data:", error);
-    return null;
-  }
-}
+import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
+import { fetchFoodDataFromOpenFoodFacts } from '@/services/openfoodfacts';
 
 
 export default function ScannerClientPage() {
@@ -72,158 +24,56 @@ export default function ScannerClientPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { foods, toggleFavoriteFood, favoriteFoodIds } = useAppContext();
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
-  const [isScanning, setIsScanning] = useState(true);
-  const [scannedBarcode, setScannedBarcode] = useState<string | null>(null);
-  const [isFormOpen, setFormOpen] = useState(false);
+  
   const [foodToCreate, setFoodToCreate] = useState<Partial<Food> | undefined>(undefined);
+  const [isFormOpen, setFormOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
-  
+  const [localBarcode, setLocalBarcode] = useState<string | null>(null);
+
   const fromFavorites = useMemo(() => searchParams.get('from') === 'favorites', [searchParams]);
-
-  const existingFood = scannedBarcode ? foods.find(f => f.id === scannedBarcode) : undefined;
-
-  useEffect(() => {
-    const getCameraPermission = async () => {
-      if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
-        toast({
-          variant: 'destructive',
-          title: t('Camera not supported'),
-          description: t('Your browser does not support camera access.'),
-        });
-        setHasCameraPermission(false);
-        return;
-      }
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        setHasCameraPermission(true);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: t('Camera Access Denied'),
-          description: t('Please enable camera permissions in your browser settings to use this app.'),
-        });
-      }
-    };
-
-    getCameraPermission();
-
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [t, toast]);
+  const existingFood = localBarcode ? foods.find(f => f.id === localBarcode) : undefined;
   
-  useEffect(() => {
-    let detector: BarcodeDetector | undefined;
-    let animationFrameId: number;
+  const handleScanSuccess = async (barcode: string) => {
+    toast({
+      title: t('Barcode detected!'),
+      description: `${t('Scanned barcode: {barcode}', { barcode: barcode })}`,
+    });
+    setLocalBarcode(barcode);
 
-    if (typeof window.BarcodeDetector === 'undefined') {
-      toast({
-          variant: 'destructive',
-          title: 'Scanner Not Supported',
-          description: t('The Barcode Detector API is not supported in this browser.'),
-      });
-      setIsScanning(false);
-      return;
-    }
-
-    try {
-      detector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
-    } catch (e) {
-       toast({
-        variant: 'destructive',
-        title: 'Scanner Init Failed',
-        description: t('Could not initialize the barcode scanner.'),
-      });
-      setIsScanning(false);
-      return;
-    }
-
-    const scan = async () => {
-      if (videoRef.current && !videoRef.current.paused && videoRef.current.videoWidth > 0 && videoRef.current.readyState >= 3 && detector && isScanning) {
-        try {
-          const barcodes = await detector.detect(videoRef.current);
-          if (barcodes.length > 0) {
-            const detectedBarcode = barcodes[0].rawValue;
-            setIsScanning(false);
-             if (videoRef.current && videoRef.current.srcObject) {
-                (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
-             }
-            toast({
-              title: t('Barcode detected!'),
-              description: `${t('Scanned barcode: {barcode}', { barcode: detectedBarcode })}`,
-            });
-            
-            const localFood = foods.find(f => f.id === detectedBarcode);
-            if (localFood) {
-                if (fromFavorites) {
-                    const isAlreadyFavorite = favoriteFoodIds.includes(localFood.id);
-                    if (isAlreadyFavorite) {
-                        setScannedBarcode(detectedBarcode);
-                    } else {
-                        toggleFavoriteFood(localFood.id);
-                        router.push('/favorites');
-                    }
-                } else {
-                    setScannedBarcode(detectedBarcode);
-                }
+    const localFood = foods.find(f => f.id === barcode);
+    if (localFood) {
+        if (fromFavorites) {
+            const isAlreadyFavorite = favoriteFoodIds.includes(localFood.id);
+            if (isAlreadyFavorite) {
+                // Already favorite, just show the info
             } else {
-              // If not, fetch from API
-              setIsFetching(true);
-              setScannedBarcode(detectedBarcode);
-              const fetchedData = await fetchFoodData(detectedBarcode);
-              setIsFetching(false);
-              if (fetchedData) {
-                setFoodToCreate(fetchedData);
-                setFormOpen(true);
-              } else {
-                 setFoodToCreate({ id: detectedBarcode });
-                 setFormOpen(true);
-              }
+                // Not a favorite yet, add it and redirect
+                toggleFavoriteFood(localFood.id);
+                router.push('/favorites');
             }
-          }
-        } catch (e) {
-          console.error('Barcode detection failed:', e);
         }
-      }
-      if (isScanning) {
-        animationFrameId = requestAnimationFrame(scan);
-      }
-    };
-
-    if (isScanning && hasCameraPermission) {
-      scan();
+    } else {
+      // If not in local data, fetch from API
+      setIsFetching(true);
+      const fetchedData = await fetchFoodDataFromOpenFoodFacts(barcode);
+      setIsFetching(false);
+      
+      setFoodToCreate(fetchedData || { id: barcode });
+      setFormOpen(true);
     }
+  };
 
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [isScanning, hasCameraPermission, t, toast, foods, fromFavorites, router, toggleFavoriteFood, favoriteFoodIds]);
+  const {
+    videoRef,
+    hasCameraPermission,
+    isScanning,
+    startScan,
+  } = useBarcodeScanner({ onScanSuccess: handleScanSuccess, toast });
 
   const handleScanAgain = () => {
-    setScannedBarcode(null);
+    setLocalBarcode(null);
     setFoodToCreate(undefined);
-    setIsScanning(true);
-    // Restart camera
-    const getCameraPermission = async () => {
-       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) { console.error('Error restarting camera:', error); }
-    }
-    getCameraPermission();
+    startScan();
   };
 
   const handleFormSubmitted = () => {
@@ -232,9 +82,11 @@ export default function ScannerClientPage() {
   };
   
   const handleOpenForm = () => {
-    setFoodToCreate({ id: scannedBarcode || '' });
+    setFoodToCreate({ id: localBarcode || '' });
     setFormOpen(true);
   }
+
+  const showScanResult = localBarcode && !isScanning;
 
   return (
     <div className="flex flex-col h-full">
@@ -258,7 +110,7 @@ export default function ScannerClientPage() {
                   <div className="w-3/4 h-1/2 border-4 border-dashed border-primary rounded-lg" />
                 </div>
               )}
-               {!isScanning && scannedBarcode && (
+               {showScanResult && (
                  <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white">
                     {isFetching ? <Spinner className="h-8 w-8" /> : <p className="text-lg font-bold">{t('scan complete')}</p>}
                  </div>
@@ -267,11 +119,11 @@ export default function ScannerClientPage() {
           )}
 
           <div className="mt-4">
-            {!scannedBarcode && (
+            {!localBarcode && isScanning && (
                 <p className="text-center text-muted-foreground">{t('Align a barcode within the frame to scan it.')}</p>
             )}
 
-            {scannedBarcode && !isFetching &&(
+            {showScanResult && !isFetching && (
               <Card>
                 <CardHeader>
                   <CardTitle>{t('Scan Result')}</CardTitle>
@@ -282,7 +134,7 @@ export default function ScannerClientPage() {
                       <Alert>
                         <AlertTitle>{t('Food with this barcode already exists')}</AlertTitle>
                         <AlertDescription>
-                         {t('A food with barcode {barcode} is already in your list: {foodName}.', { barcode: scannedBarcode, foodName: getFoodName(existingFood, locale) })}
+                         {t('A food with barcode {barcode} is already in your list: {foodName}.', { barcode: localBarcode, foodName: getFoodName(existingFood, locale) })}
                         </AlertDescription>
                       </Alert>
                        <div className="flex gap-2 mt-4">
@@ -292,7 +144,7 @@ export default function ScannerClientPage() {
                     </div>
                   ) : (
                      <div>
-                      <p>{t('Scanned barcode: {barcode}', { barcode: scannedBarcode })}</p>
+                      <p>{t('Scanned barcode: {barcode}', { barcode: localBarcode })}</p>
                       <p className="text-sm text-muted-foreground">{t("This food isn't in your list yet.")}</p>
                       <div className="flex gap-2 mt-4">
                         <Button onClick={handleOpenForm} className="flex-1">{t('Add')}</Button>
