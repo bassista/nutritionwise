@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -71,7 +72,7 @@ function useFavoriteData() {
     const [favoriteFoodIds, setFavoriteFoodIds] = useLocalStorage<string[]>('favoriteFoodIds', []);
     const toggleFavoriteFood = useCallback((foodId: string) => {
         setFavoriteFoodIds(prev =>
-            prev.includes(foodId) ? prev.filter(id => id !== foodId) : [...prev, foodId]
+            prev.includes(foodId) ? prev.filter(id => id !== foodId) : [foodId, ...prev]
         );
     }, [setFavoriteFoodIds]);
     return { favoriteFoodIds, setFavoriteFoodIds, toggleFavoriteFood };
