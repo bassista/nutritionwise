@@ -164,7 +164,7 @@ export default function DiaryPage() {
                                     </div>
                                     <TooltipProvider>
                                         <Tooltip>
-                                            <TooltipTrigger asChild>
+                                            <TooltipTrigger>
                                                 <div className={cn("flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-xl", dailyScore.color)}>
                                                     {dailyScore.grade}
                                                 </div>
@@ -204,7 +204,7 @@ export default function DiaryPage() {
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                            <div className={cn("flex items-center justify-center w-8 h-8 rounded-full text-white font-bold text-sm mr-2", mealScore.color)}>
+                                                             <div className={cn("flex items-center justify-center w-8 h-8 rounded-full text-white font-bold text-sm mr-2", mealScore.color)}>
                                                                 {mealScore.grade}
                                                             </div>
                                                         </TooltipTrigger>
