@@ -22,6 +22,7 @@ import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown } from '
 import FoodSelectorForMeal from './FoodSelectorForMeal';
 import { useLocale } from '@/context/LocaleContext';
 import { getFoodName } from '@/lib/utils';
+import { calculateTotalNutrientsForMeal } from '@/lib/calculations';
 
 interface MealBuilderProps {
   open: boolean;
@@ -76,18 +77,8 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
   };
   
   const totalNutrients = useMemo(() => {
-    return mealFoods.reduce((acc, mealFood) => {
-      const food = getFoodById(mealFood.foodId);
-      if (food) {
-        const factor = mealFood.grams / (food.serving_size_g || 100);
-        acc.calories += (food.calories || 0) * factor;
-        acc.protein += (food.protein || 0) * factor;
-        acc.carbohydrates += (food.carbohydrates || 0) * factor;
-        acc.fat += (food.fat || 0) * factor;
-      }
-      return acc;
-    }, { calories: 0, protein: 0, carbohydrates: 0, fat: 0 });
-  }, [mealFoods, getFoodById]);
+    return calculateTotalNutrientsForMeal({ id: '', name: mealName, foods: mealFoods }, getFoodById);
+  }, [mealFoods, mealName, getFoodById]);
 
   const nutrientSummary = [
     { Icon: Flame, value: totalNutrients.calories.toFixed(0) + ' kcal', color: 'text-orange-400' },
