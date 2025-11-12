@@ -237,11 +237,13 @@ export default function SettingsPage() {
 
   const handleLoadBaseFoods = async () => {
     setIsLoadingBaseFoods(true);
-    // Use a short timeout to allow the UI to update to the loading state
-    await new Promise(resolve => setTimeout(resolve, 100));
-
     try {
-        const text = baseFoodDataCsv;
+        const response = await fetch('/base-food-data.csv');
+        if (!response.ok) {
+            throw new Error('Failed to fetch base food data');
+        }
+        const text = await response.text();
+
         const rows = text.split('\n').filter(row => row.trim() !== '');
         const header = rows.shift()?.trim().split(',').map(h => h.trim()) || [];
         
@@ -618,5 +620,7 @@ export default function SettingsPage() {
     </>
   );
 }
+
+    
 
     
