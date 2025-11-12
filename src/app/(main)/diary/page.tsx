@@ -43,17 +43,24 @@ const calculateTotalNutrients = (
         } else if (loggedItem.type === 'meal') {
             const meal = getMealById(loggedItem.itemId);
             if (meal) {
+                // Determine the scaling factor based on logged grams vs. total meal grams
+                const totalMealGrams = meal.foods.reduce((acc, mf) => acc + mf.grams, 0);
+                const mealFactor = (loggedItem.grams && totalMealGrams > 0) ? loggedItem.grams / totalMealGrams : 1;
+
                 meal.foods.forEach(mealFood => {
                     const food = getFoodById(mealFood.foodId);
                     if (food) {
-                        const factor = mealFood.grams / (food.serving_size_g || 100);
-                        totals.calories += (food.calories || 0) * factor;
-                        totals.protein += (food.protein || 0) * factor;
-                        totals.carbohydrates += (food.carbohydrates || 0) * factor;
-                        totals.fat += (food.fat || 0) * factor;
-                        totals.fiber += (food.fiber || 0) * factor;
-                        totals.sugar += (food.sugar || 0) * factor;
-                        totals.sodium += (food.sodium || 0) * factor;
+                        // Original factor for the food within the meal, then scaled by the meal's portion
+                        const foodFactorInMeal = mealFood.grams / (food.serving_size_g || 100);
+                        const finalFactor = foodFactorInMeal * mealFactor;
+                        
+                        totals.calories += (food.calories || 0) * finalFactor;
+                        totals.protein += (food.protein || 0) * finalFactor;
+                        totals.carbohydrates += (food.carbohydrates || 0) * finalFactor;
+                        totals.fat += (food.fat || 0) * finalFactor;
+                        totals.fiber += (food.fiber || 0) * finalFactor;
+                        totals.sugar += (food.sugar || 0) * finalFactor;
+                        totals.sodium += (food.sodium || 0) * finalFactor;
                     }
                 });
             }
@@ -164,8 +171,8 @@ export default function DiaryPage() {
                                     </div>
                                     <TooltipProvider>
                                         <Tooltip>
-                                            <TooltipTrigger>
-                                                <div className={cn("flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-xl", dailyScore.color)}>
+                                            <TooltipTrigger asChild>
+                                                 <div className={cn("flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-xl", dailyScore.color)}>
                                                     {dailyScore.grade}
                                                 </div>
                                             </TooltipTrigger>
@@ -268,3 +275,5 @@ export default function DiaryPage() {
         </div>
     );
 }
+
+    
