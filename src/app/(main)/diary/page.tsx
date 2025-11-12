@@ -198,29 +198,11 @@ export default function DiaryPage() {
 
                         <Accordion type="multiple" defaultValue={mealTypes} className="w-full">
                             {mealTypes.map(mealType => {
-                                const mealItems = todaysLog[mealType] || [];
-                                const mealNutrients = calculateTotalNutrients(mealItems, getFoodById, getMealById);
-                                const mealScore = calculateMealScore(mealNutrients, goals);
-
                                 return (
                                 <AccordionItem value={mealType} key={mealType}>
                                     <AccordionTrigger>
                                         <div className="flex justify-between items-center w-full">
                                             <span className="text-lg font-semibold">{mealTypeTranslations[mealType]}</span>
-                                            {mealItems.length > 0 && (
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                             <div onClick={(e) => e.stopPropagation()} className={cn("flex items-center justify-center w-8 h-8 rounded-full text-white font-bold text-sm mr-2", mealScore.color)}>
-                                                                {mealScore.grade}
-                                                            </div>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p>{t('Meal Score')}: {mealScore.percentage}%</p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            )}
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent>
