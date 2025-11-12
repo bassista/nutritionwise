@@ -103,18 +103,21 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     }
 
     const scanLoop = async () => {
-      if (videoRef.current && !videoRef.current.paused && videoRef.current.videoWidth > 0 && videoRef.current.readyState >= 3 && detector && isScanning) {
+      if (videoRef.current && videoRef.current.readyState >= 3 && detector) {
         try {
           const barcodes = await detector.detect(videoRef.current);
           if (barcodes.length > 0) {
             const detectedBarcode = barcodes[0].rawValue;
             stopScan();
             onScanSuccess(detectedBarcode);
+            // Stop the loop once a barcode is found and handled
+            return;
           }
         } catch (e) {
           console.error('Barcode detection failed:', e);
         }
       }
+      // Continue the loop only if scanning is still active
       if (isScanning) {
         animationFrameId = requestAnimationFrame(scanLoop);
       }
