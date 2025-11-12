@@ -1,3 +1,4 @@
+
 export interface NutritionalInfo {
   calories: number;
   protein: number;
@@ -68,6 +69,20 @@ export interface NutritionalGoals {
   sodium: number;
 }
 
+export interface ShoppingListItem {
+    id: string;
+    foodId?: string;
+    text?: string;
+    checked: boolean;
+}
+
+export interface ShoppingList {
+    id: string;
+    name: string;
+    items: ShoppingListItem[];
+    isDeletable: boolean;
+}
+
 export interface AppData {
   foods: Food[];
   meals: Meal[];
@@ -75,6 +90,7 @@ export interface AppData {
   settings: AppSettings;
   locale: 'en' | 'it';
   dailyLogs: DailyLog;
+  shoppingLists: ShoppingList[];
 }
 
 export type DeleteFoodResult = {

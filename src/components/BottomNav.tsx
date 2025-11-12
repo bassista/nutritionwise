@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Wheat, Heart, UtensilsCrossed, Plus, BookOpen, LineChart } from 'lucide-react';
+import { Wheat, Heart, UtensilsCrossed, Plus, BookOpen, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -17,23 +17,17 @@ export default function BottomNav() {
   const navItems = [
     { href: '/diary', label: t('Diary') },
     { href: '/foods', label: t('Foods') },
-    { href: 'create-meal', label: t('Create') },
     { href: '/favorites', label: t('Favorites') },
     { href: '/meals', label: t('Meals') },
+    { href: '/shopping-list', label: t('Shopping Lists') },
   ];
   
-  const navIcons = {
+  const navIcons: Record<string, React.ElementType> = {
     [t('Diary')]: BookOpen,
-    [t('Analytics')]: LineChart,
     [t('Foods')]: Wheat,
-    [t('Meals')]: UtensilsCrossed,
-    [t('Create')]: Plus,
     [t('Favorites')]: Heart,
-  };
-
-  const handleCreateMealClick = () => {
-    const context = pathname === '/favorites' ? 'favorites' : 'all';
-    setMealBuilderOpen(true, context);
+    [t('Meals')]: UtensilsCrossed,
+    [t('Shopping Lists')]: ShoppingCart,
   };
 
 
@@ -42,25 +36,8 @@ export default function BottomNav() {
       <div className="flex justify-around items-center h-full max-w-lg mx-auto">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
-          const Icon = navIcons[item.label as keyof typeof navIcons] || Wheat;
-
-          if (item.href === 'create-meal') {
-            return (
-              <div key={item.href} className="relative -top-6">
-                <Button
-                  size="icon"
-                  className="w-16 h-16 rounded-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-lg"
-                  onClick={handleCreateMealClick}
-                  aria-label={t('Create new meal')}
-                >
-                  <Plus className="w-8 h-8" />
-                </Button>
-              </div>
-            );
-          }
+          const Icon = navIcons[item.label] || Wheat;
           
-          if (item.href === '/settings' || item.href === '/analytics') return null;
-
           return (
             <Link
               href={item.href}

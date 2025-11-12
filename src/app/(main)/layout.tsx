@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Heart, Wheat, Settings, UtensilsCrossed, LineChart, BookOpen, ScanLine } from 'lucide-react';
+import { Heart, Wheat, Settings, UtensilsCrossed, LineChart, BookOpen, ScanLine, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
@@ -48,6 +48,7 @@ function SidebarNav() {
       { href: '/scanner', icon: ScanLine, label: t('Scanner') },
       { href: '/favorites', icon: Heart, label: t('Favorites') },
       { href: '/meals', icon: UtensilsCrossed, label: t('Meals') },
+      { href: '/shopping-list', icon: ShoppingCart, label: t('Shopping Lists') },
     ], [t]);
     
     const handleLinkClick = () => {

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState } from 'react';
@@ -23,7 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { MoreVertical, Trash2, Edit, Flame, Beef, Wheat, Droplets, GripVertical, CalendarPlus } from 'lucide-react';
+import { MoreVertical, Trash2, Edit, Flame, Beef, Wheat, Droplets, GripVertical, CalendarPlus, ShoppingCart } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +46,7 @@ import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 import { getFoodName } from '@/lib/utils';
 import { formatISO, startOfToday } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 
 const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
@@ -76,9 +78,10 @@ interface MealCardProps {
 
 const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
   ({ meal, reorderable, style, attributes, listeners }, ref) => {
-    const { getFoodById, deleteMeal, addLogEntry } = useAppContext();
+    const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList } = useAppContext();
     const [isEditing, setIsEditing] = useState(false);
     const { t, locale } = useLocale();
+    const { toast } = useToast();
 
     const totalNutrients = useMemo(
       () => calculateTotalNutrients(meal, getFoodById),
@@ -94,6 +97,15 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
         const today = formatISO(startOfToday(), { representation: 'date' });
         addLogEntry(today, mealType, { type: 'meal', itemId: meal.id });
     };
+
+    const handleAddToShoppingList = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        addMealToShoppingList(meal.id);
+        toast({
+            title: t('Ingredients Added'),
+            description: t('The ingredients for "{mealName}" have been added to your shopping list.', { mealName: meal.name }),
+        });
+    }
     
     const nutrientDisplay = [
       { Icon: Flame, value: totalNutrients.calories.toFixed(0), label: 'kcal', color: 'text-orange-400', name: t('Calories') },
@@ -132,7 +144,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
                         <CalendarPlus className="mr-2 h-4 w-4" />
                         <span>{t('Add to Breakfast')}</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleAddTo-diary(e, 'lunch')}>
+                    <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'lunch')}>
                         <CalendarPlus className="mr-2 h-4 w-4" />
                         <span>{t('Add to Lunch')}</span>
                     </DropdownMenuItem>
@@ -143,6 +155,10 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
                      <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'snack')}>
                         <CalendarPlus className="mr-2 h-4 w-4" />
                         <span>{t('Add to Snack')}</span>
+                    </DropdownMenuItem>
+                     <DropdownMenuItem onClick={(e) => handleAddToShoppingList(e)}>
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        <span>{t('Add to Shopping List')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setIsEditing(true)}>
                       <Edit className="mr-2 h-4 w-4" />
