@@ -45,7 +45,7 @@ const calculateMacroBalanceScore = (nutrients: NutritionalInfo): number => {
 
 const calculateNutrientQualityScore = (nutrients: NutritionalInfo, goals: NutritionalGoals): number => {
     let score = 100;
-    const penaltyMultiplier = 25; 
+    const penaltyMultiplier = 12.5; 
 
     // Penalty for too much sugar (relative to goal for the day)
     // We assume a meal is ~1/3 of the day
@@ -147,5 +147,30 @@ export const calculateDailyScore = (nutrients: NutritionalInfo, goals: Nutrition
     const percentage = Math.round(Math.min(100, finalScore));
     const { grade, color } = getGrade(percentage);
     
+    return { percentage, grade, color };
+};
+
+export const calculateHydrationScore = (waterIntakeMl: number, goalMl: number): Score => {
+    if (goalMl <= 0) {
+        return { percentage: 0, grade: 'N/A', color: 'bg-muted' };
+    }
+
+    const ratio = waterIntakeMl / goalMl;
+    let score = 0;
+
+    if (ratio >= 1 && ratio <= 1.2) {
+        // Max score if intake is between 100% and 120%
+        score = 100;
+    } else if (ratio < 1) {
+        // Score increases linearly up to 100%
+        score = ratio * 100;
+    } else { // ratio > 1.2
+        // Score decreases from 100 to 0 as intake goes from 120% to 200%
+        score = Math.max(0, 100 - ((ratio - 1.2) / 0.8) * 100);
+    }
+    
+    const percentage = Math.round(score);
+    const { grade, color } = getGrade(percentage);
+
     return { percentage, grade, color };
 };

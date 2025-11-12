@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Droplets, GlassWater } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { calculateHydrationScore } from '@/lib/scoring';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface WaterTrackerProps {
   selectedDate: string;
@@ -35,11 +38,29 @@ export default function WaterTracker({ selectedDate }: WaterTrackerProps) {
   const handleAddGlass = () => {
     addWaterIntake(selectedDate, glassSizeMl);
   };
+  
+  const hydrationScore = useMemo(() => {
+    return calculateHydrationScore(waterIntakeMl, goalMl);
+  }, [waterIntakeMl, goalMl]);
 
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>{t('Water Intake')}</CardTitle>
+        <div className="flex justify-between items-center">
+            <CardTitle>{t('Water Intake')}</CardTitle>
+             <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                         <div className={cn("flex items-center justify-center w-10 h-10 rounded-full text-white font-bold text-lg", hydrationScore.color)}>
+                            {hydrationScore.grade}
+                        </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{t('Hydration Score')}: {hydrationScore.percentage}%</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
