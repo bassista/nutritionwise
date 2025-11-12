@@ -10,7 +10,9 @@ import { useAppContext } from '@/context/AppContext';
 import { useLocale } from '@/context/LocaleContext';
 import { Food } from '@/lib/types';
 import { getFoodName } from '@/lib/utils';
-import { Plus } from 'lucide-react';
+import { Plus, Heart } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
 
 interface AddItemDialogProps {
   open: boolean;
@@ -21,16 +23,25 @@ interface AddItemDialogProps {
 
 export default function AddItemDialog({ open, onOpenChange, onAddItem, existingItemIds }: AddItemDialogProps) {
   const { t, locale } = useLocale();
-  const { foods } = useAppContext();
+  const { foods, favoriteFoodIds } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'search' | 'manual'>('search');
+  const [searchFavoritesOnly, setSearchFavoritesOnly] = useState(false);
+
+  const sourceFoods = useMemo(() => {
+    if (searchFavoritesOnly) {
+        const foodMap = new Map(foods.map(f => [f.id, f]));
+        return favoriteFoodIds.map(id => foodMap.get(id)).filter(Boolean) as Food[];
+    }
+    return foods;
+  }, [foods, searchFavoritesOnly, favoriteFoodIds]);
 
   const filteredFoods = useMemo(() => {
-    return foods.filter(food => 
+    return sourceFoods.filter(food => 
       !existingItemIds.includes(food.id) &&
       getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [foods, searchTerm, locale, existingItemIds]);
+  }, [sourceFoods, searchTerm, locale, existingItemIds]);
 
   const handleSelectFood = (food: Food) => {
     onAddItem({ foodId: food.id });
@@ -57,7 +68,20 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
         </DialogHeader>
 
         <div className="flex border-b">
-            <button onClick={() => setActiveTab('search')} className={`flex-1 pb-2 text-sm font-medium ${activeTab === 'search' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}>{t('Search Food')}</button>
+            <div className="flex-1 flex items-center justify-center">
+                 <button onClick={() => setActiveTab('search')} className={`pb-2 text-sm font-medium ${activeTab === 'search' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}>{t('Search Food')}</button>
+                 <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                        "ml-2 h-8 w-8",
+                        activeTab === 'manual' && 'invisible'
+                    )}
+                    onClick={() => setSearchFavoritesOnly(prev => !prev)}
+                    >
+                    <Heart className={cn('h-4 w-4', searchFavoritesOnly ? 'text-red-500 fill-current' : 'text-muted-foreground')} />
+                </Button>
+            </div>
             <button onClick={() => setActiveTab('manual')} className={`flex-1 pb-2 text-sm font-medium ${activeTab === 'manual' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground'}`}>{t('Add Manually')}</button>
         </div>
         
