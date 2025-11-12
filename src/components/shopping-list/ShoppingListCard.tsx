@@ -113,11 +113,11 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
             )}
           </ScrollArea>
         </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row gap-2 pt-6">
-            <Button variant="outline" size="sm" className="w-full sm:w-auto sm:flex-grow" onClick={() => toggleAllShoppingListItems(list.id, !allItemsChecked)}>
+        <CardFooter className="gap-2 pt-6 sm:grid sm:grid-cols-2">
+            <Button variant="outline" size="sm" className="w-full" onClick={() => toggleAllShoppingListItems(list.id, !allItemsChecked)}>
                 <Check className="mr-2 h-4 w-4" /> {allItemsChecked ? t('Uncheck All') : t('Check All')}
             </Button>
-            <Button size="sm" className="w-full sm:w-auto sm:flex-grow" onClick={() => setAddItemOpen(true)}>
+            <Button size="sm" className="w-full" onClick={() => setAddItemOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" /> {t('Add Item')}
             </Button>
         </CardFooter>
