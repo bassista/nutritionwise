@@ -48,7 +48,8 @@ import {
 import { Download, Upload, Info } from 'lucide-react';
 import { useRef, useCallback, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { NutritionalGoals } from '@/lib/types';
+import { NutritionalGoals, HydrationSettings } from '@/lib/types';
+import { Switch } from '@/components/ui/switch';
 
 
 const settingsSchema = z.object({
@@ -69,8 +70,17 @@ const nutritionalGoalsSchema = z.object({
     sodium: z.coerce.number().min(0, "Cannot be negative"),
 });
 
+const hydrationSettingsSchema = z.object({
+    goalLiters: z.coerce.number().min(0.1, "Must be at least 0.1"),
+    glassSizeMl: z.coerce.number().int().min(1, "Must be at least 1"),
+    remindersEnabled: z.boolean(),
+    reminderIntervalMinutes: z.coerce.number().int().min(1, "Must be at least 1"),
+    reminderStartTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
+    reminderEndTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
+});
+
 export default function SettingsPage() {
-  const { settings, updateSettings, clearAllData, exportData, importData, updateNutritionalGoals, exportFoodsToCsv } = useAppContext();
+  const { settings, updateSettings, clearAllData, exportData, importData, updateNutritionalGoals, exportFoodsToCsv, updateHydrationSettings } = useAppContext();
   const { toast } = useToast();
   const { t, setLocale, locale } = useLocale();
   const backupFileRef = useRef<HTMLInputElement>(null);
@@ -86,10 +96,16 @@ export default function SettingsPage() {
     resolver: zodResolver(nutritionalGoalsSchema),
     defaultValues: settings.nutritionalGoals,
   });
+  
+  const hydrationForm = useForm<z.infer<typeof hydrationSettingsSchema>>({
+    resolver: zodResolver(hydrationSettingsSchema),
+    defaultValues: settings.hydrationSettings,
+  });
 
   useEffect(() => {
     goalsForm.reset(settings.nutritionalGoals);
-  }, [settings.nutritionalGoals, goalsForm]);
+    hydrationForm.reset(settings.hydrationSettings);
+  }, [settings, goalsForm, hydrationForm]);
 
   function onDisplaySubmit(values: z.infer<typeof settingsSchema>) {
     updateSettings(values);
@@ -104,6 +120,14 @@ export default function SettingsPage() {
     toast({
         title: t('Goals Saved'),
         description: t('Your nutritional goals have been updated.'),
+    });
+  }
+
+  function onHydrationSubmit(values: z.infer<typeof hydrationSettingsSchema>) {
+    updateHydrationSettings(values);
+    toast({
+        title: t('Hydration Settings Saved'),
+        description: t('Your hydration settings have been updated.'),
     });
   }
 
@@ -236,6 +260,123 @@ export default function SettingsPage() {
                         ))}
                     </div>
                     <Button type="submit">{t('Save Goals')}</Button>
+                  </form>
+                </Form>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="hydration">
+               <AccordionTrigger>
+                 <div className="text-left">
+                  <h3 className="text-lg font-semibold">{t('Hydration')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t('Manage your water intake goals and reminders.')}
+                  </p>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Form {...hydrationForm}>
+                  <form onSubmit={hydrationForm.handleSubmit(onHydrationSubmit)} className="space-y-8">
+                     <div className="grid grid-cols-2 gap-4">
+                         <FormField
+                          control={hydrationForm.control}
+                          name="goalLiters"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('Daily Goal (Liters)')}</FormLabel>
+                              <FormControl>
+                                <Input type="number" step="0.1" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={hydrationForm.control}
+                          name="glassSizeMl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('Glass Size (ml)')}</FormLabel>
+                              <FormControl>
+                                <Input type="number" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                    </div>
+                    
+                    <FormField
+                        control={hydrationForm.control}
+                        name="remindersEnabled"
+                        render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                            <FormLabel className="text-base">
+                                {t('Enable Reminders')}
+                            </FormLabel>
+                            <FormDescription>
+                                {t('Receive notifications to drink water.')}
+                            </FormDescription>
+                            </div>
+                            <FormControl>
+                            <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                            />
+                            </FormControl>
+                        </FormItem>
+                        )}
+                    />
+                    
+                    {hydrationForm.watch('remindersEnabled') && (
+                        <div className="space-y-4">
+                             <FormField
+                              control={hydrationForm.control}
+                              name="reminderIntervalMinutes"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('Reminder Interval (minutes)')}</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                               <FormField
+                                  control={hydrationForm.control}
+                                  name="reminderStartTime"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>{t('Reminders Start Time')}</FormLabel>
+                                      <FormControl>
+                                        <Input type="time" {...field} />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                 <FormField
+                                  control={hydrationForm.control}
+                                  name="reminderEndTime"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>{t('Reminders End Time')}</FormLabel>
+                                      <FormControl>
+                                        <Input type="time" {...field} />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+
+                    <Button type="submit">{t('Save Hydration Settings')}</Button>
                   </form>
                 </Form>
               </AccordionContent>

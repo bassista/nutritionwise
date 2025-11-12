@@ -2,10 +2,11 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult, DailyLog, NutritionalGoals, MealType, LoggedItem } from '@/lib/types';
+import type { Food, Meal, AppSettings, MealFood, AppData, DeleteFoodResult, DailyLog, NutritionalGoals, MealType, LoggedItem, HydrationSettings } from '@/lib/types';
 import { useLocale, type Locale } from './LocaleContext';
 import { getFoodName } from '@/lib/utils';
 import { defaultFoods } from '@/lib/data';
+import { scheduleWaterReminders, cancelWaterReminders, requestNotificationPermission } from '@/lib/notifications';
 
 type MealBuilderContext = 'all' | 'favorites';
 
@@ -38,6 +39,8 @@ interface AppContextType {
   removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
   updateNutritionalGoals: (goals: NutritionalGoals) => void;
   exportFoodsToCsv: () => string;
+  addWaterIntake: (date: string, amountMl: number) => void;
+  updateHydrationSettings: (hydrationSettings: Partial<HydrationSettings>) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,9 +55,19 @@ const defaultGoals: NutritionalGoals = {
   sodium: 2300,
 };
 
+const defaultHydrationSettings: HydrationSettings = {
+  goalLiters: 2,
+  glassSizeMl: 200,
+  remindersEnabled: false,
+  reminderIntervalMinutes: 120,
+  reminderStartTime: '08:00',
+  reminderEndTime: '20:00',
+};
+
 const defaultSettings: AppSettings = {
   foodsPerPage: 8,
   nutritionalGoals: defaultGoals,
+  hydrationSettings: defaultHydrationSettings,
 };
 
 const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
@@ -66,8 +79,13 @@ const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((va
       const item = window.localStorage.getItem(key);
       if (item) {
         const parsedItem = JSON.parse(item);
-        if (key === 'settings' && !parsedItem.nutritionalGoals) {
-            parsedItem.nutritionalGoals = defaultGoals;
+        if (key === 'settings') {
+            if (!parsedItem.nutritionalGoals) {
+                parsedItem.nutritionalGoals = defaultGoals;
+            }
+            if (!parsedItem.hydrationSettings) {
+                parsedItem.hydrationSettings = defaultHydrationSettings;
+            }
         }
         setStoredValue(parsedItem);
       }
@@ -100,7 +118,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [dailyLogs, setDailyLogs] = useLocalStorage<DailyLog>('dailyLogs', {});
   const [isMealBuilderOpen, setIsMealBuilderOpen] = useState(false);
   const [mealBuilderContext, setMealBuilderContext] = useState<MealBuilderContext>('all');
-  const { locale, setLocale } = useLocale();
+  const { locale, setLocale, t } = useLocale();
 
   const getFoodById = useCallback((id: string) => foods.find(f => f.id === id), [foods]);
   const getMealById = useCallback((id: string) => meals.find(m => m.id === id), [meals]);
@@ -142,9 +160,37 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [setDailyLogs]);
 
+  const addWaterIntake = useCallback((date: string, amountMl: number) => {
+    setDailyLogs(prevLogs => {
+        const newLogs = { ...prevLogs };
+        if (!newLogs[date]) {
+            newLogs[date] = {};
+        }
+        newLogs[date].waterIntakeMl = (newLogs[date].waterIntakeMl || 0) + amountMl;
+        return newLogs;
+    });
+  }, [setDailyLogs]);
+
   const updateSettings = useCallback((newSettings: Partial<AppSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
   }, [setSettings]);
+  
+  const updateHydrationSettings = useCallback(async (hydrationSettings: Partial<HydrationSettings>) => {
+    const newHydrationSettings = { ...settings.hydrationSettings, ...hydrationSettings };
+    updateSettings({ hydrationSettings: newHydrationSettings });
+
+    if (newHydrationSettings.remindersEnabled) {
+      const permission = await requestNotificationPermission();
+      if (permission === 'granted') {
+        scheduleWaterReminders(newHydrationSettings, t);
+      } else {
+        // If permission denied, update the state to reflect that reminders are off
+        updateSettings({ hydrationSettings: { ...newHydrationSettings, remindersEnabled: false } });
+      }
+    } else {
+      cancelWaterReminders();
+    }
+  }, [settings.hydrationSettings, updateSettings, t]);
 
   const updateNutritionalGoals = useCallback((goals: NutritionalGoals) => {
     updateSettings({ nutritionalGoals: goals });
@@ -236,11 +282,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const newLogs = JSON.parse(JSON.stringify(prevLogs));
       Object.keys(newLogs).forEach(date => {
         Object.keys(newLogs[date]).forEach(mealType => {
-          newLogs[date][mealType as MealType] = newLogs[date][mealType as MealType]!.filter(
-            (item: LoggedItem) => !(item.type === 'food' && item.itemId === foodId)
-          );
-          if (newLogs[date][mealType as MealType]!.length === 0) {
-            delete newLogs[date][mealType as MealType];
+          if (mealType !== 'waterIntakeMl') {
+            newLogs[date][mealType as MealType] = newLogs[date][mealType as MealType]!.filter(
+              (item: LoggedItem) => !(item.type === 'food' && item.itemId === foodId)
+            );
+            if (newLogs[date][mealType as MealType]!.length === 0) {
+              delete newLogs[date][mealType as MealType];
+            }
           }
         });
         if (Object.keys(newLogs[date]).length === 0) {
@@ -268,11 +316,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const newLogs = JSON.parse(JSON.stringify(prevLogs));
       Object.keys(newLogs).forEach(date => {
         Object.keys(newLogs[date]).forEach(mealType => {
-          newLogs[date][mealType as MealType] = newLogs[date][mealType as MealType]!.filter(
-            (item: LoggedItem) => !(item.type === 'meal' && item.itemId === mealId)
-          );
-           if (newLogs[date][mealType as MealType]!.length === 0) {
-            delete newLogs[date][mealType as MealType];
+           if (mealType !== 'waterIntakeMl') {
+            newLogs[date][mealType as MealType] = newLogs[date][mealType as MealType]!.filter(
+              (item: LoggedItem) => !(item.type === 'meal' && item.itemId === mealId)
+            );
+            if (newLogs[date][mealType as MealType]!.length === 0) {
+              delete newLogs[date][mealType as MealType];
+            }
           }
         });
          if (Object.keys(newLogs[date]).length === 0) {
@@ -323,7 +373,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     ];
 
     const rows = foods.map(food => {
-      const allLangs = new Set([...Object.keys(food.name), ...Object.keys(food.category)]);
+      const allLangs = new Set([...Object.keys(food.name), ...Object.keys(food.category || {})]);
       
       const nameCategoryPairs = Array.from(allLangs).map(lang => {
         const name = food.name[lang] || '';
@@ -388,6 +438,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     removeLogEntry,
     updateNutritionalGoals,
     exportFoodsToCsv,
+    addWaterIntake,
+    updateHydrationSettings,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

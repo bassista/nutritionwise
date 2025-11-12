@@ -26,9 +26,19 @@ export interface Meal {
   foods: MealFood[];
 }
 
+export interface HydrationSettings {
+  goalLiters: number;
+  glassSizeMl: number;
+  remindersEnabled: boolean;
+  reminderIntervalMinutes: number;
+  reminderStartTime: string; // "HH:mm"
+  reminderEndTime: string; // "HH:mm"
+}
+
 export interface AppSettings {
   foodsPerPage: number;
   nutritionalGoals: NutritionalGoals;
+  hydrationSettings: HydrationSettings;
 }
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
@@ -44,6 +54,7 @@ export interface LoggedItem {
 export interface DailyLog {
   [date: string]: { // ISO date string: YYYY-MM-DD
     [mealType in MealType]?: LoggedItem[];
+    waterIntakeMl?: number;
   };
 }
 

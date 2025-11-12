@@ -17,6 +17,7 @@ import FoodSelectorForMeal from '@/components/meal/FoodSelectorForMeal';
 import LogFoodDialog from '@/components/diary/LogFoodDialog';
 import { Food, Meal, LoggedItem, MealType } from '@/lib/types';
 import { getFoodName } from '@/lib/utils';
+import WaterTracker from '@/components/diary/WaterTracker';
 
 
 const calculateTotalNutrients = (
@@ -77,7 +78,10 @@ export default function DiaryPage() {
     const todaysLog = useMemo(() => dailyLogs[selectedDateString] || {}, [dailyLogs, selectedDateString]);
 
     const allLoggedItems = useMemo(() => {
-      return (Object.values(todaysLog).flat() as LoggedItem[]) || [];
+      const foodItems = (Object.entries(todaysLog)
+        .filter(([key]) => key !== 'waterIntakeMl')
+        .flatMap(([, value]) => value) as LoggedItem[]) || [];
+      return foodItems;
     }, [todaysLog]);
 
     const totalNutrients = useMemo(() => {
@@ -144,6 +148,7 @@ export default function DiaryPage() {
                                 />
                             </CardContent>
                         </Card>
+                         <WaterTracker selectedDate={selectedDateString} />
                     </div>
                     <div className="md:col-span-2 space-y-6">
                         <Card>

@@ -191,7 +191,24 @@
   "CSV Food Data": "Dati Alimenti CSV",
   "Download Foods (CSV)": "Scarica in CSV",
   "CSV Exported": "CSV Esportato",
-  "Your food data has been downloaded as a CSV file.": "I tuoi dati alimentari sono stati scaricati come file CSV."
+  "Your food data has been downloaded as a CSV file.": "I tuoi dati alimentari sono stati scaricati come file CSV.",
+  "Hydration": "Idratazione",
+  "Manage your water intake goals and reminders.": "Gestisci i tuoi obiettivi e promemoria di idratazione.",
+  "Daily Goal (Liters)": "Obiettivo Giornaliero (Litri)",
+  "Glass Size (ml)": "Dimensione Bicchiere (ml)",
+  "Enable Reminders": "Abilita Promemoria",
+  "Receive notifications to drink water.": "Ricevi notifiche per ricordarti di bere.",
+  "Reminder Interval (minutes)": "Intervallo Promemoria (minuti)",
+  "Reminders Start Time": "Ora Inizio Promemoria",
+  "Reminders End Time": "Ora Fine Promemoria",
+  "Save Hydration Settings": "Salva Impostazioni Idratazione",
+  "Hydration Settings Saved": "Impostazioni Idratazione Salvate",
+  "Your hydration settings have been updated.": "Le tue impostazioni di idratazione sono state aggiornate.",
+  "Water Intake": "Idratazione",
+  "Today's Progress": "Progresso di oggi",
+  "Add a glass": "Aggiungi un bicchiere",
+  "glasses": "bicchieri",
+  "glass": "bicchiere",
+  "Time to Hydrate!": "È ora di idratarsi!",
+  "Don't forget to drink a glass of water.": "Non dimenticare di bere un bicchiere d'acqua."
 }
-
-    
