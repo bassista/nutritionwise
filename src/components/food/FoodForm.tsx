@@ -73,10 +73,10 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
     return Array.from(new Set(allCategories.filter(Boolean)));
   }, [foods, locale, t]);
   
-  const defaultValues: FoodFormValues = {
+  const defaultValues: FoodFormValues = useMemo(() => ({
     id: '',
     name: '',
-    category: '',
+    category: t('Uncategorized'),
     serving_size_g: 100,
     calories: 0,
     protein: 0,
@@ -85,7 +85,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
     fiber: 0,
     sugar: 0,
     sodium: 0,
-  };
+  }), [t]);
 
   const form = useForm<FoodFormValues>({
     resolver: zodResolver(foodSchema),
@@ -112,7 +112,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
         form.reset({
           id: foodToCreate.id || '',
           name: foodToCreate.name?.[locale] || foodToCreate.name?.['en'] || '',
-          category: foodToCreate.category?.[locale] || foodToCreate.category?.['en'] || '',
+          category: foodToCreate.category?.[locale] || foodToCreate.category?.['en'] || t('Uncategorized'),
           serving_size_g: foodToCreate.serving_size_g || 100,
           calories: foodToCreate.calories || 0,
           protein: foodToCreate.protein || 0,
@@ -128,7 +128,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, foodToEdit, foodToCreate, locale, form.reset]);
+  }, [open, foodToEdit, foodToCreate, locale, form.reset, defaultValues]);
 
 
   const onSubmit = (data: FoodFormValues) => {
