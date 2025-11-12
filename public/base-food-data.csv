@@ -1,0 +1,91 @@
+id,name_category,serving_size_g,calories,protein,carbohydrates,fat,fiber,sugar,sodium
+pasta,"en=Pasta:Cereals and Derivatives;it=Pasta:Cereali e derivati",100,355,12.5,71.7,1.5,3.2,3.2,6
+rice,"en=White Rice:Cereals and Derivatives;it=Riso Bianco:Cereali e derivati",100,130,2.7,28,0.3,0.4,0.1,1
+bread,"en=White Bread:Cereals and Derivatives;it=Pane Bianco:Cereali e derivati",100,265,9,49,3.2,2.7,5,491
+chicken_breast,"en=Chicken Breast (cooked):Meat;it=Petto di Pollo (cotto):Carne",100,165,31,0,3.6,0,0,74
+salmon,"en=Salmon (cooked):Fish;it=Salmone (cotto):Pesce",100,208,22,0,13,0,0,59
+egg,"en=Egg (boiled):Dairy & Alternatives;it=Uovo (sodo):Latticini e alternative",50,78,6,0.6,5,0,0.6,62
+milk,"en=Milk (whole):Dairy & Alternatives;it=Latte (intero):Latticini e alternative",244,149,7.7,12,8,0,12,107
+yogurt,"en=Yogurt (plain):Dairy & Alternatives;it=Yogurt (bianco):Latticini e alternative",100,59,10,3.6,0.4,0,3.6,36
+apple,"en=Apple:Fruit;it=Mela:Frutta",100,52,0.3,14,0.2,2.4,10,1
+banana,"en=Banana:Fruit;it=Banana:Frutta",100,89,1.1,23,0.3,2.6,12,1
+orange,"en=Orange:Fruit;it=Arancia:Frutta",100,47,0.9,12,0.1,2.4,9,0
+strawberry,"en=Strawberry:Fruit;it=Fragola:Frutta",100,32,0.7,8,0.3,2,4.9,1
+broccoli,"en=Broccoli (cooked):Vegetables;it=Broccoli (cotti):Verdure",100,35,2.4,7.2,0.4,3.3,1.4,41
+carrot,"en=Carrot (raw):Vegetables;it=Carota (cruda):Verdure",100,41,0.9,10,0.2,2.8,4.7,69
+spinach,"en=Spinach (raw):Vegetables;it=Spinaci (crudi):Verdure",100,23,2.9,3.6,0.4,2.2,0.4,79
+tomato,"en=Tomato (raw):Vegetables;it=Pomodoro (crudo):Verdure",100,18,0.9,3.9,0.2,1.2,2.6,5
+potato,"en=Potato (cooked):Vegetables;it=Patata (cotta):Verdure",100,87,1.9,20,0.1,1.8,0.8,6
+olive_oil,"en=Olive Oil:Fats and Oils;it=Olio d'oliva:Grassi e Oli",100,884,0,0,100,0,0,2
+almonds,"en=Almonds:Nuts and Seeds;it=Mandorle:Frutta secca e semi",100,579,21,22,49,12.5,4.4,1
+lentils,"en=Lentils (cooked):Legumes;it=Lenticchie (cotte):Legumi",100,116,9,20,0.4,8,0.3,2
+chickpeas,"en=Chickpeas (cooked):Legumes;it=Ceci (cotti):Legumi",100,139,7.6,23,2.4,7,4.2,7
+tuna_canned,"en=Tuna (canned in water):Fish;it=Tonno (in scatola al naturale):Pesce",100,116,26,0,1,0,0,300
+parmesan,"en=Parmesan Cheese:Dairy & Alternatives;it=Parmigiano:Latticini e alternative",100,431,38,4.1,29,0,0,1529
+beef_mince,"en=Beef Mince (cooked):Meat;it=Carne Macinata di Manzo (cotta):Carne",100,250,26,0,15,0,0,72
+avocado,"en=Avocado:Fruit;it=Avocado:Frutta",100,160,2,8.5,15,6.7,0.7,7
+peanut_butter,"en=Peanut Butter:Spreads;it=Burro di Arachidi:Creme spalmabili",100,588,25,20,50,6,9,17
+dark_chocolate,"en=Dark Chocolate (70-85%):Sweets;it=Cioccolato Fondente (70-85%):Dolci",100,598,7.8,46,43,11,24,20
+oats,"en=Oats:Cereals and Derivatives;it=Avena:Cereali e derivati",100,389,16.9,66.3,6.9,10.6,0,2
+quinoa,"en=Quinoa (cooked):Cereals and Derivatives;it=Quinoa (cotta):Cereali e derivati",100,120,4.4,21.3,1.9,2.8,0.9,7
+sweet_potato,"en=Sweet Potato (cooked):Vegetables;it=Patata Dolce (cotta):Verdure",100,86,1.6,20.1,0.1,3,4.2,55
+mozzarella,"en=Mozzarella:Dairy & Alternatives;it=Mozzarella:Latticini e alternative",100,280,28,3.1,17,0,1.2,16
+lettuce,"en=Lettuce:Vegetables;it=Lattuga:Verdure",100,15,1.4,2.9,0.2,1.3,0.8,28
+cucumber,"en=Cucumber:Vegetables;it=Cetriolo:Verdure",100,15,0.7,3.6,0.1,0.5,1.7,2
+zucchini,"en=Zucchini (cooked):Vegetables;it=Zucchine (cotte):Verdure",100,17,1.2,3.1,0.3,1,2.5,8
+onion,"en=Onion:Vegetables;it=Cipolla:Verdure",100,40,1.1,9.3,0.1,1.7,4.2,4
+garlic,"en=Garlic:Vegetables;it=Aglio:Verdure",100,149,6.4,33.1,0.5,2.1,1,17
+mushrooms,"en=Mushrooms (cooked):Vegetables;it=Funghi (cotti):Verdure",100,28,3.6,4.4,0.5,2,2.5,6
+bell_pepper,"en=Bell Pepper (raw):Vegetables;it=Peperone (crudo):Verdure",100,31,1,6,0.3,2.1,4.2,4
+shrimp,"en=Shrimp (cooked):Fish;it=Gamberetti (cotti):Pesce",100,99,24,0.2,0.3,0,0,111
+coffee,"en=Coffee (brewed):Drinks;it=Caffè (infuso):Bevande",100,1,0.1,0,0,0,0,2
+tea,"en=Tea (brewed):Drinks;it=Tè (infuso):Bevande",100,1,0.1,0.3,0,0,0,3
+honey,"en=Honey:Sweets;it=Miele:Dolci",100,304,0.3,82,0,0.2,82,4
+maple_syrup,"en=Maple Syrup:Sweets;it=Sciroppo d'acero:Dolci",100,260,0,67,0.1,0,67,2
+butter,"en=Butter:Fats and Oils;it=Burro:Grassi e Oli",100,717,0.9,0.1,81,0,0.1,643
+cottage_cheese,"en=Cottage Cheese:Dairy & Alternatives;it=Fiocchi di latte:Latticini e alternative",100,98,11,3.4,4.3,0,3.2,364
+tofu,"en=Tofu:Legumes;it=Tofu:Legumi",100,76,8,1.9,4.8,1.9,0,7
+ketchup,"en=Ketchup:Condiments;it=Ketchup:Salse",100,101,0.9,25,0.1,0,22,1110
+mayonnaise,"en=Mayonnaise:Condiments;it=Maionese:Salse",100,720,1,1.3,79,0,1.3,635
+mustard,"en=Mustard:Condiments;it=Senape:Salse",100,143,8,8,9,4,3,1140
+pork_chop,"en=Pork Chop (cooked):Meat;it=Costoletta di maiale (cotta):Carne",100,231,26,0,14,0,0,59
+cod,"en=Cod (cooked):Fish;it=Merluzzo (cotto):Pesce",100,105,23,0,0.7,0,0,94
+blueberry,"en=Blueberry:Fruit;it=Mirtillo:Frutta",100,57,0.7,14.5,0.3,2.4,10,1
+raspberry,"en=Raspberry:Fruit;it=Lampone:Frutta",100,52,1.2,12,0.7,6.5,4.4,1
+cashews,"en=Cashews:Nuts and Seeds;it=Anacardi:Frutta secca e semi",100,553,18,30,44,3.3,6,12
+walnuts,"en=Walnuts:Nuts and Seeds;it=Noci:Frutta secca e semi",100,654,15,14,65,7,2.6,2
+chia_seeds,"en=Chia Seeds:Nuts and Seeds;it=Semi di Chia:Frutta secca e semi",100,486,17,42,31,34,0,16
+flax_seeds,"en=Flax Seeds:Nuts and Seeds;it=Semi di Lino:Frutta secca e semi",100,534,18,29,42,27,1.6,30
+pumpkin_seeds,"en=Pumpkin Seeds:Nuts and Seeds;it=Semi di Zucca:Frutta secca e semi",100,559,30,11,49,6,1.4,7
+sunflower_seeds,"en=Sunflower Seeds:Nuts and Seeds;it=Semi di Girasole:Frutta secca e semi",100,584,21,20,51,8.6,2.6,9
+whole_wheat_bread,"en=Whole Wheat Bread:Cereals and Derivatives;it=Pane Integrale:Cereali e derivati",100,247,13,41,3.4,7,6,460
+brown_rice,"en=Brown Rice (cooked):Cereals and Derivatives;it=Riso Integrale (cotto):Cereali e derivati",100,112,2.6,23.5,0.9,1.8,0.2,5
+greek_yogurt,"en=Greek Yogurt (plain):Dairy & Alternatives;it=Yogurt Greco (bianco):Latticini e alternative",100,97,9,4,5,0,3,35
+edamame,"en=Edamame (cooked):Legumes;it=Edamame (cotto):Legumi",100,121,11,9,5,5,2,6
+black_beans,"en=Black Beans (cooked):Legumes;it=Fagioli Neri (cotti):Legumi",100,132,8.9,23.7,0.5,8.7,0.3,1
+kidney_beans,"en=Kidney Beans (cooked):Legumes;it=Fagioli Rossi (cotti):Legumi",100,127,8.7,22.8,0.5,6.4,0.3,1
+pineapple,"en=Pineapple:Fruit;it=Ananas:Frutta",100,50,0.5,13,0.1,1.4,10,1
+mango,"en=Mango:Fruit;it=Mango:Frutta",100,60,0.8,15,0.4,1.6,14,1
+grapes,"en=Grapes:Fruit;it=Uva:Frutta",100,69,0.7,18,0.2,0.9,15,2
+watermelon,"en=Watermelon:Fruit;it=Anguria:Frutta",100,30,0.6,8,0.2,0.4,6,1
+asparagus,"en=Asparagus (cooked):Vegetables;it=Asparagi (cotti):Verdure",100,22,2.4,4.1,0.2,2,2.1,14
+celery,"en=Celery:Vegetables;it=Sedano:Verdure",100,14,0.7,3,0.2,1.6,1.4,80
+cauliflower,"en=Cauliflower (cooked):Vegetables;it=Cavolfiore (cotto):Verdure",100,23,1.8,4.1,0.5,2,2,9
+eggplant,"en=Eggplant (cooked):Vegetables;it=Melanzana (cotta):Verdure",100,35,0.8,8.7,0.2,2.5,3.2,1
+green_beans,"en=Green Beans (cooked):Vegetables;it=Fagiolini (cotti):Verdure",100,35,1.9,7.9,0.2,3.2,3.6,4
+turkey_breast,"en=Turkey Breast (cooked):Meat;it=Petto di Tacchino (cotto):Carne",100,135,30,0,1,0,0,108
+feta_cheese,"en=Feta Cheese:Dairy & Alternatives;it=Feta:Latticini e alternative",100,264,14,4.1,21,0,4.1,1116
+cheddar_cheese,"en=Cheddar Cheese:Dairy & Alternatives;it=Cheddar:Latticini e alternative",100,404,23,3.1,33,0,0.5,653
+ham,"en=Ham:Meat;it=Prosciutto Cotto:Carne",100,145,21,1.5,6,0,1.5,1200
+sausage,"en=Sausage (pork, cooked):Meat;it=Salsiccia (maiale, cotta):Carne",100,334,20,1.9,27,0,0,848
+bacon,"en=Bacon (cooked):Meat;it=Bacon (cotto):Carne",100,541,37,1.4,42,0,0,2100
+orange_juice,"en=Orange Juice:Drinks;it=Succo d'arancia:Bevande",100,45,0.7,10.4,0.2,0.2,8.4,1
+apple_juice,"en=Apple Juice:Drinks;it=Succo di mela:Bevande",100,46,0.1,11.3,0.1,0.2,9.6,4
+coca_cola,"en=Coca-Cola:Drinks;it=Coca-Cola:Bevande",100,42,0,10.6,0,0,10.6,1
+beer,"en=Beer:Drinks;it=Birra:Bevande",100,43,0.5,3.6,0,0,0,4
+wine_red,"en=Red Wine:Drinks;it=Vino Rosso:Bevande",100,85,0.1,2.6,0,0,0.6,4
+wine_white,"en=White Wine:Drinks;it=Vino Bianco:Bevande",100,82,0.1,2.6,0,0,1.4,5
+ice_cream,"en=Ice Cream (vanilla):Sweets;it=Gelato (vaniglia):Dolci",100,207,3.5,24,11,0.7,21,80
+croissant,"en=Croissant:Sweets;it=Cornetto:Dolci",100,406,8,46,21,2.6,11,467
+balsamic_vinegar,"en=Balsamic Vinegar:Condiments;it=Aceto Balsamico:Salse",100,88,0.5,17,0,0,15,24
+soy_sauce,"en=Soy Sauce:Condiments;it=Salsa di soia:Salse",100,53,8,5,0.1,0.8,0.4,5493
