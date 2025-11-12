@@ -45,13 +45,14 @@ const calculateMacroBalanceScore = (nutrients: NutritionalInfo): number => {
 
 const calculateNutrientQualityScore = (nutrients: NutritionalInfo, goals: NutritionalGoals): number => {
     let score = 100;
+    const penaltyMultiplier = 25; // Reduced from 50
 
     // Penalty for too much sugar (relative to goal for the day)
     // We assume a meal is ~1/3 of the day
     if (nutrients.sugar && goals.sugar > 0) {
         const sugarRatio = nutrients.sugar / (goals.sugar / 3); // Meal's sugar vs 1/3 of daily goal
         if (sugarRatio > 1) {
-            score -= Math.min(25, (sugarRatio - 1) * 50); // Max penalty of 25 points
+            score -= Math.min(20, (sugarRatio - 1) * penaltyMultiplier); // Max penalty of 20 points
         }
     }
 
@@ -59,7 +60,7 @@ const calculateNutrientQualityScore = (nutrients: NutritionalInfo, goals: Nutrit
     if (nutrients.sodium && goals.sodium > 0) {
         const sodiumRatio = nutrients.sodium / (goals.sodium / 3);
         if (sodiumRatio > 1) {
-            score -= Math.min(25, (sodiumRatio - 1) * 50); // Max penalty of 25 points
+            score -= Math.min(20, (sodiumRatio - 1) * penaltyMultiplier); // Max penalty of 20 points
         }
     }
 
@@ -98,11 +99,12 @@ export const calculateDailyScore = (nutrients: NutritionalInfo, goals: Nutrition
     
     // 3. Nutrient Quality Score (Weight: 30%)
     let qualityScore = 100;
+    const penaltyMultiplier = 40; // Reduced from 80
      if (nutrients.sugar && goals.sugar > 0 && nutrients.sugar > goals.sugar) {
-        qualityScore -= Math.min(40, ((nutrients.sugar / goals.sugar) - 1) * 80);
+        qualityScore -= Math.min(30, ((nutrients.sugar / goals.sugar) - 1) * penaltyMultiplier);
     }
      if (nutrients.sodium && goals.sodium > 0 && nutrients.sodium > goals.sodium) {
-        qualityScore -= Math.min(40, ((nutrients.sodium / goals.sodium) - 1) * 80);
+        qualityScore -= Math.min(30, ((nutrients.sodium / goals.sodium) - 1) * penaltyMultiplier);
     }
     if (nutrients.fiber && goals.fiber > 0 && nutrients.fiber >= goals.fiber) {
         qualityScore += 20; // Bonus for meeting fiber goal
