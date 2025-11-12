@@ -4,7 +4,7 @@
 import { useMemo } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { useLocale } from '@/context/LocaleContext';
-import { useAppContext } from '@/context/AppContext';
+import { useAchievements } from '@/context/AchievementContext';
 import { allBadges } from '@/lib/gamification';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Trophy, Lock } from 'lucide-react';
@@ -18,7 +18,7 @@ import {
 
 export default function AchievementsPage() {
   const { t } = useLocale();
-  const { userAchievements } = useAppContext();
+  const { userAchievements } = useAchievements();
 
   const achievementsWithStatus = useMemo(() => {
     const earnedIds = new Set(userAchievements.map(a => a.badgeId));
@@ -72,5 +72,3 @@ export default function AchievementsPage() {
     </div>
   );
 }
-
-    

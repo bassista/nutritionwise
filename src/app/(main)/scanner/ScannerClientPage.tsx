@@ -8,7 +8,8 @@ import { useLocale } from '@/context/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { useAppContext } from '@/context/AppContext';
+import { useFoods } from '@/context/FoodContext';
+import { useFavorites } from '@/context/FavoriteContext';
 import { FoodForm } from '@/components/food/FoodForm';
 import { getFoodName } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +24,8 @@ export default function ScannerClientPage() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { foods, toggleFavoriteFood, favoriteFoodIds } = useAppContext();
+  const { foods } = useFoods();
+  const { favoriteFoodIds, toggleFavorite } = useFavorites();
   
   const [foodToCreate, setFoodToCreate] = useState<Partial<Food> | undefined>(undefined);
   const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);
@@ -49,7 +51,7 @@ export default function ScannerClientPage() {
                 // Already favorite, just show the info
             } else {
                 // Not a favorite yet, add it and redirect
-                toggleFavoriteFood(localFood.id);
+                toggleFavorite(localFood.id);
                 router.push('/favorites');
             }
         }

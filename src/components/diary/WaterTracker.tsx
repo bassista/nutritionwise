@@ -2,7 +2,8 @@
 "use client";
 
 import { useMemo } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useSettings } from '@/context/SettingsContext';
+import { useDailyLogs } from '@/context/DailyLogContext';
 import { useLocale } from '@/context/LocaleContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,8 @@ interface WaterTrackerProps {
 }
 
 export default function WaterTracker({ selectedDate }: WaterTrackerProps) {
-  const { settings, dailyLogs, addWaterIntake } = useAppContext();
+  const { settings } = useSettings();
+  const { dailyLogs, addWaterIntake } = useDailyLogs();
   const { t } = useLocale();
 
   const { goalLiters, glassSizeMl } = settings.hydrationSettings;
@@ -84,5 +86,3 @@ export default function WaterTracker({ selectedDate }: WaterTrackerProps) {
     </Card>
   );
 }
-
-    

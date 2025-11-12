@@ -4,7 +4,13 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useAppContext } from '@/context/AppContext';
+import { useSettings } from '@/context/SettingsContext';
+import { useFoods } from '@/context/FoodContext';
+import { useMeals } from '@/context/MealContext';
+import { useFavorites } from '@/context/FavoriteContext';
+import { useDailyLogs } from '@/context/DailyLogContext';
+import { useShoppingLists } from '@/context/ShoppingListContext';
+import { useAchievements } from '@/context/AchievementContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import {
@@ -80,7 +86,14 @@ const hydrationSettingsSchema = z.object({
 });
 
 export default function SettingsPage() {
-  const { settings, updateSettings, clearAllData, exportData, importData, updateNutritionalGoals, exportFoodsToCsv, updateHydrationSettings } = useAppContext();
+  const { settings, updateSettings, updateNutritionalGoals, updateHydrationSettings } = useSettings();
+  const { foods, setFoods, exportFoodsToCsv } = useFoods();
+  const { setMeals } = useMeals();
+  const { setFavoriteFoodIds } = useFavorites();
+  const { setDailyLogs } = useDailyLogs();
+  const { setShoppingLists } = useShoppingLists();
+  const { setAchievements } = useAchievements();
+  
   const { toast } = useToast();
   const { t, setLocale, locale } = useLocale();
   const backupFileRef = useRef<HTMLInputElement>(null);
@@ -103,12 +116,13 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
+    displayForm.reset({ foodsPerPage: settings.foodsPerPage });
     goalsForm.reset(settings.nutritionalGoals);
     hydrationForm.reset(settings.hydrationSettings);
-  }, [settings, goalsForm, hydrationForm]);
+  }, [settings, displayForm, goalsForm, hydrationForm]);
 
   function onDisplaySubmit(values: z.infer<typeof settingsSchema>) {
-    updateSettings(values);
+    updateSettings({foodsPerPage: values.foodsPerPage});
     toast({
       title: t('Settings Saved'),
       description: t('Your preferences have been updated.'),
@@ -130,20 +144,52 @@ export default function SettingsPage() {
         description: t('Your hydration settings have been updated.'),
     });
   }
+  
+    const clearAllData = () => {
+        setFoods([]);
+        setMeals([]);
+        setFavoriteFoodIds([]);
+        setDailyLogs({});
+        setShoppingLists([]);
+        setAchievements([]);
+        // Note: We don't clear settings here to preserve user preferences
+        toast({ title: t('Data Cleared'), description: t('All your entries have been deleted.') });
+    };
+  
+    const exportData = () => {
+        const data = {
+            foods,
+            meals: useMeals.getState().meals,
+            favoriteFoodIds: useFavorites.getState().favoriteFoodIds,
+            settings,
+            dailyLogs: useDailyLogs.getState().dailyLogs,
+            shoppingLists: useShoppingLists.getState().shoppingLists,
+            userAchievements: useAchievements.getState().userAchievements,
+            locale
+        };
+        const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
+        const link = document.createElement("a");
+        link.href = jsonString;
+        link.download = `nutrition-wise-backup-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        link.remove();
+        toast({
+        title: t('Data Exported'),
+        description: t('Your data has been downloaded as a JSON file.'),
+        });
+    };
 
-  const handleExport = () => {
-    const data = exportData();
-    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
-    const link = document.createElement("a");
-    link.href = jsonString;
-    link.download = `nutrition-wise-backup-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    link.remove();
-     toast({
-      title: t('Data Exported'),
-      description: t('Your data has been downloaded as a JSON file.'),
-    });
-  };
+    const importData = (data: any) => {
+        if (data.foods) setFoods(data.foods);
+        if (data.meals) setMeals(data.meals);
+        if (data.favoriteFoodIds) setFavoriteFoodIds(data.favoriteFoodIds);
+        if (data.settings) useSettings.getState().setSettings(data.settings);
+        if (data.dailyLogs) setDailyLogs(data.dailyLogs);
+        if (data.shoppingLists) setShoppingLists(data.shoppingLists);
+        if (data.userAchievements) setAchievements(data.userAchievements);
+        if (data.locale) setLocale(data.locale);
+        toast({ title: t('Import Successful'), description: t('Your data has been restored from the backup.') });
+    };
 
   const handleBackupFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -155,10 +201,6 @@ export default function SettingsPage() {
         const text = e.target?.result as string;
         const data = JSON.parse(text);
         importData(data);
-        toast({
-          title: t('Import Successful'),
-          description: t('Your data has been restored from the backup.'),
-        });
       } catch (error) {
         toast({
           variant: 'destructive',
@@ -172,7 +214,7 @@ export default function SettingsPage() {
       }
     };
     reader.readAsText(file);
-  }, [importData, toast, t]);
+  }, []);
 
   const handleCsvExport = () => {
     const csvString = exportFoodsToCsv();
@@ -460,7 +502,7 @@ export default function SettingsPage() {
                         {t('Download all your data to a file, or restore it from a backup.')}
                       </p>
                       <div className="flex gap-2">
-                        <Button variant="outline" onClick={handleExport}>
+                        <Button variant="outline" onClick={exportData}>
                           <Download className="mr-2 h-4 w-4" />
                           {t('Download Data')}
                         </Button>

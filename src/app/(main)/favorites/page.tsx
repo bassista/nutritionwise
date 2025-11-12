@@ -2,7 +2,9 @@
 "use client";
 
 import { useMemo, useState } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useFoods } from '@/context/FoodContext';
+import { useFavorites } from '@/context/FavoriteContext';
+import { useUIState } from '@/context/UIStateContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Plus, ScanLine } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
@@ -15,7 +17,9 @@ import { useToast } from '@/hooks/use-toast';
 
 
 export default function FavoritesPage() {
-  const { foods, favoriteFoodIds, setFavoriteFoodIds, setMealBuilderOpen, deleteFood } = useAppContext();
+  const { foods, deleteFood } = useFoods();
+  const { favoriteFoodIds, setFavoriteFoodIds } = useFavorites();
+  const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const { toast } = useToast();
 

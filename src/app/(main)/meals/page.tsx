@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useMeals } from '@/context/MealContext';
+import { useUIState } from '@/context/UIStateContext';
 import { PageHeader } from '@/components/PageHeader';
 import MealCard from '@/components/meal/MealCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -28,7 +29,8 @@ import {
 import type { Meal } from '@/lib/types';
 
 export default function MealsPage() {
-  const { meals, setMeals, setMealBuilderOpen } = useAppContext();
+  const { meals, setMeals } = useMeals();
+  const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
 

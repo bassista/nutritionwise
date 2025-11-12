@@ -5,13 +5,13 @@ import { Wheat, Heart, UtensilsCrossed, Plus, BookOpen, ShoppingCart, Trophy } f
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useAppContext } from '@/context/AppContext';
+import { useUIState } from '@/context/UIStateContext';
 import { cn } from '@/lib/utils';
 import { useLocale } from '@/context/LocaleContext';
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { setMealBuilderOpen } = useAppContext();
+  const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
 
   const navItems = [

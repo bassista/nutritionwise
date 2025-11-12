@@ -1,7 +1,10 @@
 
 "use client";
 import { useMemo, useState } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useDailyLogs } from '@/context/DailyLogContext';
+import { useFoods } from '@/context/FoodContext';
+import { useMeals } from '@/context/MealContext';
+import { useSettings } from '@/context/SettingsContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -21,7 +24,10 @@ import {
 
 
 export default function AnalyticsPage() {
-    const { dailyLogs, getFoodById, getMealById, settings } = useAppContext();
+    const { dailyLogs } = useDailyLogs();
+    const { getFoodById } = useFoods();
+    const { getMealById } = useMeals();
+    const { settings } = useSettings();
     const { t } = useLocale();
     const [period, setPeriod] = useState<AnalysisPeriod>('last7days');
 

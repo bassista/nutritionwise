@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import BottomNav from '@/components/BottomNav';
 import MealBuilder from '@/components/meal/MealBuilder';
-import { useAppContext } from '@/context/AppContext';
+import { useUIState } from '@/context/UIStateContext';
 import {
   Sidebar,
   SidebarContent,
@@ -87,7 +87,7 @@ export default function MainLayoutClient({
 }: {
   children: React.ReactNode;
 }) {
-  const { isMealBuilderOpen, setMealBuilderOpen } = useAppContext();
+  const { isMealBuilderOpen, setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const [isMounted, setIsMounted] = useState(false);
 

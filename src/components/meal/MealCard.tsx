@@ -3,7 +3,11 @@
 
 import { useMemo, useState } from 'react';
 import type { Meal, MealType } from '@/lib/types';
-import { useAppContext } from '@/context/AppContext';
+import { useFoods } from '@/context/FoodContext';
+import { useMeals } from '@/context/MealContext';
+import { useDailyLogs } from '@/context/DailyLogContext';
+import { useShoppingLists } from '@/context/ShoppingListContext';
+import { useSettings } from '@/context/SettingsContext';
 import {
   Card,
   CardContent,
@@ -61,7 +65,11 @@ interface MealCardProps {
 
 const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
   ({ meal, reorderable, style, attributes, listeners }, ref) => {
-    const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList, settings } = useAppContext();
+    const { getFoodById } = useFoods();
+    const { deleteMeal } = useMeals();
+    const { addLogEntry } = useDailyLogs();
+    const { addMealToShoppingList } = useShoppingLists();
+    const { settings } = useSettings();
     const [isEditing, setIsEditing] = useState(false);
     const { t, locale } = useLocale();
     const { toast } = useToast();
@@ -277,5 +285,3 @@ export default function MealCard({ meal, reorderable }: Omit<MealCardProps, 'sty
   }
   return <MealCardComponent meal={meal} />;
 }
-
-    

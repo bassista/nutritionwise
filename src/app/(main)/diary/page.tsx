@@ -4,7 +4,10 @@
 import { useState, useMemo, useCallback } from 'react';
 import { format, startOfToday, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
-import { useAppContext } from '@/context/AppContext';
+import { useSettings } from '@/context/SettingsContext';
+import { useDailyLogs } from '@/context/DailyLogContext';
+import { useFoods } from '@/context/FoodContext';
+import { useMeals } from '@/context/MealContext';
 import { useLocale } from '@/context/LocaleContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Calendar } from '@/components/ui/calendar';
@@ -23,7 +26,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 
 export default function DiaryPage() {
-    const { settings, dailyLogs, getFoodById, getMealById, addLogEntry, removeLogEntry } = useAppContext();
+    const { settings } = useSettings();
+    const { dailyLogs, addLogEntry, removeLogEntry } = useDailyLogs();
+    const { getFoodById } = useFoods();
+    const { getMealById } = useMeals();
     const { t, locale } = useLocale();
     const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
     
@@ -209,7 +215,3 @@ export default function DiaryPage() {
         </div>
     );
 }
-
-    
-
-    

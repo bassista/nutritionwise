@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -7,7 +8,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Heart, GripVertical, Flame, Wheat, Minus, Trash2, Edit, PlusCircle, CalendarPlus } from 'lucide-react';
 import type { Food, MealType } from '@/lib/types';
-import { useAppContext } from '@/context/AppContext';
+import { useFavorites } from '@/context/FavoriteContext';
+import { useDailyLogs } from '@/context/DailyLogContext';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
@@ -45,7 +47,8 @@ interface FoodCardProps {
 
 const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
   ({ food, reorderable, onDelete, onEdit, style, attributes, listeners }, ref) => {
-    const { favoriteFoodIds, toggleFavoriteFood, addLogEntry } = useAppContext();
+    const { favoriteFoodIds, toggleFavorite } = useFavorites();
+    const { addLogEntry } = useDailyLogs();
     const { t, locale } = useLocale();
     const isFavorite = favoriteFoodIds.includes(food.id);
     
@@ -57,7 +60,7 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
     
     const handleFavoriteClick = (e: React.MouseEvent) => {
       e.stopPropagation();
-      toggleFavoriteFood(food.id);
+      toggleFavorite(food.id);
     };
     
     const handleEditClick = (e: React.MouseEvent) => {

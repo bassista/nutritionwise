@@ -23,7 +23,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useAppContext } from '@/context/AppContext';
+import { useFoods } from '@/context/FoodContext';
+import { useFavorites } from '@/context/FavoriteContext';
 import { useToast } from '@/hooks/use-toast';
 import { useLocale } from '@/context/LocaleContext';
 import { Food } from '@/lib/types';
@@ -63,7 +64,8 @@ interface FoodFormProps {
 }
 
 export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmitted, autoFavorite = false }: FoodFormProps) {
-  const { addFood, updateFood, foods, toggleFavoriteFood } = useAppContext();
+  const { addFood, updateFood, foods } = useFoods();
+  const { toggleFavorite } = useFavorites();
   const { toast } = useToast();
   const { t, locale } = useLocale();
 
@@ -179,7 +181,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
       };
       addFood(newFood);
       if (autoFavorite) {
-        toggleFavoriteFood(newFood.id);
+        toggleFavorite(newFood.id);
       }
       toast({ title: t('Food Created') });
       onOpenChange(false);

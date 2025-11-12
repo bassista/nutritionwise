@@ -15,7 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useAppContext } from '@/context/AppContext';
+import { useFoods } from '@/context/FoodContext';
+import { useMeals } from '@/context/MealContext';
 import { useToast } from '@/hooks/use-toast';
 import type { Meal, MealFood, Food } from '@/lib/types';
 import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown } from 'lucide-react';
@@ -30,7 +31,8 @@ interface MealBuilderProps {
 }
 
 export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuilderProps) {
-  const { addMeal, updateMeal, getFoodById, mealBuilderContext } = useAppContext();
+  const { getFoodById } = useFoods();
+  const { addMeal, updateMeal } = useMeals();
   const { toast } = useToast();
   const { t, locale } = useLocale();
 
@@ -196,7 +198,6 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
         onOpenChange={setFoodSelectorOpen}
         onSelectFood={handleAddFood}
         currentFoodIds={mealFoods.map(mf => mf.foodId)}
-        context={mealBuilderContext}
       />
     </>
   );

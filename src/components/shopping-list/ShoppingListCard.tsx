@@ -3,7 +3,8 @@
 
 import { useState } from 'react';
 import { ShoppingList, ShoppingListItem } from '@/lib/types';
-import { useAppContext } from '@/context/AppContext';
+import { useFoods } from '@/context/FoodContext';
+import { useShoppingLists } from '@/context/ShoppingListContext';
 import { useLocale } from '@/context/LocaleContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,15 +23,15 @@ interface ShoppingListCardProps {
 }
 
 export default function ShoppingListCard({ list }: ShoppingListCardProps) {
+  const { getFoodById } = useFoods();
   const { 
-    getFoodById, 
     deleteShoppingList, 
     renameShoppingList, 
     addShoppingListItem, 
     updateShoppingListItem, 
     removeShoppingListItem,
     toggleAllShoppingListItems,
-  } = useAppContext();
+  } = useShoppingLists();
   const { t, locale } = useLocale();
 
   const [isAddItemOpen, setAddItemOpen] = useState(false);

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useShoppingLists } from '@/context/ShoppingListContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, Edit, Check } from 'lucide-react';
@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 export default function ShoppingListPage() {
-  const { shoppingLists, createShoppingList } = useAppContext();
+  const { shoppingLists, createShoppingList } = useShoppingLists();
   const { t } = useLocale();
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
