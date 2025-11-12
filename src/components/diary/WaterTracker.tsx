@@ -6,7 +6,7 @@ import { useAppContext } from '@/context/AppContext';
 import { useLocale } from '@/context/LocaleContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Droplets, Plus } from 'lucide-react';
+import { Droplets, GlassWater } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 interface WaterTrackerProps {
@@ -25,7 +25,7 @@ export default function WaterTracker({ selectedDate }: WaterTrackerProps) {
   }, [dailyLogs, selectedDate]);
 
   const glassesCount = useMemo(() => {
-    return Math.floor(waterIntakeMl / glassSizeMl);
+    return glassSizeMl > 0 ? Math.floor(waterIntakeMl / glassSizeMl) : 0;
   }, [waterIntakeMl, glassSizeMl]);
 
   const progress = useMemo(() => {
@@ -54,10 +54,10 @@ export default function WaterTracker({ selectedDate }: WaterTrackerProps) {
             <Droplets className="h-5 w-5" />
             <span className="font-medium">{glassesCount} {glassesCount === 1 ? t('glass') : t('glasses')}</span>
           </div>
-          <Button onClick={handleAddGlass} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            {t('Add a glass')}
-          </Button>
+          <button onClick={handleAddGlass} className="flex flex-col items-center gap-1 text-primary hover:text-primary/90 transition-colors">
+            <GlassWater className="h-8 w-8" />
+            <span className="text-xs font-medium">{t('Add')}</span>
+          </button>
         </div>
       </CardContent>
     </Card>
