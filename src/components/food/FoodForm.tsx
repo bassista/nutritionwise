@@ -69,7 +69,6 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
 
   const categories = useMemo(() => {
     const allCategories = foods.map(f => getCategoryName(f, locale, t));
-    allCategories.push(t('Uncategorized')); // Ensure 'Uncategorized' is always an option
     return Array.from(new Set(allCategories.filter(Boolean)));
   }, [foods, locale, t]);
   

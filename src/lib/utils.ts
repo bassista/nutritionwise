@@ -13,7 +13,7 @@ export const getFoodName = (food: Food, locale: Locale): string => {
 };
 
 export const getCategoryName = (food: Food, locale: Locale, t: (key: string) => string): string => {
-  if (!food.category) {
+  if (!food.category || (!food.category[locale] && !food.category['en'])) {
     return t('Uncategorized');
   }
   return food.category[locale] || food.category['en'] || t('Uncategorized');
