@@ -174,3 +174,5 @@ export const calculateHydrationScore = (waterIntakeMl: number, goalMl: number): 
 
     return { percentage, grade, color };
 };
+
+    
