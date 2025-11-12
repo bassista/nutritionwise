@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import BottomNav from '@/components/BottomNav';
 import MealBuilder from '@/components/meal/MealBuilder';
 import { useAppContext } from '@/context/AppContext';
@@ -21,7 +21,6 @@ import { Heart, Wheat, Settings, UtensilsCrossed, LineChart, BookOpen, ScanLine,
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
-import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { SheetTitle } from '@/components/ui/sheet';
 import Spinner from '@/components/ui/spinner';
@@ -41,7 +40,14 @@ function SidebarHeaderContent() {
 function SidebarNav() {
     const { t } = useLocale();
     const pathname = usePathname();
-    const { isMobile, setOpenMobile } = useSidebar();
+    const { isMobile, setOpenMobile, openMobile } = useSidebar();
+
+    useEffect(() => {
+        if (isMobile && openMobile) {
+            setOpenMobile(false);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname, isMobile]);
 
     const navItems = useMemo(() => [
       { href: '/diary', icon: BookOpen, label: t('Diary') },
@@ -54,12 +60,6 @@ function SidebarNav() {
       { href: '/achievements', icon: Trophy, label: t('Achievements') },
     ], [t]);
     
-    const handleLinkClick = () => {
-      if (isMobile) {
-        setOpenMobile(false);
-      }
-    };
-
     return (
         <SidebarContent>
           <SidebarMenu>
@@ -69,7 +69,6 @@ function SidebarNav() {
                   asChild
                   isActive={pathname === item.href}
                   tooltip={item.label}
-                  onClick={handleLinkClick}
                 >
                   <Link href={item.href}>
                     <item.icon />
