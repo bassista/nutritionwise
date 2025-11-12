@@ -68,8 +68,9 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
   const { t, locale } = useLocale();
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => getCategoryName(f, locale, t));
-    return Array.from(new Set(allCategories.filter(Boolean)));
+    const existingCategories = foods.map(f => getCategoryName(f, locale, t));
+    // Ensure "Uncategorized" is always in the list, and use a Set to remove duplicates
+    return Array.from(new Set([t('Uncategorized'), ...existingCategories.filter(Boolean)]));
   }, [foods, locale, t]);
   
   const defaultValues: FoodFormValues = useMemo(() => ({
@@ -127,7 +128,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, foodToEdit, foodToCreate, form.reset, defaultValues]);
+  }, [open, foodToEdit, foodToCreate, form, defaultValues, locale]);
 
 
   const onSubmit = (data: FoodFormValues) => {
@@ -231,7 +232,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('Category')}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder={t('Select category...')} />
