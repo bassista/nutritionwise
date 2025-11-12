@@ -85,34 +85,35 @@ export const allBadges: Badge[] = [
 type EvaluationData = {
     dailyLogs: DailyLog;
     settings: AppSettings;
-    meals: Meal[];
-    favoriteFoodIds: string[];
-    shoppingLists: any[]; // Use 'any' to avoid circular dependency issues, or define a specific type.
-    foods: Food[];
+    meals?: Meal[];
+    favoriteFoodIds?: string[];
+    shoppingLists?: any[]; // Use 'any' to avoid circular dependency issues, or define a specific type.
+    foods?: Food[];
 }
 
 export function evaluateAchievements(data: EvaluationData, badges: Badge[], earnedBadgeIds: Set<string>): UserAchievement[] {
     const newAchievements: UserAchievement[] = [];
     
     // Easy
-    if (!earnedBadgeIds.has('first-log') && Object.keys(data.dailyLogs).length > 0) {
+    if (!earnedBadgeIds.has('first-log') && data.dailyLogs && Object.keys(data.dailyLogs).length > 0) {
         newAchievements.push({ badgeId: 'first-log', date: new Date().toISOString() });
     }
-    if (!earnedBadgeIds.has('meal-creator') && data.meals.length > 0) {
+    if (!earnedBadgeIds.has('meal-creator') && data.meals && data.meals.length > 0) {
         newAchievements.push({ badgeId: 'meal-creator', date: new Date().toISOString() });
     }
-    if (!earnedBadgeIds.has('first-favorite') && data.favoriteFoodIds.length > 0) {
+    if (!earnedBadgeIds.has('first-favorite') && data.favoriteFoodIds && data.favoriteFoodIds.length > 0) {
         newAchievements.push({ badgeId: 'first-favorite', date: new Date().toISOString() });
     }
-    if (!earnedBadgeIds.has('scanner-pro') && data.foods.some(f => f.id.length === 13 && /^\d+$/.test(f.id))) {
+    if (!earnedBadgeIds.has('scanner-pro') && data.foods && data.foods.some(f => f.id.length === 13 && /^\d+$/.test(f.id))) {
        newAchievements.push({ badgeId: 'scanner-pro', date: new Date().toISOString() });
     }
-    if (!earnedBadgeIds.has('list-specialist') && data.shoppingLists.some(l => l.isDeletable)) {
+    if (!earnedBadgeIds.has('list-specialist') && data.shoppingLists && data.shoppingLists.some(l => l.isDeletable)) {
         newAchievements.push({ badgeId: 'list-specialist', date: new Date().toISOString() });
     }
 
     // Medium
     const checkStreak = (days: number) => {
+        if (!data.dailyLogs) return false;
         const today = new Date();
         for (let i = 0; i < days; i++) {
             const dateToCheck = format(subDays(today, i), 'yyyy-MM-dd');
@@ -131,6 +132,7 @@ export function evaluateAchievements(data: EvaluationData, badges: Badge[], earn
     }
 
     const checkWaterStreak = (days: number) => {
+        if (!data.dailyLogs || !data.settings) return false;
         const goalMl = data.settings.hydrationSettings.goalLiters * 1000;
         if (goalMl <= 0) return false;
         const today = new Date();
@@ -147,11 +149,11 @@ export function evaluateAchievements(data: EvaluationData, badges: Badge[], earn
         newAchievements.push({ badgeId: 'water-goal-7', date: new Date().toISOString() });
     }
 
-    if (!earnedBadgeIds.has('pro-planner') && data.meals.length >= 10) {
+    if (!earnedBadgeIds.has('pro-planner') && data.meals && data.meals.length >= 10) {
         newAchievements.push({ badgeId: 'pro-planner', date: new Date().toISOString() });
     }
 
-    if (!earnedBadgeIds.has('favorite-collector') && data.favoriteFoodIds.length >= 25) {
+    if (!earnedBadgeIds.has('favorite-collector') && data.favoriteFoodIds && data.favoriteFoodIds.length >= 25) {
         newAchievements.push({ badgeId: 'favorite-collector', date: new Date().toISOString() });
     }
 
@@ -160,11 +162,11 @@ export function evaluateAchievements(data: EvaluationData, badges: Badge[], earn
         newAchievements.push({ badgeId: 'hydration-monarch', date: new Date().toISOString() });
     }
     
-    if (!earnedBadgeIds.has('supreme-chef') && data.meals.length >= 50) {
+    if (!earnedBadgeIds.has('supreme-chef') && data.meals && data.meals.length >= 50) {
         newAchievements.push({ badgeId: 'supreme-chef', date: new Date().toISOString() });
     }
     
-    if (!earnedBadgeIds.has('guru-of-favorites') && data.favoriteFoodIds.length >= 100) {
+    if (!earnedBadgeIds.has('guru-of-favorites') && data.favoriteFoodIds && data.favoriteFoodIds.length >= 100) {
         newAchievements.push({ badgeId: 'guru-of-favorites', date: new Date().toISOString() });
     }
 

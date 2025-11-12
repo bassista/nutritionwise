@@ -146,7 +146,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   // Gamification check
   useEffect(() => {
     const earnedBadgeIds = new Set(userAchievements.map(a => a.badgeId));
-    const newAchievements = evaluateAchievements({ dailyLogs, settings }, allBadges, earnedBadgeIds);
+    const newAchievements = evaluateAchievements(
+        { dailyLogs, settings, meals, favoriteFoodIds, shoppingLists, foods },
+        allBadges,
+        earnedBadgeIds
+    );
     
     if (newAchievements.length > 0) {
       const updatedAchievements = [...userAchievements, ...newAchievements];
@@ -163,7 +167,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         }
       });
     }
-  }, [dailyLogs, settings, userAchievements, setUserAchievements, t, toast]);
+  }, [dailyLogs, settings, meals, favoriteFoodIds, shoppingLists, foods, userAchievements, setUserAchievements, t, toast]);
 
   const getFoodById = useCallback((id: string) => foods.find(f => f.id === id), [foods]);
   const getMealById = useCallback((id: string) => meals.find(m => m.id === id), [meals]);
