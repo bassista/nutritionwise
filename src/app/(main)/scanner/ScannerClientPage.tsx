@@ -26,6 +26,7 @@ export default function ScannerClientPage() {
   const { foods, toggleFavoriteFood, favoriteFoodIds } = useAppContext();
   
   const [foodToCreate, setFoodToCreate] = useState<Partial<Food> | undefined>(undefined);
+  const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);
   const [isFormOpen, setFormOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [localBarcode, setLocalBarcode] = useState<string | null>(null);
@@ -73,6 +74,7 @@ export default function ScannerClientPage() {
   const handleScanAgain = () => {
     setLocalBarcode(null);
     setFoodToCreate(undefined);
+    setFoodToEdit(undefined);
     startScan();
   };
 
@@ -84,6 +86,21 @@ export default function ScannerClientPage() {
   const handleOpenForm = () => {
     setFoodToCreate({ id: localBarcode || '' });
     setFormOpen(true);
+  }
+
+  const handleViewFood = () => {
+    if (existingFood) {
+        setFoodToEdit(existingFood);
+        setFormOpen(true);
+    }
+  }
+  
+  const handleFormOpenChange = (open: boolean) => {
+    setFormOpen(open);
+    if (!open) {
+      setFoodToEdit(undefined);
+      setFoodToCreate(undefined);
+    }
   }
 
   const showScanResult = localBarcode && !isScanning;
@@ -138,7 +155,7 @@ export default function ScannerClientPage() {
                         </AlertDescription>
                       </Alert>
                        <div className="flex gap-2 mt-4">
-                        <Button onClick={() => router.push('/foods')} className="flex-1">{t('View Food')}</Button>
+                        <Button onClick={handleViewFood} className="flex-1">{t('View Food')}</Button>
                         <Button onClick={handleScanAgain} variant="outline" className="flex-1">{t('Scan Again')}</Button>
                       </div>
                     </div>
@@ -160,8 +177,9 @@ export default function ScannerClientPage() {
       </div>
       <FoodForm
         open={isFormOpen}
-        onOpenChange={setFormOpen}
+        onOpenChange={handleFormOpenChange}
         foodToCreate={foodToCreate}
+        foodToEdit={foodToEdit}
         onSubmitted={handleFormSubmitted}
         autoFavorite={fromFavorites}
       />
