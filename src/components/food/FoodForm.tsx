@@ -127,7 +127,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, foodToEdit, foodToCreate, locale, form.reset, defaultValues]);
+  }, [open, foodToEdit, foodToCreate, form.reset, defaultValues]);
 
 
   const onSubmit = (data: FoodFormValues) => {
