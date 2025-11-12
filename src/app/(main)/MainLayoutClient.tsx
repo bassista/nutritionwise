@@ -105,8 +105,8 @@ export default function MainLayoutClient({
         <SidebarHeaderContent />
         <SidebarNav />
       </Sidebar>
-      <SidebarInset>
-        <div className="flex flex-col min-h-screen">
+      <SidebarInset className="min-h-screen">
+        <div className="flex flex-col h-full">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6">
             <SidebarTrigger className="md:hidden"/>
             <div className="flex-1 flex items-center justify-between">
