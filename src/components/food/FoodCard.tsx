@@ -210,7 +210,7 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
 
 FoodCard.displayName = 'FoodCard';
 
-function SortableFoodCard({ food, onEdit }: { food: Food, onEdit?: (food: Food) => void }) {
+function SortableFoodCard({ food, onEdit, onDelete }: { food: Food, onEdit?: (food: Food) => void, onDelete?: (foodId: string) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: food.id });
 
@@ -228,13 +228,14 @@ function SortableFoodCard({ food, onEdit }: { food: Food, onEdit?: (food: Food) 
       attributes={attributes}
       listeners={listeners}
       onEdit={onEdit}
+      onDelete={onDelete}
     />
   );
 }
 
 export default function FoodCardWrapper({ food, reorderable, onDelete, onEdit }: Omit<FoodCardProps, 'style' | 'attributes' | 'listeners'>) {
   if (reorderable) {
-    return <SortableFoodCard food={food} onEdit={onEdit} />;
+    return <SortableFoodCard food={food} onEdit={onEdit} onDelete={onDelete} />;
   }
   return <FoodCard food={food} reorderable={false} onDelete={onDelete} onEdit={onEdit} />;
 }
