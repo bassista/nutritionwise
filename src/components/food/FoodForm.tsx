@@ -68,8 +68,9 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
   const { t, locale } = useLocale();
 
   const categories = useMemo(() => {
-    const allCategories = foods.map(f => getCategoryName(f, locale, t)).filter(Boolean);
-    return Array.from(new Set(allCategories));
+    const allCategories = foods.map(f => getCategoryName(f, locale, t));
+    allCategories.push(t('Uncategorized')); // Ensure 'Uncategorized' is always an option
+    return Array.from(new Set(allCategories.filter(Boolean)));
   }, [foods, locale, t]);
   
   const defaultValues: FoodFormValues = {
@@ -97,7 +98,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
         form.reset({
           id: foodToEdit.id,
           name: foodToEdit.name[locale] || foodToEdit.name['en'] || '',
-          category: foodToEdit.category?.[locale] || foodToEdit.category?.['en'] || '',
+          category: getCategoryName(foodToEdit, locale, t),
           serving_size_g: foodToEdit.serving_size_g || 100,
           calories: foodToEdit.calories || 0,
           protein: foodToEdit.protein || 0,
@@ -131,7 +132,8 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
 
 
   const onSubmit = (data: FoodFormValues) => {
-    const categoryValue = data.category === 'uncategorized' ? '' : data.category;
+    const uncategorizedStr = t('Uncategorized');
+    const categoryValue = data.category === uncategorizedStr ? '' : data.category;
   
     if (foodToEdit) {
       const updatedFood: Food = {
@@ -237,7 +239,6 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                           <SelectItem value="uncategorized">{t('Uncategorized')}</SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category} value={category}>
                               {category}
