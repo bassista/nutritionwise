@@ -12,40 +12,8 @@ import { useLocale } from '@/context/LocaleContext';
 import { LoggedItem, MealType, Food, Meal, AnalysisPeriod } from '@/lib/types';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { LineChart as LineChartIcon } from 'lucide-react';
+import { calculateTotalNutrientsForItems } from '@/lib/calculations';
 
-
-const calculateTotalNutrientsForItems = (
-    items: LoggedItem[], 
-    getFoodById: (id: string) => Food | undefined, 
-    getMealById: (id: string) => Meal | undefined
-) => {
-    const totals: { [key: string]: number } = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 };
-    items.forEach(loggedItem => {
-        if (loggedItem.type === 'food') {
-            const food = getFoodById(loggedItem.itemId);
-            if (food) {
-                const factor = (loggedItem.grams || food.serving_size_g || 100) / (food.serving_size_g || 100);
-                Object.keys(totals).forEach(key => {
-                    totals[key] += (food[key as keyof Food] as number || 0) * factor;
-                })
-            }
-        } else if (loggedItem.type === 'meal') {
-            const meal = getMealById(loggedItem.itemId);
-            if (meal) {
-                meal.foods.forEach(mealFood => {
-                    const food = getFoodById(mealFood.foodId);
-                    if (food) {
-                        const factor = mealFood.grams / (food.serving_size_g || 100);
-                        Object.keys(totals).forEach(key => {
-                             totals[key] += (food[key as keyof Food] as number || 0) * factor;
-                        })
-                    }
-                });
-            }
-        }
-    });
-    return totals;
-};
 
 export default function AnalyticsPage() {
     const { dailyLogs, getFoodById, getMealById, settings } = useAppContext();

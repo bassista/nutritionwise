@@ -18,56 +18,9 @@ import LogFoodDialog from '@/components/diary/LogFoodDialog';
 import { Food, Meal, LoggedItem, MealType } from '@/lib/types';
 import { getFoodName, cn } from '@/lib/utils';
 import WaterTracker from '@/components/diary/WaterTracker';
-import { calculateMealScore, calculateDailyScore } from '@/lib/scoring';
+import { calculateDailyScore } from '@/lib/scoring';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-const calculateTotalNutrients = (
-    items: LoggedItem[], 
-    getFoodById: (id: string) => Food | undefined, 
-    getMealById: (id: string) => Meal | undefined
-) => {
-    const totals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 };
-    items.forEach(loggedItem => {
-        if (loggedItem.type === 'food') {
-            const food = getFoodById(loggedItem.itemId);
-            if (food) {
-                const factor = (loggedItem.grams || food.serving_size_g || 100) / (food.serving_size_g || 100);
-                totals.calories += (food.calories || 0) * factor;
-                totals.protein += (food.protein || 0) * factor;
-                totals.carbohydrates += (food.carbohydrates || 0) * factor;
-                totals.fat += (food.fat || 0) * factor;
-                totals.fiber += (food.fiber || 0) * factor;
-                totals.sugar += (food.sugar || 0) * factor;
-                totals.sodium += (food.sodium || 0) * factor;
-            }
-        } else if (loggedItem.type === 'meal') {
-            const meal = getMealById(loggedItem.itemId);
-            if (meal) {
-                // Determine the scaling factor based on logged grams vs. total meal grams
-                const totalMealGrams = meal.foods.reduce((acc, mf) => acc + mf.grams, 0);
-                const mealFactor = (loggedItem.grams && totalMealGrams > 0) ? loggedItem.grams / totalMealGrams : 1;
-
-                meal.foods.forEach(mealFood => {
-                    const food = getFoodById(mealFood.foodId);
-                    if (food) {
-                        // Original factor for the food within the meal, then scaled by the meal's portion
-                        const foodFactorInMeal = mealFood.grams / (food.serving_size_g || 100);
-                        const finalFactor = foodFactorInMeal * mealFactor;
-                        
-                        totals.calories += (food.calories || 0) * finalFactor;
-                        totals.protein += (food.protein || 0) * finalFactor;
-                        totals.carbohydrates += (food.carbohydrates || 0) * finalFactor;
-                        totals.fat += (food.fat || 0) * finalFactor;
-                        totals.fiber += (food.fiber || 0) * finalFactor;
-                        totals.sugar += (food.sugar || 0) * finalFactor;
-                        totals.sodium += (food.sodium || 0) * finalFactor;
-                    }
-                });
-            }
-        }
-    });
-    return totals;
-};
+import { calculateTotalNutrientsForItems } from '@/lib/calculations';
 
 
 export default function DiaryPage() {
@@ -93,7 +46,7 @@ export default function DiaryPage() {
     }, [todaysLog]);
 
     const totalNutrients = useMemo(() => {
-        return calculateTotalNutrients(allLoggedItems, getFoodById, getMealById);
+        return calculateTotalNutrientsForItems(allLoggedItems, getFoodById, getMealById);
     }, [allLoggedItems, getFoodById, getMealById]);
     
     const dailyScore = useMemo(() => {
@@ -212,7 +165,7 @@ export default function DiaryPage() {
                                                     const name = item.type === 'food' 
                                                         ? getFoodName(getFoodById(item.itemId)!, locale)
                                                         : getMealById(item.itemId)?.name || '';
-                                                    const itemNutrients = calculateTotalNutrients([item], getFoodById, getMealById);
+                                                    const itemNutrients = calculateTotalNutrientsForItems([item], getFoodById, getMealById);
                                                     return (
                                                         <div key={item.id} className="flex items-center justify-between p-2 rounded-md bg-muted/50">
                                                             <div>

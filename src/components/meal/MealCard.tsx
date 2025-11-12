@@ -48,25 +48,8 @@ import { getFoodName, cn } from '@/lib/utils';
 import { formatISO, startOfToday } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { calculateMealScore } from '@/lib/scoring';
+import { calculateTotalNutrientsForMeal } from '@/lib/calculations';
 
-
-const calculateTotalNutrients = (meal: Meal, getFoodById: Function) => {
-    const totals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 };
-    meal.foods.forEach(mealFood => {
-        const food = getFoodById(mealFood.foodId);
-        if (food) {
-            const factor = mealFood.grams / (food.serving_size_g || 100);
-            totals.calories += (food.calories || 0) * factor;
-            totals.protein += (food.protein || 0) * factor;
-            totals.carbohydrates += (food.carbohydrates || 0) * factor;
-            totals.fat += (food.fat || 0) * factor;
-            totals.fiber += (food.fiber || 0) * factor;
-            totals.sugar += (food.sugar || 0) * factor;
-            totals.sodium += (food.sodium || 0) * factor;
-        }
-    });
-    return totals;
-};
 
 interface MealCardProps {
   meal: Meal;
@@ -85,7 +68,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
     const { toast } = useToast();
 
     const totalNutrients = useMemo(
-      () => calculateTotalNutrients(meal, getFoodById),
+      () => calculateTotalNutrientsForMeal(meal, getFoodById),
       [meal, getFoodById]
     );
 
