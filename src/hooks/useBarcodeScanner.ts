@@ -31,17 +31,21 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isScanning, setIsScanning] = useState(true);
+  const isScanningRef = useRef(true);
 
   const stopScan = useCallback(() => {
+    isScanningRef.current = false;
     setIsScanning(false);
     if (videoRef.current && videoRef.current.srcObject) {
       (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
     }
   }, []);
-
+  
   const startScan = useCallback(async () => {
+    isScanningRef.current = true;
     setIsScanning(true);
-    if (hasCameraPermission) {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         if (videoRef.current) {
@@ -51,7 +55,7 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
         console.error('Error restarting camera:', error);
       }
     }
-  }, [hasCameraPermission]);
+  }, []);
 
   useEffect(() => {
     const getCameraPermission = async () => {
@@ -76,9 +80,12 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     getCameraPermission();
 
     return () => {
-      stopScan();
+      // Ensure all tracks are stopped on unmount
+      if (videoRef.current && videoRef.current.srcObject) {
+        (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+      }
     };
-  }, [t, toast, stopScan]);
+  }, [t, toast]);
 
   useEffect(() => {
     let detector: BarcodeDetector | undefined;
@@ -87,10 +94,11 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     if (!isScanning || !hasCameraPermission) {
       return;
     }
-
+    
     if (typeof window.BarcodeDetector === 'undefined') {
       toast({ variant: 'destructive', title: t('Scanner Not Supported'), description: t('The Barcode Detector API is not supported in this browser.') });
       setIsScanning(false);
+      isScanningRef.current = false;
       return;
     }
 
@@ -99,28 +107,28 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     } catch (e) {
       toast({ variant: 'destructive', title: t('Scanner Init Failed'), description: t('Could not initialize the barcode scanner.') });
       setIsScanning(false);
+      isScanningRef.current = false;
       return;
     }
 
     const scanLoop = async () => {
-      if (videoRef.current && videoRef.current.readyState >= 3 && detector) {
+      if (!isScanningRef.current) return;
+
+      if (videoRef.current && videoRef.current.readyState >= 2 && detector) {
         try {
           const barcodes = await detector.detect(videoRef.current);
           if (barcodes.length > 0) {
             const detectedBarcode = barcodes[0].rawValue;
             stopScan();
             onScanSuccess(detectedBarcode);
-            // Stop the loop once a barcode is found and handled
             return;
           }
         } catch (e) {
           console.error('Barcode detection failed:', e);
         }
       }
-      // Continue the loop only if scanning is still active
-      if (isScanning) {
-        animationFrameId = requestAnimationFrame(scanLoop);
-      }
+      
+      animationFrameId = requestAnimationFrame(scanLoop);
     };
 
     scanLoop();
@@ -129,6 +137,7 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
       cancelAnimationFrame(animationFrameId);
     };
   }, [isScanning, hasCameraPermission, t, toast, onScanSuccess, stopScan]);
+
 
   return {
     videoRef,
