@@ -491,3 +491,5 @@ export const useAppData = ({ defaultFoods, defaultSettings, defaultShoppingLists
         addMealToShoppingList,
     };
 };
+
+    
