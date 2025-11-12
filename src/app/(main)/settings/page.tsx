@@ -51,8 +51,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Download, Upload, Info } from 'lucide-react';
-import { useRef, useCallback, useEffect } from 'react';
+import { Download, Upload, Info, Loader2 } from 'lucide-react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NutritionalGoals, HydrationSettings } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
@@ -87,7 +87,7 @@ const hydrationSettingsSchema = z.object({
 
 export default function SettingsPage() {
   const { settings, updateSettings, updateNutritionalGoals, updateHydrationSettings } = useSettings();
-  const { foods, setFoods, exportFoodsToCsv } = useFoods();
+  const { foods, setFoods, exportFoodsToCsv, importFoods: importFoodsFromContext } = useFoods();
   const { setMeals } = useMeals();
   const { setFavoriteFoodIds } = useFavorites();
   const { setDailyLogs } = useDailyLogs();
@@ -97,6 +97,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const { t, setLocale, locale } = useLocale();
   const backupFileRef = useRef<HTMLInputElement>(null);
+  const [isLoadingBaseFoods, setIsLoadingBaseFoods] = useState(false);
 
   const displayForm = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
@@ -232,6 +233,55 @@ export default function SettingsPage() {
       description: t('Your food data has been downloaded as a CSV file.'),
     });
   }
+
+  const handleLoadBaseFoods = async () => {
+    setIsLoadingBaseFoods(true);
+    try {
+        const response = await fetch('https://pastebin.com/raw/XwRp3Vhd');
+        if (!response.ok) {
+            throw new Error('Failed to fetch base food data');
+        }
+        const text = await response.text();
+        
+        const rows = text.split('\n').filter(row => row.trim() !== '');
+        const header = rows.shift()?.trim().split(',').map(h => h.trim()) || [];
+        
+        if (!header.includes('id') || !header.includes('name_category')) {
+          throw new Error(t("CSV must contain 'id' and 'name_category' columns."));
+        }
+
+        const parsedFoods: { [key: string]: string }[] = rows.map(row => {
+            const values = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+            const foodObject: { [key: string]: string } = {};
+            
+            header.forEach((h, i) => {
+                let value = values[i]?.trim() || '';
+                if (value.startsWith('"') && value.endsWith('"')) {
+                    value = value.substring(1, value.length - 1);
+                }
+                foodObject[h] = value;
+            });
+            return foodObject;
+        });
+
+        const newFoodsCount = importFoodsFromContext(parsedFoods);
+
+        toast({
+          title: t('Import Successful'),
+          description: t('{count} new food(s) imported.', { count: newFoodsCount }),
+        });
+
+    } catch (error: any) {
+        toast({
+          variant: 'destructive',
+          title: t('Import Failed'),
+          description: error.message || t('An unexpected error occurred during import.'),
+        });
+    } finally {
+        setIsLoadingBaseFoods(false);
+    }
+  };
+
 
   const goalsFields: {name: keyof NutritionalGoals, label: string}[] = [
       { name: 'calories', label: t('Calories (kcal)')},
@@ -470,6 +520,21 @@ export default function SettingsPage() {
               <AccordionContent>
                 <div className="space-y-6">
                     <div>
+                        <h3 className="font-semibold mb-2">{t('Base Food Data')}</h3>
+                        <p className="text-sm text-muted-foreground mb-3">
+                            {t('Load a default list of food items into the app.')}
+                        </p>
+                        <Button onClick={handleLoadBaseFoods} disabled={isLoadingBaseFoods}>
+                            {isLoadingBaseFoods ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <Download className="mr-2 h-4 w-4" />
+                            )}
+                            {t('Load')}
+                        </Button>
+                    </div>
+                    <Separator />
+                    <div>
                       <h3 className="font-semibold mb-2">{t('CSV Food Data')}</h3>
                       <div className='flex items-center gap-2'>
                         <p className="text-sm text-muted-foreground">
@@ -554,3 +619,5 @@ export default function SettingsPage() {
     </>
   );
 }
+
+    

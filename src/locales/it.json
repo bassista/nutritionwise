@@ -266,5 +266,10 @@
   "Log a meal for 100 consecutive days.": "Registra un pasto per 100 giorni consecutivi.",
   "Meal Score": "Punteggio Pasto",
   "Daily Score": "Punteggio Giornaliero",
-  "Hydration Score": "Punteggio Idratazione"
+  "Hydration Score": "Punteggio Idratazione",
+  "Base Food Data": "Dati Alimenti di Base",
+  "Load a default list of food items into the app.": "Carica una lista predefinita di alimenti nell'app.",
+  "Load": "Carica"
 }
+
+    

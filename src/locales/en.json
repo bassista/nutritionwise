@@ -266,5 +266,10 @@
   "Log a meal for 100 consecutive days.": "Log a meal for 100 consecutive days.",
   "Meal Score": "Meal Score",
   "Daily Score": "Daily Score",
-  "Hydration Score": "Hydration Score"
+  "Hydration Score": "Hydration Score",
+  "Base Food Data": "Base Food Data",
+  "Load a default list of food items into the app.": "Load a default list of food items into the app.",
+  "Load": "Load"
 }
+
+    
