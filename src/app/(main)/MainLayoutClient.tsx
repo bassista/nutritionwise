@@ -123,12 +123,12 @@ export default function MainLayoutClient({
             </div>
           </header>
           <main className="flex-grow pb-20 md:pb-8">{children}</main>
-          <BottomNav />
-          <MealBuilder
-            open={isMealBuilderOpen}
-            onOpenChange={setMealBuilderOpen}
-          />
         </div>
+        <BottomNav />
+        <MealBuilder
+          open={isMealBuilderOpen}
+          onOpenChange={setMealBuilderOpen}
+        />
       </SidebarInset>
     </SidebarProvider>
   );

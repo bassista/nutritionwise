@@ -244,9 +244,9 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <PageHeader title={t('Settings')} />
-      <div className="container mx-auto px-4 flex-grow overflow-auto pb-24 md:pb-4">
+      <div className="container mx-auto px-4 flex-grow overflow-auto">
         <div className="py-4 max-w-2xl mx-auto">
            <Accordion type="single" collapsible className="w-full" defaultValue="language">
             <AccordionItem value="language">
@@ -551,6 +551,6 @@ export default function SettingsPage() {
           </Accordion>
         </div>
       </div>
-    </div>
+    </>
   );
 }
