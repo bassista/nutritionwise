@@ -17,38 +17,32 @@ interface LocaleContextType {
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
-const useLocalStorage = <T,>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] => {
-    const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-    useEffect(() => {
-      // This effect runs only on the client
-      try {
-        const item = window.localStorage.getItem(key);
-        if (item) {
-          setStoredValue(JSON.parse(item));
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }, [key]);
-  
-    const setValue = (value: T | ((val: T) => T)) => {
-      try {
-        const valueToStore = value instanceof Function ? value(storedValue) : value;
-        setStoredValue(valueToStore);
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(key, JSON.stringify(valueToStore));
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-  
-    return [storedValue, setValue];
-  };
-
 export const LocaleProvider = ({ children }: { children: ReactNode }) => {
-  const [locale, setLocale] = useLocalStorage<Locale>('locale', 'en');
+  const [locale, setLocaleState] = useState<Locale>('en');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    try {
+      const item = window.localStorage.getItem('locale');
+      if (item && (item === '"en"' || item === '"it"')) {
+        setLocaleState(JSON.parse(item));
+      }
+    } catch (error) {
+      console.error('Failed to load locale from localStorage', error);
+    }
+    setIsMounted(true);
+  }, []);
+
+  const setLocale = useCallback((newLocale: Locale) => {
+    try {
+      setLocaleState(newLocale);
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('locale', JSON.stringify(newLocale));
+      }
+    } catch (error) {
+      console.error('Failed to save locale to localStorage', error);
+    }
+  }, []);
 
   const t = useCallback((key: string, values?: Record<string, string | number>): string => {
     let translation = translations[locale]?.[key] || key;
@@ -62,9 +56,13 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
   
   const value = {
     locale,
-    setLocale: setLocale,
+    setLocale,
     t,
   };
+  
+  if (!isMounted) {
+    return null; // Don't render anything on the server or until mounted on the client
+  }
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 };
