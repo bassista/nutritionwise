@@ -133,7 +133,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
               <div className="flex items-center flex-shrink-0">
                 <TooltipProvider>
                     <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger asChild>
                             <div className={cn("flex items-center justify-center w-10 h-10 rounded-full text-white font-bold text-lg", mealScore.color)}>
                                 {mealScore.grade}
                             </div>
