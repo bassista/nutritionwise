@@ -45,7 +45,7 @@ const calculateMacroBalanceScore = (nutrients: NutritionalInfo): number => {
 
 const calculateNutrientQualityScore = (nutrients: NutritionalInfo, goals: NutritionalGoals): number => {
     let score = 100;
-    const penaltyMultiplier = 25; // Reduced from 50
+    const penaltyMultiplier = 25; 
 
     // Penalty for too much sugar (relative to goal for the day)
     // We assume a meal is ~1/3 of the day
@@ -88,32 +88,63 @@ export const calculateMealScore = (nutrients: NutritionalInfo, goals: Nutritiona
 };
 
 export const calculateDailyScore = (nutrients: NutritionalInfo, goals: NutritionalGoals): Score => {
-    if (nutrients.calories === 0) return { percentage: 0, grade: 'N/A', color: 'bg-muted' };
+    if (nutrients.calories === 0 || goals.calories === 0) {
+        return { percentage: 0, grade: 'N/A', color: 'bg-muted' };
+    }
 
-    // 1. Calorie Adherence Score (Weight: 30%)
-    const calorieDiff = Math.abs(nutrients.calories - goals.calories);
-    const calorieScore = Math.max(0, 100 - (calorieDiff / goals.calories) * 100);
+    // Nutrients to be "under" a limit. Score is 100 if under, penalized if over.
+    const getUnderLimitScore = (consumed: number, goal: number): number => {
+        if (goal <= 0) return 100;
+        if (consumed <= goal) return 100;
+        // Penalize for exceeding the goal. The score drops from 100 to 0 as consumption goes from goal to 2*goal.
+        return Math.max(0, 100 - ((consumed - goal) / goal) * 100);
+    };
 
-    // 2. Macro Balance Score (Weight: 40%)
-    const macroScore = calculateMacroBalanceScore(nutrients);
+    // Nutrients to be "close to" a target. Score is 100 at target, decreases if under or over.
+    const getTargetAdherenceScore = (consumed: number, goal: number): number => {
+        if (goal <= 0) return 100;
+        const diffPercent = Math.abs(consumed - goal) / goal;
+        // Score is 100 if diff is 0, and 0 if diff is 100% or more.
+        return Math.max(0, 100 - diffPercent * 100);
+    };
     
-    // 3. Nutrient Quality Score (Weight: 30%)
-    let qualityScore = 100;
-    const penaltyMultiplier = 40; // Reduced from 80
-     if (nutrients.sugar && goals.sugar > 0 && nutrients.sugar > goals.sugar) {
-        qualityScore -= Math.min(30, ((nutrients.sugar / goals.sugar) - 1) * penaltyMultiplier);
-    }
-     if (nutrients.sodium && goals.sodium > 0 && nutrients.sodium > goals.sodium) {
-        qualityScore -= Math.min(30, ((nutrients.sodium / goals.sodium) - 1) * penaltyMultiplier);
-    }
-    if (nutrients.fiber && goals.fiber > 0 && nutrients.fiber >= goals.fiber) {
-        qualityScore += 20; // Bonus for meeting fiber goal
-    }
-    qualityScore = Math.max(0, Math.min(120, qualityScore));
+    // Bonus for fiber. Score from 0 to 100 based on how close to the goal.
+    const getFiberBonusScore = (consumed: number, goal: number): number => {
+        if (goal <= 0) return 0;
+        return Math.min(100, (consumed / goal) * 100);
+    };
 
-    const finalScore = (calorieScore * 0.3) + (macroScore * 0.4) + (qualityScore * 0.3);
+    const scores = {
+        calories: getUnderLimitScore(nutrients.calories, goals.calories),
+        fat: getUnderLimitScore(nutrients.fat, goals.fat),
+        sugar: getUnderLimitScore(nutrients.sugar || 0, goals.sugar),
+        sodium: getUnderLimitScore(nutrients.sodium || 0, goals.sodium),
+        protein: getTargetAdherenceScore(nutrients.protein, goals.protein),
+        carbohydrates: getTargetAdherenceScore(nutrients.carbohydrates, goals.carbohydrates),
+        fiber: getFiberBonusScore(nutrients.fiber || 0, goals.fiber),
+    };
 
-    const percentage = Math.round(Math.max(0, Math.min(100, finalScore)));
+    // Weighted average for the final score
+    const weights = {
+        calories: 0.25,
+        protein: 0.20,
+        carbohydrates: 0.20,
+        fat: 0.10,
+        sugar: 0.10,
+        sodium: 0.10,
+        fiber: 0.05, // Fiber acts as a bonus of up to 5 points
+    };
+
+    const finalScore = 
+        scores.calories * weights.calories +
+        scores.protein * weights.protein +
+        scores.carbohydrates * weights.carbohydrates +
+        scores.fat * weights.fat +
+        scores.sugar * weights.sugar +
+        scores.sodium * weights.sodium +
+        scores.fiber * weights.fiber;
+    
+    const percentage = Math.round(Math.min(100, finalScore));
     const { grade, color } = getGrade(percentage);
     
     return { percentage, grade, color };
