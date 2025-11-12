@@ -113,7 +113,7 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
             )}
           </ScrollArea>
         </CardContent>
-        <CardFooter className="flex-col sm:flex-row gap-2 pt-6">
+        <CardFooter className="flex flex-col sm:flex-row gap-2 pt-6">
             <Button variant="outline" size="sm" className="w-full" onClick={() => toggleAllShoppingListItems(list.id, !allItemsChecked)}>
                 <Check className="mr-2 h-4 w-4" /> {allItemsChecked ? t('Uncheck All') : t('Check All')}
             </Button>
