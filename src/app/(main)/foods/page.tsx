@@ -58,7 +58,7 @@ export default function FoodsPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <PageHeader title={t('All Foods')}>
         <div className="flex gap-2">
             <Button asChild variant="outline">
@@ -88,6 +88,6 @@ export default function FoodsPage() {
         onOpenChange={handleFormOpenChange}
         foodToEdit={foodToEdit}
       />
-    </div>
+    </>
   );
 }

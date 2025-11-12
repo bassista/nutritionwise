@@ -55,7 +55,7 @@ export default function AnalyticsPage() {
 
     if (noData) {
         return (
-             <div className="flex flex-col h-full">
+             <>
                 <PageHeader title={t('Analytics')} />
                 <div className="container mx-auto px-4 flex-grow py-4">
                     <Alert>
@@ -66,12 +66,12 @@ export default function AnalyticsPage() {
                         </AlertDescription>
                     </Alert>
                 </div>
-            </div>
+            </>
         )
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <>
             <PageHeader title={t('Analytics')}>
                 <Select value={period} onValueChange={(value) => setPeriod(value as AnalysisPeriod)}>
                     <SelectTrigger className="w-[180px]">
@@ -155,6 +155,6 @@ export default function AnalyticsPage() {
                     </Card>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

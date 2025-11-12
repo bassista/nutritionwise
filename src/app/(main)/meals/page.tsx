@@ -62,7 +62,7 @@ export default function MealsPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <PageHeader title={t('My Meals')}>
         <Button onClick={() => setMealBuilderOpen(true, 'all')}>
           <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
@@ -83,7 +83,7 @@ export default function MealsPage() {
           </div>
         </div>
       </div>
-      <div className="container mx-auto px-4 flex-grow">
+      <div className="container mx-auto px-4 flex-grow overflow-auto">
         <div className="py-4 pt-8 space-y-4">
           {filteredMeals.length > 0 ? (
              <DndContext
@@ -116,6 +116,6 @@ export default function MealsPage() {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

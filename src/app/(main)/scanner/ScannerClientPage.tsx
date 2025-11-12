@@ -108,7 +108,7 @@ export default function ScannerClientPage() {
   const showScanResult = localBarcode && !isScanning;
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <PageHeader title={t('Barcode Scanner')} />
       <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
         <div className="max-w-md mx-auto">
@@ -185,6 +185,6 @@ export default function ScannerClientPage() {
         onSubmitted={handleFormSubmitted}
         autoFavorite={fromFavorites}
       />
-    </div>
+    </>
   );
 }

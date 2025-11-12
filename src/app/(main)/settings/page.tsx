@@ -246,8 +246,8 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader title={t('Settings')} />
-      <div className="container mx-auto px-4 flex-grow overflow-auto">
-        <div className="py-4 max-w-2xl mx-auto">
+      <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
+        <div className="max-w-2xl mx-auto">
            <Accordion type="single" collapsible className="w-full" defaultValue="language">
             <AccordionItem value="language">
               <AccordionTrigger>

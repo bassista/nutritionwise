@@ -69,7 +69,7 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <PageHeader title={t('Favorite Foods')}>
         <div className="flex gap-2">
             <Button asChild variant="outline">
@@ -101,6 +101,6 @@ export default function FavoritesPage() {
         foodToEdit={foodToEdit}
         autoFavorite={true}
       />
-    </div>
+    </>
   );
 }

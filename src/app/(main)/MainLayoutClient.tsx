@@ -122,7 +122,7 @@ export default function MainLayoutClient({
               </div>
             </div>
           </header>
-          <main className="flex-grow pb-20 md:pb-8">{children}</main>
+          <main className="flex-grow pb-20 md:pb-0">{children}</main>
         </div>
         <BottomNav />
         <MealBuilder

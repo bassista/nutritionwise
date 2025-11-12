@@ -30,7 +30,7 @@ export default function AchievementsPage() {
   }, [userAchievements]);
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <PageHeader title={t('Achievements')} />
       <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -69,6 +69,6 @@ export default function AchievementsPage() {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }

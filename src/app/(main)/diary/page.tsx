@@ -102,7 +102,7 @@ export default function DiaryPage() {
     };
     
     return (
-        <div className="flex flex-col h-full">
+        <>
             <PageHeader title={t('Food Diary')} />
             <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -212,6 +212,6 @@ export default function DiaryPage() {
                     onLog={handleLogFood}
                 />
               )}
-        </div>
+        </>
     );
 }

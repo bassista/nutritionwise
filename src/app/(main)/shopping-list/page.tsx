@@ -37,7 +37,7 @@ export default function ShoppingListPage() {
   };
   
   return (
-    <div className="flex flex-col h-full">
+    <>
       <PageHeader title={t('Shopping Lists')}>
         <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> {t('New List')}
@@ -70,6 +70,6 @@ export default function ShoppingListPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
