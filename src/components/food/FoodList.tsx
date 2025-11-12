@@ -60,7 +60,7 @@ export default function FoodList({ foods, onReorder, onDeleteFood, onEditFood }:
         <SortableContext items={foods.map(f => f.id)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {foods.map(food => (
-              <FoodCardWrapper key={food.id} food={food} reorderable={true} onEdit={onEditFood} />
+              <FoodCardWrapper key={food.id} food={food} reorderable={true} onEdit={onEditFood} onDelete={onDeleteFood} />
             ))}
           </div>
         </SortableContext>
