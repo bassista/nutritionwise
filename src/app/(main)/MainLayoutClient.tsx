@@ -40,15 +40,14 @@ function SidebarHeaderContent() {
 function SidebarNav() {
     const { t } = useLocale();
     const pathname = usePathname();
-    const { isMobile, setOpenMobile, openMobile } = useSidebar();
+    const { isMobile, setOpenMobile } = useSidebar();
 
-    useEffect(() => {
-        if (isMobile && openMobile) {
-            setOpenMobile(false);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pathname, isMobile]);
-
+    const handleLinkClick = () => {
+      if (isMobile) {
+        setOpenMobile(false);
+      }
+    };
+    
     const navItems = useMemo(() => [
       { href: '/diary', icon: BookOpen, label: t('Diary') },
       { href: '/analytics', icon: LineChart, label: t('Analytics') },
@@ -69,6 +68,7 @@ function SidebarNav() {
                   asChild
                   isActive={pathname === item.href}
                   tooltip={item.label}
+                  onClick={handleLinkClick}
                 >
                   <Link href={item.href}>
                     <item.icon />
