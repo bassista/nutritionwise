@@ -86,7 +86,7 @@ export default function AnalyticsPage() {
                             <CardDescription>{t('Calorie and macronutrient intake')} {periodDescription}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <ChartContainer config={chartConfig} className="h-64 w-full">
+                            <ChartContainer config={chartConfig} className="h-52 w-full">
                                 <LineChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
                                     <CartesianGrid vertical={false} />
                                     <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value} />
@@ -104,16 +104,16 @@ export default function AnalyticsPage() {
                         </CardHeader>
                         <CardContent className="flex justify-center">
                             {analysisData.macroDistribution.length > 0 ? (
-                                <ChartContainer config={chartConfig} className="h-64 w-full">
+                                <ChartContainer config={chartConfig} className="h-52 w-full">
                                     <PieChart>
                                         <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-                                        <Pie data={analysisData.macroDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                                        <Pie data={analysisData.macroDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
                                             const RADIAN = Math.PI / 180;
                                             const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
                                             const x = cx + radius * Math.cos(-midAngle * RADIAN);
                                             const y = cy + radius * Math.sin(-midAngle * RADIAN);
                                             return (
-                                                <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+                                                <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize="12">
                                                     {`${(percent * 100).toFixed(0)}%`}
                                                 </text>
                                             );
@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
                                     </PieChart>
                                 </ChartContainer>
                             ) : (
-                                <div className="flex items-center justify-center h-64 text-muted-foreground">{t('Not enough data')}</div>
+                                <div className="flex items-center justify-center h-52 text-muted-foreground">{t('Not enough data')}</div>
                             )}
                         </CardContent>
                     </Card>
@@ -132,7 +132,7 @@ export default function AnalyticsPage() {
                             <CardDescription>{t('Your average daily nutrient intake compared to your goals.')}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                             <ChartContainer config={chartConfig} className="h-64 w-full">
+                             <ChartContainer config={chartConfig} className="h-52 w-full">
                                 <BarChart data={[{ name: 'average', ...analysisData.avgNutrients, ...settings.nutritionalGoals }]} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
                                     <CartesianGrid vertical={false} />
                                     <XAxis dataKey="name" tickLine={false} axisLine={false} />
@@ -152,5 +152,3 @@ export default function AnalyticsPage() {
         </div>
     );
 }
-
-    
