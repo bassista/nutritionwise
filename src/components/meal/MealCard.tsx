@@ -44,11 +44,10 @@ import { ScrollArea } from '../ui/scroll-area';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
-import { getFoodName, cn } from '@/lib/utils';
+import { getFoodName, cn, calculateTotalNutrientsForMeal } from '@/lib/utils';
 import { formatISO, startOfToday } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { calculateMealScore } from '@/lib/scoring';
-import { calculateTotalNutrientsForMeal } from '@/lib/calculations';
 
 
 interface MealCardProps {

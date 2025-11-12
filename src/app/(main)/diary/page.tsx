@@ -16,11 +16,10 @@ import { Plus, Trash2 } from 'lucide-react';
 import FoodSelectorForMeal from '@/components/meal/FoodSelectorForMeal';
 import LogFoodDialog from '@/components/diary/LogFoodDialog';
 import { Food, Meal, LoggedItem, MealType } from '@/lib/types';
-import { getFoodName, cn } from '@/lib/utils';
+import { getFoodName, cn, calculateTotalNutrientsForItems } from '@/lib/utils';
 import WaterTracker from '@/components/diary/WaterTracker';
 import { calculateDailyScore } from '@/lib/scoring';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { calculateTotalNutrientsForItems } from '@/lib/calculations';
 
 
 export default function DiaryPage() {

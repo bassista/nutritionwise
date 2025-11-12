@@ -12,7 +12,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { LoggedItem, MealType, Food, Meal, AnalysisPeriod } from '@/lib/types';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { LineChart as LineChartIcon } from 'lucide-react';
-import { calculateTotalNutrientsForItems } from '@/lib/calculations';
+import { calculateTotalNutrientsForItems } from '@/lib/utils';
 
 
 export default function AnalyticsPage() {

@@ -21,8 +21,7 @@ import type { Meal, MealFood, Food } from '@/lib/types';
 import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown } from 'lucide-react';
 import FoodSelectorForMeal from './FoodSelectorForMeal';
 import { useLocale } from '@/context/LocaleContext';
-import { getFoodName } from '@/lib/utils';
-import { calculateTotalNutrientsForMeal } from '@/lib/calculations';
+import { getFoodName, calculateTotalNutrientsForMeal } from '@/lib/utils';
 
 interface MealBuilderProps {
   open: boolean;
