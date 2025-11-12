@@ -11,11 +11,13 @@ import { FoodForm } from '@/components/food/FoodForm';
 import { Food } from '@/lib/types';
 import Link from 'next/link';
 import FoodListPage from '@/components/food/FoodListPage';
+import { useToast } from '@/hooks/use-toast';
 
 
 export default function FavoritesPage() {
-  const { foods, favoriteFoodIds, setFavoriteFoodIds, setMealBuilderOpen } = useAppContext();
+  const { foods, favoriteFoodIds, setFavoriteFoodIds, setMealBuilderOpen, deleteFood } = useAppContext();
   const { t } = useLocale();
+  const { toast } = useToast();
 
   const [isFormOpen, setFormOpen] = useState(false);
   const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);
@@ -32,6 +34,22 @@ export default function FavoritesPage() {
   const handleEditFood = (food: Food) => {
     setFoodToEdit(food);
     setFormOpen(true);
+  };
+
+  const handleDeleteFood = (foodId: string) => {
+    const result = deleteFood(foodId);
+    if (!result.success) {
+      toast({
+        variant: 'destructive',
+        title: t('Cannot delete food'),
+        description: t('Food is used in meal: {mealNames}', { mealNames: result.conflictingMeals?.join(', ') || '' }),
+      });
+    } else {
+        toast({
+            title: t('Food Deleted'),
+            description: t('The food has been successfully deleted.'),
+        });
+    }
   };
   
   const handleFormOpenChange = (open: boolean) => {
@@ -67,6 +85,7 @@ export default function FavoritesPage() {
       <FoodListPage
         foods={favoriteFoods}
         onEditFood={handleEditFood}
+        onDeleteFood={handleDeleteFood}
         onReorder={setFavoriteFoodIds}
         reorderableIds={favoriteFoodIds}
         pageType="favorites"
