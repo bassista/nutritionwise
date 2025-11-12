@@ -189,7 +189,9 @@
   "Start logging your meals in the diary to see your analytics.": "Inizia a registrare i tuoi pasti nel diario per vedere le tue statistiche.",
   "Not enough data": "Dati insufficienti",
   "CSV Food Data": "Dati Alimenti CSV",
-  "Download Foods (CSV)": "Scarica Alimenti (CSV)",
+  "Download Foods (CSV)": "Scarica in CSV",
   "CSV Exported": "CSV Esportato",
   "Your food data has been downloaded as a CSV file.": "I tuoi dati alimentari sono stati scaricati come file CSV."
 }
+
+    
