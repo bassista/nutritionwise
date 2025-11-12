@@ -91,14 +91,14 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     let detector: BarcodeDetector | undefined;
     let animationFrameId: number;
 
-    if (!isScanning || !hasCameraPermission) {
+    if (!hasCameraPermission) {
       return;
     }
     
     if (typeof window.BarcodeDetector === 'undefined') {
       toast({ variant: 'destructive', title: t('Scanner Not Supported'), description: t('The Barcode Detector API is not supported in this browser.') });
-      setIsScanning(false);
       isScanningRef.current = false;
+      setIsScanning(false);
       return;
     }
 
@@ -106,15 +106,15 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
       detector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
     } catch (e) {
       toast({ variant: 'destructive', title: t('Scanner Init Failed'), description: t('Could not initialize the barcode scanner.') });
-      setIsScanning(false);
       isScanningRef.current = false;
+      setIsScanning(false);
       return;
     }
 
     const scanLoop = async () => {
       if (!isScanningRef.current) return;
 
-      if (videoRef.current && videoRef.current.readyState >= 2 && detector) {
+      if (videoRef.current && videoRef.current.readyState >= 2 && !videoRef.current.paused && detector) {
         try {
           const barcodes = await detector.detect(videoRef.current);
           if (barcodes.length > 0) {
@@ -131,7 +131,9 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
       animationFrameId = requestAnimationFrame(scanLoop);
     };
 
-    scanLoop();
+    if (isScanning) {
+        scanLoop();
+    }
 
     return () => {
       cancelAnimationFrame(animationFrameId);
