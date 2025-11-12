@@ -237,7 +237,7 @@ export default function SettingsPage() {
   const handleLoadBaseFoods = async () => {
     setIsLoadingBaseFoods(true);
     try {
-        const response = await fetch('https://pastebin.com/raw/XwRp3Vhd');
+        const response = await fetch('https://cors-anywhere.herokuapp.com/https://pastebin.com/raw/XwRp3Vhd');
         if (!response.ok) {
             throw new Error('Failed to fetch base food data');
         }
@@ -620,4 +620,5 @@ export default function SettingsPage() {
   );
 }
 
+    
     
