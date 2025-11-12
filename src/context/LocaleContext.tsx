@@ -19,7 +19,6 @@ const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 export const LocaleProvider = ({ children }: { children: ReactNode }) => {
   const [locale, setLocaleState] = useState<Locale>('en');
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     try {
@@ -30,7 +29,6 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Failed to load locale from localStorage', error);
     }
-    setIsMounted(true);
   }, []);
 
   const setLocale = useCallback((newLocale: Locale) => {
@@ -59,10 +57,6 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     setLocale,
     t,
   };
-  
-  if (!isMounted) {
-    return null; // Don't render anything on the server or until mounted on the client
-  }
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 };
