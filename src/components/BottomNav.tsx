@@ -19,7 +19,7 @@ export default function BottomNav() {
     { href: '/foods', label: t('Foods') },
     { href: '/favorites', label: t('Favorites') },
     { href: '/meals', label: t('Meals') },
-    { href: '/achievements', label: t('Achievements') },
+    { href: '/shopping-list', label: t('Shopping Lists') },
   ];
   
   const navIcons: Record<string, React.ElementType> = {
@@ -27,7 +27,7 @@ export default function BottomNav() {
     [t('Foods')]: Wheat,
     [t('Favorites')]: Heart,
     [t('Meals')]: UtensilsCrossed,
-    [t('Achievements')]: Trophy,
+    [t('Shopping Lists')]: ShoppingCart,
   };
 
 
