@@ -272,7 +272,14 @@
   "Load": "Carica",
   "All": "Tutti",
   "Earned": "Ottenuti",
-  "Not Earned": "Non Ottenuti"
+  "Not Earned": "Non Ottenuti",
+  "Weight": "Peso",
+  "Body Weight": "Peso Corporeo",
+  "Enter weight in kg": "Inserisci peso in kg",
+  "Weight Saved": "Peso Salvato",
+  "Your weight for this day has been updated to": "Il tuo peso per questo giorno è stato aggiornato a",
+  "Weight Removed": "Peso Rimosso",
+  "Weight Trend": "Andamento Peso",
+  "Your weight trend": "Il tuo andamento del peso",
+  "Weight (kg)": "Peso (kg)"
 }
-
-    

@@ -7,12 +7,12 @@ import { useMeals } from '@/context/MealContext';
 import { useSettings } from '@/context/SettingsContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, AreaChart, Area } from 'recharts';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { useLocale } from '@/context/LocaleContext';
 import { AnalysisPeriod } from '@/lib/types';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { LineChart as LineChartIcon } from 'lucide-react';
+import { LineChart as LineChartIcon, Weight } from 'lucide-react';
 import { processAnalyticsData } from '@/lib/analytics';
 import {
   Select,
@@ -40,6 +40,7 @@ export default function AnalyticsPage() {
         protein: { label: t('Protein'), color: 'hsl(var(--chart-2))' },
         carbohydrates: { label: t('Carbohydrates'), color: 'hsl(var(--chart-3))' },
         fat: { label: t('Fat'), color: 'hsl(var(--chart-4))' },
+        weight: { label: t('Weight'), color: 'hsl(var(--chart-5))' },
     };
 
     const noData = Object.keys(dailyLogs).length === 0;
@@ -52,6 +53,8 @@ export default function AnalyticsPage() {
         }
         return periodMap[period];
     }, [period, t]);
+    
+    const weightDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.weight !== undefined), [analysisData.lineChartData]);
 
     if (noData) {
         return (
@@ -132,6 +135,33 @@ export default function AnalyticsPage() {
                             )}
                         </CardContent>
                     </Card>
+
+                    {weightDataAvailable && (
+                        <Card className="lg:col-span-3">
+                            <CardHeader>
+                                <CardTitle>{t('Weight Trend')}</CardTitle>
+                                <CardDescription>{t('Your weight trend')} {periodDescription}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ChartContainer config={chartConfig} className="h-52 w-full">
+                                    <AreaChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                                        <YAxis domain={['dataMin - 1', 'dataMax + 1']} unit="kg" />
+                                        <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+                                        <defs>
+                                            <linearGradient id="fillWeight" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--color-weight)" stopOpacity={0.8}/>
+                                            <stop offset="95%" stopColor="var(--color-weight)" stopOpacity={0.1}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <Area type="monotone" dataKey="weight" stroke="var(--color-weight)" strokeWidth={2} dot={false} name={t('Weight (kg)')} fill="url(#fillWeight)" />
+                                    </AreaChart>
+                                </ChartContainer>
+                            </CardContent>
+                        </Card>
+                    )}
+
                     <Card className="lg:col-span-3">
                         <CardHeader>
                             <CardTitle>{t('Average Daily Intake')}</CardTitle>

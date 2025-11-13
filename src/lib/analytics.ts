@@ -18,9 +18,10 @@ export function processAnalyticsData(
     let startDate: Date;
     let days: number;
 
+    const allLoggedDates = Object.keys(dailyLogs).sort();
+
     if (period === 'all') {
-        const allDates = Object.keys(dailyLogs).sort();
-        startDate = allDates.length > 0 ? parseISO(allDates[0]) : endDate;
+        startDate = allLoggedDates.length > 0 ? parseISO(allLoggedDates[0]) : endDate;
         days = differenceInDays(endDate, startDate) + 1;
     } else {
         days = period === 'last7days' ? 7 : 30;
@@ -31,14 +32,26 @@ export function processAnalyticsData(
 
     let totalNutrientsOverPeriod = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, count: 0 };
     
+    let lastKnownWeight: number | undefined = undefined;
+    // Find the last known weight before the start date
+    for (let i = allLoggedDates.length - 1; i >= 0; i--) {
+        const date = allLoggedDates[i];
+        if (date < format(startDate, 'yyyy-MM-dd') && dailyLogs[date]?.weight) {
+            lastKnownWeight = dailyLogs[date]?.weight;
+            break;
+        }
+    }
+
+
     const data = dateInterval.map(date => {
         const dateString = format(date, 'yyyy-MM-dd');
         const log = dailyLogs[dateString];
         
         let dailyTotals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
+        let weightData: number | undefined = undefined;
 
         if (log) {
-            const allItems = Object.values(log).flat() as LoggedItem[];
+            const allItems = Object.values(log).flat().filter(item => typeof item === 'object' && item !== null && 'type' in item) as LoggedItem[];
             const nutrients = calculateTotalNutrientsForItems(allItems, getFoodById, getMealById);
             dailyTotals = {
                 calories: nutrients.calories,
@@ -53,10 +66,19 @@ export function processAnalyticsData(
             if (nutrients.calories > 0) {
                 totalNutrientsOverPeriod.count++;
             }
+            if (log.weight) {
+                weightData = log.weight;
+                lastKnownWeight = log.weight;
+            } else {
+                weightData = lastKnownWeight;
+            }
+        } else {
+             weightData = lastKnownWeight;
         }
         
         return {
             date: format(date, 'MMM d'),
+            weight: weightData,
             ...dailyTotals
         };
     });

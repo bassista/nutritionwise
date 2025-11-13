@@ -56,6 +56,7 @@ export interface DailyLog {
   [date: string]: { // ISO date string: YYYY-MM-DD
     [mealType in MealType]?: LoggedItem[];
     waterIntakeMl?: number;
+    weight?: number;
   };
 }
 

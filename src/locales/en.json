@@ -272,7 +272,14 @@
   "Load": "Load",
   "All": "All",
   "Earned": "Earned",
-  "Not Earned": "Not Earned"
+  "Not Earned": "Not Earned",
+  "Weight": "Weight",
+  "Body Weight": "Body Weight",
+  "Enter weight in kg": "Enter weight in kg",
+  "Weight Saved": "Weight Saved",
+  "Your weight for this day has been updated to": "Your weight for this day has been updated to",
+  "Weight Removed": "Weight Removed",
+  "Weight Trend": "Weight Trend",
+  "Your weight trend": "Your weight trend",
+  "Weight (kg)": "Weight (kg)"
 }
-
-    

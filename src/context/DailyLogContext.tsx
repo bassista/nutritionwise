@@ -11,6 +11,7 @@ interface DailyLogContextType {
     addLogEntry: (date: string, mealType: MealType, item: { type: 'food' | 'meal', itemId: string, grams?: number }) => void;
     removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
     addWaterIntake: (date: string, amountMl: number) => void;
+    updateWeight: (date: string, weight?: number) => void;
 }
 
 const DailyLogContext = createContext<DailyLogContextType | undefined>(undefined);
@@ -50,8 +51,26 @@ export const DailyLogProvider = ({ children }: { children: ReactNode }) => {
         });
     }, [setDailyLogs]);
 
+    const updateWeight = useCallback((date: string, weight?: number) => {
+        setDailyLogs(prev => {
+            const newLogs = { ...prev };
+            const dayLog = newLogs[date] || {};
+            if (weight === undefined || weight <= 0) {
+                delete dayLog.weight;
+            } else {
+                dayLog.weight = weight;
+            }
+            newLogs[date] = { ...dayLog };
+            
+            if (Object.keys(newLogs[date]).length === 0) {
+                delete newLogs[date];
+            }
+            return newLogs;
+        });
+    }, [setDailyLogs]);
+
     return (
-        <DailyLogContext.Provider value={{ dailyLogs, setDailyLogs, addLogEntry, removeLogEntry, addWaterIntake }}>
+        <DailyLogContext.Provider value={{ dailyLogs, setDailyLogs, addLogEntry, removeLogEntry, addWaterIntake, updateWeight }}>
             {children}
         </DailyLogContext.Provider>
     );

@@ -21,6 +21,7 @@ import LogFoodDialog from '@/components/diary/LogFoodDialog';
 import { Food, Meal, LoggedItem, MealType } from '@/lib/types';
 import { getFoodName, cn, calculateTotalNutrientsForItems } from '@/lib/utils';
 import WaterTracker from '@/components/diary/WaterTracker';
+import WeightTracker from '@/components/diary/WeightTracker';
 import { calculateDailyScore } from '@/lib/scoring';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -45,7 +46,7 @@ export default function DiaryPage() {
 
     const allLoggedItems = useMemo(() => {
       const foodItems = (Object.entries(todaysLog)
-        .filter(([key]) => key !== 'waterIntakeMl')
+        .filter(([key]) => key !== 'waterIntakeMl' && key !== 'weight')
         .flatMap(([, value]) => value) as LoggedItem[]) || [];
       return foodItems;
     }, [todaysLog]);
@@ -105,7 +106,7 @@ export default function DiaryPage() {
         <>
             <PageHeader title={t('Food Diary')} />
             <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
-                <div className="flex flex-col lg:flex-row gap-6">
+                <div className="flex flex-wrap lg:flex-nowrap gap-6">
                     <div className="w-full lg:w-auto lg:min-w-[350px]">
                         <Card>
                             <CardContent className="p-2 flex justify-center">
@@ -119,8 +120,9 @@ export default function DiaryPage() {
                             </CardContent>
                         </Card>
                          <WaterTracker selectedDate={selectedDateString} />
+                         <WeightTracker selectedDate={selectedDateString} />
                     </div>
-                    <div className="flex-1 space-y-6">
+                    <div className="flex-1 min-w-[300px] space-y-6">
                         <Card>
                             <CardHeader>
                                 <div className="flex justify-between items-start">
