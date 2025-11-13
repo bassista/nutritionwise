@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { useLocale } from '@/context/LocaleContext';
 import { useAchievements } from '@/context/AchievementContext';
@@ -15,10 +15,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+type AchievementFilter = "all" | "earned" | "not-earned";
 
 export default function AchievementsPage() {
   const { t } = useLocale();
   const { userAchievements } = useAchievements();
+  const [filter, setFilter] = useState<AchievementFilter>("all");
 
   const achievementsWithStatus = useMemo(() => {
     const earnedIds = new Set(userAchievements.map(a => a.badgeId));
@@ -29,12 +33,30 @@ export default function AchievementsPage() {
     }));
   }, [userAchievements]);
 
+  const filteredAchievements = useMemo(() => {
+    if (filter === "earned") {
+      return achievementsWithStatus.filter(a => a.isEarned);
+    }
+    if (filter === "not-earned") {
+      return achievementsWithStatus.filter(a => !a.isEarned);
+    }
+    return achievementsWithStatus;
+  }, [achievementsWithStatus, filter]);
+
   return (
     <>
-      <PageHeader title={t('Achievements')} />
+      <PageHeader title={t('Achievements')}>
+        <Tabs value={filter} onValueChange={(value) => setFilter(value as AchievementFilter)}>
+            <TabsList>
+                <TabsTrigger value="all">{t('All')}</TabsTrigger>
+                <TabsTrigger value="earned">{t('Earned')}</TabsTrigger>
+                <TabsTrigger value="not-earned">{t('Not Earned')}</TabsTrigger>
+            </TabsList>
+        </Tabs>
+      </PageHeader>
       <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {achievementsWithStatus.map(badge => (
+          {filteredAchievements.map(badge => (
             <TooltipProvider key={badge.id}>
               <Tooltip>
                 <TooltipTrigger asChild>

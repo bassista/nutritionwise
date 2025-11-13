@@ -269,7 +269,10 @@
   "Hydration Score": "Hydration Score",
   "Base Food Data": "Base Food Data",
   "Load a default list of food items into the app.": "Load a default list of food items into the app.",
-  "Load": "Load"
+  "Load": "Load",
+  "All": "All",
+  "Earned": "Earned",
+  "Not Earned": "Not Earned"
 }
 
     
