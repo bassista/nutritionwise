@@ -144,7 +144,7 @@ export default function AnalyticsPage() {
                             </CardHeader>
                             <CardContent>
                                 <ChartContainer config={chartConfig} className="h-52 w-full">
-                                    <AreaChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
+                                    <AreaChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
                                         <YAxis domain={['dataMin - 1', 'dataMax + 1']} unit="kg" />
