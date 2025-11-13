@@ -5,40 +5,60 @@ import { useState, useMemo } from 'react';
 import { useShoppingLists } from '@/context/ShoppingListContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Edit, Check } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
 import ShoppingListCard from '@/components/shopping-list/ShoppingListCard';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import type { ShoppingList } from '@/lib/types';
+
 
 export default function ShoppingListPage() {
-  const { shoppingLists, createShoppingList } = useShoppingLists();
+  const { shoppingLists, setShoppingLists } = useShoppingLists();
   const { t } = useLocale();
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
 
-  const sortedShoppingLists = useMemo(() => {
-    return [...shoppingLists].sort((a, b) => {
-      if (!a.isDeletable && b.isDeletable) return -1;
-      if (a.isDeletable && !b.isDeletable) return 1;
-      return 0;
-    });
-  }, [shoppingLists]);
+  const defaultList = useMemo(() => shoppingLists.find(list => !list.isDeletable), [shoppingLists]);
+  
+  const userLists = useMemo(() => shoppingLists.filter(list => list.isDeletable), [shoppingLists]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = userLists.findIndex((list) => list.id === active.id);
+      const newIndex = userLists.findIndex((list) => list.id === over.id);
+      const reorderedUserLists = arrayMove(userLists, oldIndex, newIndex);
+      setShoppingLists(defaultList ? [defaultList, ...reorderedUserLists] : reorderedUserLists);
+    }
+  };
 
   const handleCreateList = () => {
     if (newListName.trim()) {
-      createShoppingList(newListName.trim());
+      const newList: ShoppingList = { id: `sl-${Date.now()}`, name: newListName.trim(), items: [], isDeletable: true };
+      setShoppingLists(prev => [...prev, newList]);
       setNewListName('');
       setCreateDialogOpen(false);
     }
@@ -53,9 +73,19 @@ export default function ShoppingListPage() {
       </PageHeader>
       <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {sortedShoppingLists.map(list => (
-            <ShoppingListCard key={list.id} list={list} />
-          ))}
+          {defaultList && <ShoppingListCard list={defaultList} />}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            id="shopping-lists-dnd-context"
+          >
+            <SortableContext items={userLists.map(l => l.id)} strategy={verticalListSortingStrategy}>
+                {userLists.map(list => (
+                  <ShoppingListCard key={list.id} list={list} reorderable />
+                ))}
+            </SortableContext>
+          </DndContext>
         </div>
       </div>
 
@@ -81,4 +111,3 @@ export default function ShoppingListPage() {
     </>
   );
 }
-

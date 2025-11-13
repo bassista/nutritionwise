@@ -8,7 +8,7 @@ import { useMeals } from './MealContext';
 
 interface ShoppingListContextType {
     shoppingLists: ShoppingList[];
-    setShoppingLists: (lists: ShoppingList[]) => void;
+    setShoppingLists: (lists: ShoppingList[] | ((prev: ShoppingList[]) => ShoppingList[])) => void;
     createShoppingList: (name: string) => void;
     deleteShoppingList: (listId: string) => void;
     renameShoppingList: (listId: string, newName: string) => void;
@@ -31,7 +31,7 @@ export const ShoppingListProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const hasDefaultList = shoppingLists.some(list => list.id === 'default-meals');
         if (!hasDefaultList) {
-            setShoppingLists(prev => [...prev, defaultShoppingLists[0]]);
+            setShoppingLists(prev => [defaultShoppingLists[0], ...prev]);
         }
     }, [shoppingLists, setShoppingLists]);
 
