@@ -284,7 +284,20 @@
   "Weight (kg)": "Weight (kg)",
   "over the last {days} days.": "over the last {days} days.",
   "Data Cleared": "Data Cleared",
-  "All your entries have been deleted.": "All your entries have been deleted."
+  "All your entries have been deleted.": "All your entries have been deleted.",
+  "Top 10 Foods": "Top 10 Foods",
+  "Your most frequently consumed foods, ranked by": "Your most frequently consumed foods, ranked by",
+  "Frequency": "Frequency",
+  "Food": "Food",
+  "Count": "Count",
+  "Weekly Consistency": "Weekly Consistency",
+  "Average diet score by day of the week.": "Average diet score by day of the week.",
+  "Score": "Score",
+  "Sun": "Sun",
+  "Mon": "Mon",
+  "Tue": "Tue",
+  "Wed": "Wed",
+  "Thu": "Thu",
+  "Fri": "Fri",
+  "Sat": "Sat"
 }
-
-    

@@ -284,5 +284,20 @@
   "Weight (kg)": "Peso (kg)",
   "over the last {days} days.": "negli ultimi {days} giorni.",
   "Data Cleared": "Dati Cancellati",
-  "All your entries have been deleted.": "Tutte le tue voci sono state eliminate."
+  "All your entries have been deleted.": "Tutte le tue voci sono state eliminate.",
+  "Top 10 Foods": "Top 10 Alimenti",
+  "Your most frequently consumed foods, ranked by": "I tuoi alimenti più consumati, classificati per",
+  "Frequency": "Frequenza",
+  "Food": "Alimento",
+  "Count": "Conteggio",
+  "Weekly Consistency": "Costanza Settimanale",
+  "Average diet score by day of the week.": "Punteggio medio della dieta per giorno della settimana.",
+  "Score": "Punteggio",
+  "Sun": "Dom",
+  "Mon": "Lun",
+  "Tue": "Mar",
+  "Wed": "Mer",
+  "Thu": "Gio",
+  "Fri": "Ven",
+  "Sat": "Sab"
 }

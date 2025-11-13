@@ -12,7 +12,7 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '
 import { useLocale } from '@/context/LocaleContext';
 import { AnalysisPeriod } from '@/lib/types';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { LineChart as LineChartIcon, Weight } from 'lucide-react';
+import { LineChart as LineChartIcon, TrendingUp, Trophy } from 'lucide-react';
 import { processAnalyticsData } from '@/lib/analytics';
 import {
   Select,
@@ -21,6 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { getFoodName } from '@/lib/utils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+type TopFoodsMetric = 'calories' | 'protein' | 'carbohydrates' | 'fat' | 'count';
 
 
 export default function AnalyticsPage() {
@@ -28,12 +32,13 @@ export default function AnalyticsPage() {
     const { getFoodById } = useFoods();
     const { getMealById } = useMeals();
     const { settings } = useSettings();
-    const { t } = useLocale();
+    const { t, locale } = useLocale();
     const [period, setPeriod] = useState<AnalysisPeriod>('last7days');
+    const [topFoodsMetric, setTopFoodsMetric] = useState<TopFoodsMetric>('calories');
 
     const analysisData = useMemo(() => {
-        return processAnalyticsData(period, dailyLogs, getFoodById, getMealById, t);
-    }, [period, dailyLogs, getFoodById, getMealById, t]);
+        return processAnalyticsData(period, dailyLogs, getFoodById, getMealById, settings.nutritionalGoals, t);
+    }, [period, dailyLogs, getFoodById, getMealById, settings.nutritionalGoals, t]);
     
     const chartConfig: ChartConfig = {
         calories: { label: t('Calories'), color: 'hsl(var(--chart-1))' },
@@ -41,6 +46,8 @@ export default function AnalyticsPage() {
         carbohydrates: { label: t('Carbohydrates'), color: 'hsl(var(--chart-3))' },
         fat: { label: t('Fat'), color: 'hsl(var(--chart-4))' },
         weight: { label: t('Weight'), color: 'hsl(var(--chart-5))' },
+        consistency: { label: t('Consistency'), color: 'hsl(var(--chart-1))' },
+        score: { label: t('Score'), color: 'hsl(var(--chart-2))' },
     };
 
     const noData = Object.keys(dailyLogs).length === 0;
@@ -55,6 +62,10 @@ export default function AnalyticsPage() {
     }, [period, t]);
     
     const weightDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.weight !== undefined), [analysisData.lineChartData]);
+    
+    const topFoodsSorted = useMemo(() => {
+        return [...analysisData.topFoods].sort((a, b) => b[topFoodsMetric] - a[topFoodsMetric]).slice(0, 10);
+    }, [analysisData.topFoods, topFoodsMetric]);
 
     if (noData) {
         return (
@@ -135,9 +146,53 @@ export default function AnalyticsPage() {
                             )}
                         </CardContent>
                     </Card>
+                    
+                    <Card className="lg:col-span-3">
+                        <CardHeader>
+                            <CardTitle>{t('Top 10 Foods')}</CardTitle>
+                             <CardDescription>
+                                {t('Your most frequently consumed foods, ranked by')}{' '}
+                                <Select value={topFoodsMetric} onValueChange={(v) => setTopFoodsMetric(v as TopFoodsMetric)}>
+                                    <SelectTrigger className="inline-flex w-auto h-auto p-1 text-sm font-semibold border-none shadow-none">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="count">{t('Frequency')}</SelectItem>
+                                        <SelectItem value="calories">{t('Calories')}</SelectItem>
+                                        <SelectItem value="protein">{t('Protein')}</SelectItem>
+                                        <SelectItem value="carbohydrates">{t('Carbohydrates')}</SelectItem>
+                                        <SelectItem value="fat">{t('Fat')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           {topFoodsSorted.length > 0 ? (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>{t('Food')}</TableHead>
+                                            <TableHead className="text-right">{t(topFoodsMetric.charAt(0).toUpperCase() + topFoodsMetric.slice(1))}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {topFoodsSorted.map(food => (
+                                            <TableRow key={food.foodId}>
+                                                <TableCell>{getFoodName(getFoodById(food.foodId)!, locale)}</TableCell>
+                                                <TableCell className="text-right">{food[topFoodsMetric].toFixed(topFoodsMetric === 'count' ? 0 : 1)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                           ) : (
+                             <div className="flex items-center justify-center h-40 text-muted-foreground"><TrendingUp className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
+                        </CardContent>
+                    </Card>
+
 
                     {weightDataAvailable && (
-                        <Card className="lg:col-span-3">
+                        <Card className="lg:col-span-2">
                             <CardHeader>
                                 <CardTitle>{t('Weight Trend')}</CardTitle>
                                 <CardDescription>{t('Your weight trend')} {periodDescription}</CardDescription>
@@ -161,6 +216,28 @@ export default function AnalyticsPage() {
                             </CardContent>
                         </Card>
                     )}
+                    
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Weekly Consistency')}</CardTitle>
+                            <CardDescription>{t('Average diet score by day of the week.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           {analysisData.consistencyData.some(d => d.score > 0) ? (
+                            <ChartContainer config={chartConfig} className="h-52 w-full">
+                                <BarChart data={analysisData.consistencyData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
+                                    <YAxis domain={[0, 100]} />
+                                    <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+                                    <Bar dataKey="score" fill="var(--color-score)" name={t('Score')} radius={4} />
+                                </BarChart>
+                            </ChartContainer>
+                           ) : (
+                                <div className="flex items-center justify-center h-52 text-muted-foreground"><Trophy className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
+                        </CardContent>
+                    </Card>
 
                     <Card className="lg:col-span-3">
                         <CardHeader>
