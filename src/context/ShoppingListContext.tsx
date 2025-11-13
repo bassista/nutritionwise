@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { createContext, useContext, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, ReactNode, useCallback, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ShoppingList, ShoppingListItem, Meal } from '@/lib/types';
 import { useMeals } from './MealContext';
@@ -26,31 +26,14 @@ const defaultShoppingLists: ShoppingList[] = [
 const ShoppingListContext = createContext<ShoppingListContextType | undefined>(undefined);
 
 export const ShoppingListProvider = ({ children }: { children: ReactNode }) => {
-    const [shoppingLists, setShoppingLists] = useLocalStorage<ShoppingList[]>('shoppingLists', []);
+    const [shoppingLists, setShoppingLists] = useLocalStorage<ShoppingList[]>('shoppingLists', defaultShoppingLists);
 
-    // Ensure the default list always exists
-    const getInitialLists = () => {
-        const storedLists = typeof window !== 'undefined' ? localStorage.getItem('shoppingLists') : null;
-        if (storedLists) {
-            const parsedLists = JSON.parse(storedLists);
-            if (!parsedLists.find((l: ShoppingList) => l.id === 'default-meals')) {
-                return [...parsedLists, defaultShoppingLists[0]];
-            }
-            return parsedLists;
-        }
-        return defaultShoppingLists;
-    };
-    
-    const [initialized, setInitialized] = React.useState(false);
-    
-    React.useEffect(() => {
-        const lists = getInitialLists();
-        const hasDefault = lists.some((l: ShoppingList) => l.id === 'default-meals');
-        if (!hasDefault) {
+    useEffect(() => {
+        const hasDefaultList = shoppingLists.some(list => list.id === 'default-meals');
+        if (!hasDefaultList) {
             setShoppingLists(prev => [...prev, defaultShoppingLists[0]]);
         }
-        setInitialized(true);
-    }, []);
+    }, [shoppingLists, setShoppingLists]);
 
 
     const { getMealById } = useMeals();
@@ -122,16 +105,8 @@ export const ShoppingListProvider = ({ children }: { children: ReactNode }) => {
         }));
     };
 
-    const finalShoppingLists = React.useMemo(() => {
-        if (!initialized) {
-            return getInitialLists();
-        }
-        return shoppingLists;
-    }, [initialized, shoppingLists]);
-
-
     return (
-        <ShoppingListContext.Provider value={{ shoppingLists: finalShoppingLists, setShoppingLists, createShoppingList, deleteShoppingList, renameShoppingList, addShoppingListItem, updateShoppingListItem, removeShoppingListItem, toggleAllShoppingListItems, addMealToShoppingList }}>
+        <ShoppingListContext.Provider value={{ shoppingLists, setShoppingLists, createShoppingList, deleteShoppingList, renameShoppingList, addShoppingListItem, updateShoppingListItem, removeShoppingListItem, toggleAllShoppingListItems, addMealToShoppingList }}>
             {children}
         </ShoppingListContext.Provider>
     );
