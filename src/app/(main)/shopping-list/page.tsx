@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useShoppingLists } from '@/context/ShoppingListContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,14 @@ export default function ShoppingListPage() {
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
 
+  const sortedShoppingLists = useMemo(() => {
+    return [...shoppingLists].sort((a, b) => {
+      if (!a.isDeletable && b.isDeletable) return -1;
+      if (a.isDeletable && !b.isDeletable) return 1;
+      return 0;
+    });
+  }, [shoppingLists]);
+
   const handleCreateList = () => {
     if (newListName.trim()) {
       createShoppingList(newListName.trim());
@@ -45,7 +53,7 @@ export default function ShoppingListPage() {
       </PageHeader>
       <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {shoppingLists.map(list => (
+          {sortedShoppingLists.map(list => (
             <ShoppingListCard key={list.id} list={list} />
           ))}
         </div>
@@ -73,3 +81,4 @@ export default function ShoppingListPage() {
     </>
   );
 }
+
