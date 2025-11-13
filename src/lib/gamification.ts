@@ -1,7 +1,6 @@
 
 import { DailyLog, AppSettings, Badge, UserAchievement, Meal, Food } from './types';
 import { subDays, format, parseISO, differenceInDays } from 'date-fns';
-import { useAppContext } from '@/context/AppContext';
 
 export const allBadges: Badge[] = [
   // Easy
@@ -91,11 +90,19 @@ type EvaluationData = {
     foods?: Food[];
 }
 
+const hasMealLog = (dailyLogs: DailyLog): boolean => {
+    return Object.values(dailyLogs).some(dayLog => 
+        Object.keys(dayLog).some(key => 
+            key !== 'waterIntakeMl' && key !== 'weight' && Array.isArray(dayLog[key as keyof typeof dayLog]) && dayLog[key as keyof typeof dayLog]!.length > 0
+        )
+    );
+};
+
 export function evaluateAchievements(data: EvaluationData, badges: Badge[], earnedBadgeIds: Set<string>): UserAchievement[] {
     const newAchievements: UserAchievement[] = [];
     
     // Easy
-    if (!earnedBadgeIds.has('first-log') && data.dailyLogs && Object.keys(data.dailyLogs).length > 0) {
+    if (!earnedBadgeIds.has('first-log') && data.dailyLogs && hasMealLog(data.dailyLogs)) {
         newAchievements.push({ badgeId: 'first-log', date: new Date().toISOString() });
     }
     if (!earnedBadgeIds.has('meal-creator') && data.meals && data.meals.length > 0) {
@@ -117,7 +124,8 @@ export function evaluateAchievements(data: EvaluationData, badges: Badge[], earn
         const today = new Date();
         for (let i = 0; i < days; i++) {
             const dateToCheck = format(subDays(today, i), 'yyyy-MM-dd');
-            if (!data.dailyLogs[dateToCheck] || Object.keys(data.dailyLogs[dateToCheck]).filter(k => k !== 'waterIntakeMl').length === 0) {
+            const dayLog = data.dailyLogs[dateToCheck];
+            if (!dayLog || !Object.keys(dayLog).some(k => k !== 'waterIntakeMl' && k !== 'weight')) {
                 return false;
             }
         }
