@@ -105,8 +105,8 @@ export default function DiaryPage() {
         <>
             <PageHeader title={t('Food Diary')} />
             <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="md:col-span-1">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-1">
                         <Card>
                             <CardContent className="p-2">
                                 <Calendar
@@ -120,7 +120,7 @@ export default function DiaryPage() {
                         </Card>
                          <WaterTracker selectedDate={selectedDateString} />
                     </div>
-                    <div className="md:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 space-y-6">
                         <Card>
                             <CardHeader>
                                 <div className="flex justify-between items-start">
