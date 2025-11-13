@@ -84,12 +84,7 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
           className="flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1 cursor-pointer"
           onClick={handleCardClick}
         >
-          <div className="p-4 flex items-start justify-between">
-              <div
-              className="font-semibold leading-tight truncate text-base"
-            >
-              {foodName}
-            </div>
+          <div className="p-4 flex items-start gap-2">
             {reorderable && (
               <div
                 className="p-1 cursor-grab active:cursor-grabbing touch-none"
@@ -100,6 +95,9 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
                 <GripVertical className="w-5 h-5 text-muted-foreground" />
               </div>
             )}
+            <div className="flex-grow font-semibold leading-tight truncate text-base">
+              {foodName}
+            </div>
           </div>
           <CardContent className="p-4 pt-0 flex flex-col flex-grow">
             <div className="space-y-2 text-sm text-muted-foreground">
