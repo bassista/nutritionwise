@@ -64,13 +64,16 @@ export default function ShoppingListCard({ list }: ShoppingListCardProps) {
   };
   
   const allItemsChecked = list.items.length > 0 && list.items.every(item => item.checked);
+  
+  const listName = list.isDeletable ? list.name : t(list.name);
+
 
   return (
     <>
       <Card className="flex flex-col h-full">
         <CardHeader>
           <div className="flex justify-between items-start">
-            <CardTitle className="text-lg font-bold">{list.name}</CardTitle>
+            <CardTitle className="text-lg font-bold">{listName}</CardTitle>
             {!list.isDeletable ? null : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
