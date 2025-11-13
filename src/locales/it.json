@@ -20,7 +20,7 @@
   "Display": "Visualizzazione",
   "Customize how the app displays information.": "Personalizza la modalità di visualizzazione delle informazioni nell'app.",
   "Foods Per Page": "Alimenti per pagina",
-  "Set the number of food items to show on each page (1-50).": "Imposta il numero di alimenti da mostrare in ogni pagina (1-50).",
+  "Set the number of food items to show in each page (1-50).": "Imposta il numero di alimenti da mostrare in ogni pagina (1-50).",
   "Save Preferences": "Salva preferenze",
   "Settings Saved": "Impostazioni salvate",
   "Le tue preferenze sono state aggiornate.": "Le tue preferenze sono state aggiornate.",
@@ -282,5 +282,7 @@
   "Weight Trend": "Andamento Peso",
   "Your weight trend": "Il tuo andamento del peso",
   "Weight (kg)": "Peso (kg)",
-  "over the last {days} days.": "negli ultimi {days} giorni."
+  "over the last {days} days.": "negli ultimi {days} giorni.",
+  "Data Cleared": "Dati Cancellati",
+  "All your entries have been deleted.": "Tutte le tue voci sono state eliminate."
 }
