@@ -117,6 +117,16 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
         <Card className="flex flex-col h-full">
           <CardHeader>
             <div className="flex justify-between items-start gap-2">
+                {reorderable && (
+                   <div
+                    className="p-1 cursor-grab active:cursor-grabbing touch-none"
+                    {...attributes}
+                    {...listeners}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <GripVertical className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                )}
                <div className='flex-grow'>
                     <CardTitle className="text-lg font-bold">{meal.name}</CardTitle>
                </div>
@@ -134,16 +144,6 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
                     </Tooltip>
                 </TooltipProvider>
 
-                {reorderable && (
-                   <div
-                    className="p-1 cursor-grab active:cursor-grabbing touch-none"
-                    {...attributes}
-                    {...listeners}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <GripVertical className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
