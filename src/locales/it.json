@@ -305,5 +305,7 @@
   "Could not schedule reminders. Installing the app on your device might solve the issue.": "Impossibile programmare i promemoria. Installare l'app sul tuo dispositivo potrebbe risolvere il problema.",
   "foods": "alimenti",
   "Feature not available": "Funzionalità non disponibile",
-  "Notifications are temporarily disabled.": "Le notifiche sono temporaneamente disabilitate."
+  "Notifications are temporarily disabled.": "Le notifiche sono temporaneamente disabilitate.",
+  "Load More": "Carica Altri",
+  "remaining": "rimanenti"
 }

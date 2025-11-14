@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { getFoodName } from '@/lib/utils';
 import { Plus, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+const ITEMS_PER_PAGE = 40;
 
 interface AddItemDialogProps {
   open: boolean;
@@ -26,12 +27,24 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
   const { foods, favoriteFoodIds } = useAppStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'search' | 'manual'>('search');
-  const [searchFavoritesOnly, setSearchFavoritesOnly] = useState(false);
+  const [searchFavoritesOnly, setSearchFavoritesOnly] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    if (open) {
+      // Default to favorites if there are any, otherwise show all
+      setSearchFavoritesOnly(favoriteFoodIds.length > 0);
+      // Reset state on open
+      setActiveTab('search');
+      setSearchTerm('');
+      setVisibleCount(ITEMS_PER_PAGE);
+    }
+  }, [open, favoriteFoodIds.length]);
 
   const sourceFoods = useMemo(() => {
     if (searchFavoritesOnly) {
-        const foodMap = new Map(foods.map(f => [f.id, f]));
-        return favoriteFoodIds.map(id => foodMap.get(id)).filter(Boolean) as Food[];
+      const foodMap = new Map(foods.map(f => [f.id, f]));
+      return favoriteFoodIds.map(id => foodMap.get(id)).filter(Boolean) as Food[];
     }
     return foods;
   }, [foods, searchFavoritesOnly, favoriteFoodIds]);
@@ -42,20 +55,33 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
       getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [sourceFoods, searchTerm, locale, existingItemIds]);
+  
+  const visibleFoods = useMemo(() => {
+    return filteredFoods.slice(0, visibleCount);
+  }, [filteredFoods, visibleCount]);
 
   const handleSelectFood = (food: Food) => {
     onAddItem({ foodId: food.id });
     onOpenChange(false);
-    setSearchTerm('');
   };
 
   const handleAddManual = () => {
     if (searchTerm.trim()) {
       onAddItem({ text: searchTerm.trim() });
       onOpenChange(false);
-      setSearchTerm('');
     }
   };
+  
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [searchTerm, searchFavoritesOnly]);
+
+  const handleToggleFavorites = () => {
+    // Cannot toggle off if there are no favorites to begin with
+    if (favoriteFoodIds.length > 0) {
+      setSearchFavoritesOnly(prev => !prev);
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -75,9 +101,11 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
                     size="icon"
                     className={cn(
                         "ml-2 h-8 w-8",
-                        activeTab === 'manual' && 'invisible'
+                        activeTab === 'manual' && 'invisible',
+                        favoriteFoodIds.length === 0 && 'opacity-50 cursor-not-allowed'
                     )}
-                    onClick={() => setSearchFavoritesOnly(prev => !prev)}
+                    onClick={handleToggleFavorites}
+                    disabled={favoriteFoodIds.length === 0}
                     >
                     <Heart className={cn('h-4 w-4', searchFavoritesOnly ? 'text-red-500 fill-current' : 'text-muted-foreground')} />
                 </Button>
@@ -101,7 +129,7 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
         {activeTab === 'search' && (
           <ScrollArea className="flex-grow">
             <div className="space-y-2">
-              {filteredFoods.map(food => (
+              {visibleFoods.map(food => (
                 <div key={food.id} className="flex items-center p-2 rounded-md hover:bg-muted">
                   <span className="flex-grow text-sm">{getFoodName(food, locale)}</span>
                   <Button size="sm" variant="ghost" onClick={() => handleSelectFood(food)}>
@@ -109,6 +137,16 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
                   </Button>
                 </div>
               ))}
+              {filteredFoods.length > visibleCount && (
+                <div className="flex justify-center py-4">
+                    <Button variant="outline" onClick={() => setVisibleCount(c => c + ITEMS_PER_PAGE)}>
+                        {t('Load More')} ({filteredFoods.length - visibleCount} {t('remaining')})
+                    </Button>
+                </div>
+              )}
+               {filteredFoods.length === 0 && searchTerm && (
+                    <p className="text-center text-sm text-muted-foreground py-4">{t('No foods match your search.')}</p>
+                )}
             </div>
           </ScrollArea>
         )}
