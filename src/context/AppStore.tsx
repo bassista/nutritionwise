@@ -186,8 +186,8 @@ const useAppStore = create<AppState>((set, get) => {
             if (itemsArray.length === 0) return {};
 
             const newLogs = { ...state.dailyLogs };
-            const dayLog = newLogs[date] || {};
-            const mealLog = dayLog[mealType] ? [...dayLog[mealType]!] : [];
+            const dayLog = { ...(newLogs[date] || {}) };
+            const mealLog = [...(dayLog[mealType] || [])];
             
             const itemsToAdd: LoggedItem[] = [];
 
@@ -196,17 +196,18 @@ const useAppStore = create<AppState>((set, get) => {
                     const existingEntryIndex = mealLog.findIndex(logged => logged.type === 'food' && logged.itemId === item.itemId);
                     
                     if (existingEntryIndex !== -1) {
-                        const existingEntry = mealLog[existingEntryIndex];
+                        // Item exists, so update its grams
                         const newGrams = item.grams || 0; // Use the new value, overwriting the old one
-                        mealLog[existingEntryIndex] = { ...existingEntry, grams: newGrams };
+                        mealLog[existingEntryIndex] = { ...mealLog[existingEntryIndex], grams: newGrams };
                     } else {
+                        // Item doesn't exist, so add it to the list to be added
                         itemsToAdd.push({
                             ...item,
                             id: `${Date.now()}-${Math.random()}`,
                             timestamp: Date.now(),
                         });
                     }
-                } else {
+                } else { // For meals, we don't merge, just add
                     itemsToAdd.push({
                         ...item,
                         id: `${Date.now()}-${Math.random()}`,
@@ -215,7 +216,9 @@ const useAppStore = create<AppState>((set, get) => {
                 }
             });
 
-            newLogs[date] = { ...dayLog, [mealType]: [...mealLog, ...itemsToAdd] };
+            dayLog[mealType] = [...mealLog, ...itemsToAdd];
+            newLogs[date] = dayLog;
+
             return { dailyLogs: newLogs };
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {
@@ -231,29 +234,31 @@ const useAppStore = create<AppState>((set, get) => {
             const newLogs = { ...state.dailyLogs };
             const dayLog = newLogs[date];
             if (!dayLog) return {};
-
+        
             const sourceList = dayLog[fromMealType] ? [...dayLog[fromMealType]!] : [];
-            const destinationList = dayLog[toMealType] && fromMealType !== toMealType ? [...dayLog[toMealType]!] : sourceList;
-
             const movedItem = sourceList.find(item => item.id === logId);
+        
             if (!movedItem) return {};
-            
+        
+            // Remove from source
             const newSourceList = sourceList.filter(item => item.id !== logId);
-
+        
             if (fromMealType === toMealType) {
-                 const reorderedList = arrayMove(newSourceList, fromIndex, toIndex);
-                 newLogs[date] = { ...dayLog, [fromMealType]: reorderedList };
+              // Reorder within the same list
+              const reorderedList = arrayMove(newSourceList, fromIndex > toIndex ? fromIndex -1 : fromIndex, toIndex);
+              newLogs[date] = { ...dayLog, [fromMealType]: reorderedList };
             } else {
-                const newDestinationList = [...destinationList];
-                newDestinationList.splice(toIndex, 0, movedItem);
-                newLogs[date] = { ...dayLog, [fromMealType]: newSourceList, [toMealType]: newDestinationList };
+              // Move to a different list
+              const destinationList = dayLog[toMealType] ? [...dayLog[toMealType]!] : [];
+              destinationList.splice(toIndex, 0, movedItem);
+              newLogs[date] = { ...dayLog, [fromMealType]: newSourceList, [toMealType]: destinationList };
             }
-            
+        
             // Clean up empty meal logs
             if (newLogs[date][fromMealType]?.length === 0) {
               delete newLogs[date][fromMealType];
             }
-
+        
             return { dailyLogs: newLogs };
         }),
         addWaterIntake: (date, amountMl) => setStateAndSave(state => {
