@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/accordion";
 import { useLocale } from '@/context/LocaleContext';
 import { Switch } from '@/components/ui/switch';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const hydrationSettingsSchema = z.object({
     goalLiters: z.coerce.number().min(0.1, "Must be at least 0.1"),
@@ -42,13 +42,21 @@ export default function HydrationSettings() {
         resolver: zodResolver(hydrationSettingsSchema),
         defaultValues: settings.hydrationSettings,
     });
+    
+    const [remindersEnabled, setRemindersEnabled] = useState(settings.hydrationSettings.remindersEnabled);
 
     useEffect(() => {
         hydrationForm.reset(settings.hydrationSettings);
+        setRemindersEnabled(settings.hydrationSettings.remindersEnabled);
     }, [settings, hydrationForm]);
 
     function onHydrationSubmit(values: z.infer<typeof hydrationSettingsSchema>) {
         updateHydrationSettings(values);
+    }
+    
+    const handleFormSubmit = () => {
+        hydrationForm.setValue('remindersEnabled', remindersEnabled);
+        hydrationForm.handleSubmit(onHydrationSubmit)();
     }
 
     return (
@@ -63,7 +71,7 @@ export default function HydrationSettings() {
             </AccordionTrigger>
             <AccordionContent>
                 <Form {...hydrationForm}>
-                <form onSubmit={hydrationForm.handleSubmit(onHydrationSubmit)} className="space-y-8">
+                <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(); }} className="space-y-8">
                     <div className="grid grid-cols-2 gap-4">
                         <FormField
                         control={hydrationForm.control}
@@ -93,28 +101,22 @@ export default function HydrationSettings() {
                         />
                     </div>
                     
-                    <FormField
-                        control={hydrationForm.control}
-                        name="remindersEnabled"
-                        render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                            <FormLabel className="text-base">
-                                {t('Enable Reminders')}
-                            </FormLabel>
-                            <FormDescription>
-                                {t('Receive notifications to drink water.')}
-                            </FormDescription>
-                            </div>
-                             <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormItem>
-                        )}
-                    />
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                            {t('Enable Reminders')}
+                        </FormLabel>
+                        <FormDescription>
+                            {t('Receive notifications to drink water.')}
+                        </FormDescription>
+                        </div>
+                        <Switch
+                            checked={remindersEnabled}
+                            onCheckedChange={setRemindersEnabled}
+                        />
+                    </FormItem>
                     
-                    {hydrationForm.watch('remindersEnabled') && (
+                    {remindersEnabled && (
                         <div className="space-y-4">
                             <FormField
                             control={hydrationForm.control}
