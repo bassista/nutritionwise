@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useSettings } from '@/context/SettingsContext';
@@ -93,7 +93,7 @@ export default function HydrationSettings() {
                         />
                     </div>
                     
-                    <FormField
+                    <Controller
                         control={hydrationForm.control}
                         name="remindersEnabled"
                         render={({ field }) => (
