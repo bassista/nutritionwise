@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Food } from '@/lib/types';
 import Spinner from '@/components/ui/spinner';
 import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
-import { fetchFoodDataFromOpenFoodFacts } from '@/services/openfoodfacts';
+import { useOpenFoodFacts } from '@/hooks/useOpenFoodFacts';
 
 
 export default function ScannerClientPage() {
@@ -30,40 +30,19 @@ export default function ScannerClientPage() {
   const [foodToCreate, setFoodToCreate] = useState<Partial<Food> | undefined>(undefined);
   const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);
   const [isFormOpen, setFormOpen] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
-  const [localBarcode, setLocalBarcode] = useState<string | null>(null);
+  const [scannedBarcode, setScannedBarcode] = useState<string | null>(null);
 
   const fromFavorites = useMemo(() => searchParams.get('from') === 'favorites', [searchParams]);
-  const existingFood = localBarcode ? foods.find(f => f.id === localBarcode) : undefined;
+  const existingFood = scannedBarcode ? foods.find(f => f.id === scannedBarcode) : undefined;
   
-  const handleScanSuccess = async (barcode: string) => {
+  const { foodData, isFetching, error } = useOpenFoodFacts(existingFood ? null : scannedBarcode);
+
+  const handleScanSuccess = (barcode: string) => {
     toast({
       title: t('Barcode detected!'),
       description: `${t('Scanned barcode: {barcode}', { barcode: barcode })}`,
     });
-    setLocalBarcode(barcode);
-
-    const localFood = foods.find(f => f.id === barcode);
-    if (localFood) {
-        if (fromFavorites) {
-            const isAlreadyFavorite = favoriteFoodIds.includes(localFood.id);
-            if (isAlreadyFavorite) {
-                // Already favorite, just show the info
-            } else {
-                // Not a favorite yet, add it and redirect
-                toggleFavorite(localFood.id);
-                router.push('/favorites');
-            }
-        }
-    } else {
-      // If not in local data, fetch from API
-      setIsFetching(true);
-      const fetchedData = await fetchFoodDataFromOpenFoodFacts(barcode);
-      setIsFetching(false);
-      
-      setFoodToCreate(fetchedData || { id: barcode });
-      setFormOpen(true);
-    }
+    setScannedBarcode(barcode);
   };
 
   const {
@@ -73,8 +52,24 @@ export default function ScannerClientPage() {
     startScan,
   } = useBarcodeScanner({ onScanSuccess: handleScanSuccess, toast });
 
+  useEffect(() => {
+    if (scannedBarcode && !existingFood) {
+      if (!isFetching && (foodData || error)) {
+        const newFoodData = foodData || { id: scannedBarcode };
+        setFoodToCreate(newFoodData);
+        setFormOpen(true);
+      }
+    } else if (scannedBarcode && existingFood && fromFavorites) {
+        const isAlreadyFavorite = favoriteFoodIds.includes(existingFood.id);
+        if (!isAlreadyFavorite) {
+            toggleFavorite(existingFood.id);
+            router.push('/favorites');
+        }
+    }
+  }, [scannedBarcode, existingFood, foodData, isFetching, error, fromFavorites, favoriteFoodIds, toggleFavorite, router]);
+
   const handleScanAgain = () => {
-    setLocalBarcode(null);
+    setScannedBarcode(null);
     setFoodToCreate(undefined);
     setFoodToEdit(undefined);
     startScan();
@@ -86,7 +81,7 @@ export default function ScannerClientPage() {
   };
   
   const handleOpenForm = () => {
-    setFoodToCreate({ id: localBarcode || '' });
+    setFoodToCreate({ id: scannedBarcode || '' });
     setFormOpen(true);
   }
 
@@ -105,7 +100,7 @@ export default function ScannerClientPage() {
     }
   }
 
-  const showScanResult = localBarcode && !isScanning;
+  const showScanResult = scannedBarcode && !isScanning;
 
   return (
     <>
@@ -138,7 +133,7 @@ export default function ScannerClientPage() {
           )}
 
           <div className="mt-4">
-            {!localBarcode && isScanning && (
+            {!scannedBarcode && isScanning && (
                 <p className="text-center text-muted-foreground">{t('Align a barcode within the frame to scan it.')}</p>
             )}
 
@@ -153,7 +148,7 @@ export default function ScannerClientPage() {
                       <Alert>
                         <AlertTitle>{t('Food with this barcode already exists')}</AlertTitle>
                         <AlertDescription>
-                         {t('A food with barcode {barcode} is already in your list: {foodName}.', { barcode: localBarcode, foodName: getFoodName(existingFood, locale) })}
+                         {t('A food with barcode {barcode} is already in your list: {foodName}.', { barcode: scannedBarcode, foodName: getFoodName(existingFood, locale) })}
                         </AlertDescription>
                       </Alert>
                        <div className="flex gap-2 mt-4">
@@ -163,7 +158,7 @@ export default function ScannerClientPage() {
                     </div>
                   ) : (
                      <div>
-                      <p>{t('Scanned barcode: {barcode}', { barcode: localBarcode })}</p>
+                      <p>{t('Scanned barcode: {barcode}', { barcode: scannedBarcode })}</p>
                       <p className="text-sm text-muted-foreground">{t("This food isn't in your list yet.")}</p>
                       <div className="flex gap-2 mt-4">
                         <Button onClick={handleOpenForm} className="flex-1">{t('Add')}</Button>

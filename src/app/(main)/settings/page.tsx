@@ -57,7 +57,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { NutritionalGoals, HydrationSettings } from '@/lib/types';
 import { Switch } from '@/components/ui/switch';
 import { baseFoodDataCsv } from '@/lib/base-food-data';
+import useSWR from 'swr';
 
+const fetcher = (url: string) => fetch(url).then((res) => {
+    if (!res.ok) {
+        throw new Error('Failed to fetch base food data');
+    }
+    return res.text()
+});
 
 const settingsSchema = z.object({
   foodsPerPage: z.coerce
@@ -98,7 +105,8 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const { t, setLocale, locale } = useLocale();
   const backupFileRef = useRef<HTMLInputElement>(null);
-  const [isLoadingBaseFoods, setIsLoadingBaseFoods] = useState(false);
+  const [loadBaseFoods, setLoadBaseFoods] = useState(false);
+  const { data: baseFoodsData, error: baseFoodsError, isLoading: isLoadingBaseFoods } = useSWR(loadBaseFoods ? '/base-food-data.csv' : null, fetcher);
 
   const displayForm = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
@@ -234,54 +242,57 @@ export default function SettingsPage() {
       description: t('Your food data has been downloaded as a CSV file.'),
     });
   }
-
-  const handleLoadBaseFoods = async () => {
-    setIsLoadingBaseFoods(true);
-    try {
-        const response = await fetch('/base-food-data.csv');
-        if (!response.ok) {
-            throw new Error('Failed to fetch base food data');
-        }
-        const text = await response.text();
-
-        const rows = text.split('\n').filter(row => row.trim() !== '');
-        const header = rows.shift()?.trim().split(',').map(h => h.trim()) || [];
-        
-        if (!header.includes('id') || !header.includes('name_category')) {
-          throw new Error(t("CSV must contain 'id' and 'name_category' columns."));
-        }
-
-        const parsedFoods: { [key: string]: string }[] = rows.map(row => {
-            const values = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
-            const foodObject: { [key: string]: string } = {};
+  
+  useEffect(() => {
+    if (baseFoodsData) {
+        try {
+            const rows = baseFoodsData.split('\n').filter(row => row.trim() !== '');
+            const header = rows.shift()?.trim().split(',').map(h => h.trim()) || [];
             
-            header.forEach((h, i) => {
-                let value = values[i]?.trim() || '';
-                if (value.startsWith('"') && value.endsWith('"')) {
-                    value = value.substring(1, value.length - 1);
-                }
-                foodObject[h] = value;
+            if (!header.includes('id') || !header.includes('name_category')) {
+              throw new Error(t("CSV must contain 'id' and 'name_category' columns."));
+            }
+
+            const parsedFoods: { [key: string]: string }[] = rows.map(row => {
+                const values = row.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+                const foodObject: { [key: string]: string } = {};
+                
+                header.forEach((h, i) => {
+                    let value = values[i]?.trim() || '';
+                    if (value.startsWith('"') && value.endsWith('"')) {
+                        value = value.substring(1, value.length - 1);
+                    }
+                    foodObject[h] = value;
+                });
+                return foodObject;
             });
-            return foodObject;
-        });
 
-        const newFoodsCount = importFoodsFromContext(parsedFoods);
+            const newFoodsCount = importFoodsFromContext(parsedFoods);
 
-        toast({
-          title: t('Import Successful'),
-          description: t('{count} new food(s) imported.', { count: newFoodsCount }),
-        });
+            toast({
+              title: t('Import Successful'),
+              description: t('{count} new food(s) imported.', { count: newFoodsCount }),
+            });
 
-    } catch (error: any) {
-        toast({
-          variant: 'destructive',
-          title: t('Import Failed'),
-          description: error.message || t('An unexpected error occurred during import.'),
-        });
-    } finally {
-        setIsLoadingBaseFoods(false);
+        } catch (error: any) {
+            toast({
+              variant: 'destructive',
+              title: t('Import Failed'),
+              description: error.message || t('An unexpected error occurred during import.'),
+            });
+        } finally {
+            setLoadBaseFoods(false);
+        }
     }
-  };
+    if (baseFoodsError) {
+        toast({
+            variant: 'destructive',
+            title: t('Import Failed'),
+            description: baseFoodsError.message || t('An unexpected error occurred during import.'),
+        });
+        setLoadBaseFoods(false);
+    }
+  }, [baseFoodsData, baseFoodsError, importFoodsFromContext, t, toast]);
 
 
   const goalsFields: {name: keyof NutritionalGoals, label: string}[] = [
@@ -525,7 +536,7 @@ export default function SettingsPage() {
                         <p className="text-sm text-muted-foreground mb-3">
                             {t('Load a default list of food items into the app.')}
                         </p>
-                        <Button onClick={handleLoadBaseFoods} disabled={isLoadingBaseFoods}>
+                        <Button onClick={() => setLoadBaseFoods(true)} disabled={isLoadingBaseFoods}>
                             {isLoadingBaseFoods ? (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             ) : (

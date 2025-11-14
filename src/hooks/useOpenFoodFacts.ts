@@ -1,25 +1,26 @@
 
+"use client";
+
+import useSWR from 'swr';
 import type { Food } from '@/lib/types';
 
-// This file is kept for legacy purposes, but the logic has been moved to the useOpenFoodFacts hook.
-// You can delete this file if it's no longer imported anywhere.
-
-export async function fetchFoodDataFromOpenFoodFacts(barcode: string): Promise<Partial<Food> | null> {
+const fetcher = async (url: string): Promise<Partial<Food> | null> => {
   try {
-    const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
+    const response = await fetch(url);
     if (!response.ok) {
-        console.error(`OpenFoodFacts API request failed for barcode ${barcode} with status: ${response.status}`);
-        return null;
+        console.error(`OpenFoodFacts API request failed with status: ${response.status}`);
+        throw new Error('Failed to fetch data from OpenFoodFacts');
     }
 
     const data = await response.json();
     if (data.status !== 1 || !data.product) {
-        console.log(`No product found on OpenFoodFacts for barcode ${barcode}`);
+        console.log(`No product found on OpenFoodFacts`);
         return null;
     }
 
     const product = data.product;
     const nutriments = product.nutriments;
+    const barcode = url.split('/').pop()?.split('.')[0] || '';
 
     const food: Partial<Food> = {
       id: barcode,
@@ -49,10 +50,23 @@ export async function fetchFoodDataFromOpenFoodFacts(barcode: string): Promise<P
         }
     }
 
-
     return food;
   } catch (error) {
     console.error("Failed to fetch or process food data from OpenFoodFacts:", error);
-    return null;
+    throw error;
   }
+}
+
+export function useOpenFoodFacts(barcode: string | null) {
+  const url = barcode ? `https://world.openfoodfacts.org/api/v2/product/${barcode}.json` : null;
+  const { data, error, isLoading } = useSWR<Partial<Food> | null, Error>(url, fetcher, {
+    shouldRetryOnError: false, // Don't retry if the product is not found
+    revalidateOnFocus: false,
+  });
+
+  return {
+    foodData: data,
+    isFetching: isLoading,
+    error,
+  };
 }
