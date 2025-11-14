@@ -194,9 +194,9 @@ const useAppStore = create<AppState>((set, get) => {
                     const existingEntryIndex = mealLog.findIndex(logged => logged.type === 'food' && logged.itemId === item.itemId);
                     
                     if (existingEntryIndex !== -1) {
-                        // Update existing food entry
+                        // Update existing food entry by overwriting the grams
                         const existingEntry = mealLog[existingEntryIndex];
-                        const newGrams = (existingEntry.grams || 0) + (item.grams || 0);
+                        const newGrams = item.grams || 0; // Use the new value
                         mealLog[existingEntryIndex] = { ...existingEntry, grams: newGrams };
                     } else {
                         // Add new food entry to the list of items to be added
