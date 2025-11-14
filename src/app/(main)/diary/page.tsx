@@ -1,36 +1,22 @@
 
 "use client";
 
-import { useState, useMemo, useCallback } from 'react';
-import { format, startOfToday, parseISO } from 'date-fns';
+import { useState, useMemo } from 'react';
+import { format, startOfToday } from 'date-fns';
 import { it } from 'date-fns/locale';
-import { useSettings } from '@/context/SettingsContext';
-import { useDailyLogs } from '@/context/DailyLogContext';
-import { useFoods } from '@/context/FoodContext';
-import { useMeals } from '@/context/MealContext';
 import { useLocale } from '@/context/LocaleContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Calendar } from '@/components/ui/calendar';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
-import { Plus, Trash2 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import FoodSelectorForMeal from '@/components/meal/FoodSelectorForMeal';
 import LogFoodDialog from '@/components/diary/LogFoodDialog';
-import { Food, Meal, LoggedItem, MealType } from '@/lib/types';
-import { getFoodName, cn, calculateTotalNutrientsForItems } from '@/lib/utils';
+import { Food, MealType } from '@/lib/types';
 import WaterTracker from '@/components/diary/WaterTracker';
 import WeightTracker from '@/components/diary/WeightTracker';
-import { calculateDailyScore } from '@/lib/scoring';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
+import DailySummary from '@/components/diary/DailySummary';
+import MealLog from '@/components/diary/MealLog';
 
 export default function DiaryPage() {
-    const { settings } = useSettings();
-    const { dailyLogs, addLogEntry, removeLogEntry } = useDailyLogs();
-    const { getFoodById } = useFoods();
-    const { getMealById } = useMeals();
     const { t, locale } = useLocale();
     const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
     
@@ -40,24 +26,6 @@ export default function DiaryPage() {
     const [mealTypeToAdd, setMealTypeToAdd] = useState<MealType | null>(null);
 
     const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
-    const goals = settings.nutritionalGoals;
-
-    const todaysLog = useMemo(() => dailyLogs[selectedDateString] || {}, [dailyLogs, selectedDateString]);
-
-    const allLoggedItems = useMemo(() => {
-      const foodItems = (Object.entries(todaysLog)
-        .filter(([key]) => key !== 'waterIntakeMl' && key !== 'weight')
-        .flatMap(([, value]) => value) as LoggedItem[]) || [];
-      return foodItems;
-    }, [todaysLog]);
-
-    const totalNutrients = useMemo(() => {
-        return calculateTotalNutrientsForItems(allLoggedItems, getFoodById, getMealById);
-    }, [allLoggedItems, getFoodById, getMealById]);
-    
-    const dailyScore = useMemo(() => {
-        return calculateDailyScore(totalNutrients, goals);
-    }, [totalNutrients, goals]);
 
     const handleAddFoodClick = (mealType: MealType) => {
         setMealTypeToAdd(mealType);
@@ -70,37 +38,10 @@ export default function DiaryPage() {
         setLogFoodDialogOpen(true);
     };
     
-    const handleLogFood = (food: Food, grams: number) => {
-        if (mealTypeToAdd) {
-            addLogEntry(selectedDateString, mealTypeToAdd, { type: 'food', itemId: food.id, grams });
-        }
-        setLogFoodDialogOpen(false);
-        setFoodToLog(null);
-        setMealTypeToAdd(null);
-    };
-
     const handleLogDialogClose = () => {
         setLogFoodDialogOpen(false);
         setFoodToLog(null);
     }
-
-    const nutrientProgress = [
-        { name: t('Calories'), value: totalNutrients.calories, goal: goals.calories, unit: 'kcal' },
-        { name: t('Protein'), value: totalNutrients.protein, goal: goals.protein, unit: 'g' },
-        { name: t('Carbohydrates'), value: totalNutrients.carbohydrates, goal: goals.carbohydrates, unit: 'g' },
-        { name: t('Fat'), value: totalNutrients.fat, goal: goals.fat, unit: 'g' },
-        { name: t('Fiber'), value: totalNutrients.fiber, goal: goals.fiber, unit: 'g' },
-        { name: t('Sugar'), value: totalNutrients.sugar, goal: goals.sugar, unit: 'g' },
-        { name: t('Sodium'), value: totalNutrients.sodium, goal: goals.sodium, unit: 'mg' },
-    ];
-    
-    const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
-    const mealTypeTranslations: Record<MealType, string> = {
-        breakfast: t('Breakfast'),
-        lunch: t('Lunch'),
-        dinner: t('Dinner'),
-        snack: t('Snacks')
-    };
     
     return (
         <>
@@ -123,80 +64,13 @@ export default function DiaryPage() {
                          <WeightTracker selectedDate={selectedDateString} />
                     </div>
                     <div className="flex-1 min-w-[300px] space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <CardTitle>{t('Daily Summary')} - {format(selectedDate, 'PPP', { locale: locale === 'it' ? it : undefined })}</CardTitle>
-                                    </div>
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                 <div className={cn("flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-xl", dailyScore.color)}>
-                                                    {dailyScore.grade}
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{t('Daily Score')}: {dailyScore.percentage}%</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {nutrientProgress.map(n => (
-                                    <div key={n.name}>
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span className="font-medium">{n.name}</span>
-                                            <span className="text-muted-foreground">{n.value.toFixed(0)}{n.unit} / {n.goal}{n.unit}</span>
-                                        </div>
-                                        <Progress value={(n.value / (n.goal || 1)) * 100} />
-                                    </div>
-                                ))}
-                            </CardContent>
-                        </Card>
-
-                        <Accordion type="multiple" defaultValue={mealTypes} className="w-full">
-                            {mealTypes.map(mealType => {
-                                return (
-                                <AccordionItem value={mealType} key={mealType}>
-                                    <AccordionTrigger>
-                                        <div className="flex justify-between items-center w-full">
-                                            <span className="text-lg font-semibold">{mealTypeTranslations[mealType]}</span>
-                                        </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                        <div className="space-y-3">
-                                            {todaysLog[mealType] && todaysLog[mealType]!.length > 0 ? (
-                                                todaysLog[mealType]!.map(item => {
-                                                    const name = item.type === 'food' 
-                                                        ? getFoodName(getFoodById(item.itemId)!, locale)
-                                                        : getMealById(item.itemId)?.name || '';
-                                                    const itemNutrients = calculateTotalNutrientsForItems([item], getFoodById, getMealById);
-                                                    return (
-                                                        <div key={item.id} className="flex items-center justify-between p-2 rounded-md bg-muted/50">
-                                                            <div>
-                                                                <p className="font-medium">{name}</p>
-                                                                <p className="text-sm text-muted-foreground">{item.grams ? `${item.grams}g` : ''} {itemNutrients.calories.toFixed(0)} kcal</p>
-                                                            </div>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeLogEntry(selectedDateString, mealType, item.id)}>
-                                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                                            </Button>
-                                                        </div>
-                                                    )
-                                                })
-                                            ) : (
-                                                <p className="text-sm text-muted-foreground">{t('Nothing logged yet.')}</p>
-                                            )}
-                                            <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => handleAddFoodClick(mealType)}>
-                                                <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
-                                            </Button>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                                )
-                            })}
-                        </Accordion>
+                       <DailySummary selectedDate={selectedDate} />
+                       <MealLog 
+                          selectedDateString={selectedDateString} 
+                          onAddFoodClick={handleAddFoodClick}
+                          setFoodToLog={setFoodToLog}
+                          setMealTypeToAdd={setMealTypeToAdd}
+                       />
                     </div>
                 </div>
             </div>
@@ -206,12 +80,18 @@ export default function DiaryPage() {
                 onSelectFood={handleSelectFood}
                 currentFoodIds={[]}
               />
-              {foodToLog && (
+              {foodToLog && mealTypeToAdd && (
                 <LogFoodDialog
                     open={isLogFoodDialogOpen}
                     onOpenChange={handleLogDialogClose}
                     food={foodToLog}
-                    onLog={handleLogFood}
+                    mealType={mealTypeToAdd}
+                    selectedDateString={selectedDateString}
+                    onLogSuccess={() => {
+                      setLogFoodDialogOpen(false);
+                      setFoodToLog(null);
+                      setMealTypeToAdd(null);
+                    }}
                 />
               )}
         </>

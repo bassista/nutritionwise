@@ -14,18 +14,22 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useLocale } from '@/context/LocaleContext';
-import { Food } from '@/lib/types';
+import { useDailyLogs } from '@/context/DailyLogContext';
+import { Food, MealType } from '@/lib/types';
 import { getFoodName } from '@/lib/utils';
 
 interface LogFoodDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   food: Food;
-  onLog: (food: Food, grams: number) => void;
+  mealType: MealType;
+  selectedDateString: string;
+  onLogSuccess: () => void;
 }
 
-export default function LogFoodDialog({ open, onOpenChange, food, onLog }: LogFoodDialogProps) {
+export default function LogFoodDialog({ open, onOpenChange, food, mealType, selectedDateString, onLogSuccess }: LogFoodDialogProps) {
   const { t, locale } = useLocale();
+  const { addLogEntry } = useDailyLogs();
   const [grams, setGrams] = useState(food.serving_size_g || 100);
 
   useEffect(() => {
@@ -35,7 +39,8 @@ export default function LogFoodDialog({ open, onOpenChange, food, onLog }: LogFo
   }, [open, food]);
 
   const handleLogClick = () => {
-    onLog(food, grams);
+    addLogEntry(selectedDateString, mealType, { type: 'food', itemId: food.id, grams });
+    onLogSuccess();
   };
 
   return (
