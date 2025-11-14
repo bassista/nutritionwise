@@ -223,7 +223,7 @@
   "Search Food": "Search Food",
   "Add Manually": "Add Manually",
   "Enter item name...": "Enter item name...",
-  "Type the name of the item you want to add and press Enter or click the button below.": "Type the name of the item you want to add and press Enter or click the button below.",
+  "Type the name of the item you want to add and press Enter or click the button below.": "Type the name of the item you want to add and press Enter or the button below.",
   "Add \"{item}\"": "Add \"{item}\"",
   "Close": "Close",
   "Ingredients Added": "Ingredients Added",
@@ -300,5 +300,7 @@
   "Fri": "Fri",
   "Sat": "Sat",
   "Notifications Blocked": "Notifications Blocked",
-  "To enable reminders, please allow notifications in your browser settings.": "To enable reminders, please allow notifications in your browser settings."
+  "To enable reminders, please allow notifications in your browser settings.": "To enable reminders, please allow notifications in your browser settings.",
+  "Background Sync Failed": "Background Sync Failed",
+  "Could not schedule reminders. Installing the app on your device might solve the issue.": "Could not schedule reminders. Installing the app on your device might solve the issue."
 }
