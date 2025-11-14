@@ -93,7 +93,7 @@ export default function HydrationSettings() {
                         />
                     </div>
                     
-                    <Controller
+                    <FormField
                         control={hydrationForm.control}
                         name="remindersEnabled"
                         render={({ field }) => (
@@ -106,12 +106,10 @@ export default function HydrationSettings() {
                                 {t('Receive notifications to drink water.')}
                             </FormDescription>
                             </div>
-                            <FormControl>
-                            <Switch
+                             <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                             />
-                            </FormControl>
                         </FormItem>
                         )}
                     />
