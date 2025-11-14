@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { useLocale } from '@/context/LocaleContext';
@@ -37,13 +37,13 @@ export default function ScannerClientPage() {
   
   const { foodData, isFetching, error } = useOpenFoodFacts(existingFood ? null : scannedBarcode);
 
-  const handleScanSuccess = (barcode: string) => {
+  const handleScanSuccess = useCallback((barcode: string) => {
     toast({
       title: t('Barcode detected!'),
       description: `${t('Scanned barcode: {barcode}', { barcode: barcode })}`,
     });
     setScannedBarcode(barcode);
-  };
+  }, [t, toast]);
 
   const {
     videoRef,
