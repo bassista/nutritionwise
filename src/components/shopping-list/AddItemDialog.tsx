@@ -83,6 +83,8 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
     }
   }
 
+  const showSearchAllButton = searchTerm && filteredFoods.length === 0 && searchFavoritesOnly;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md flex flex-col h-[70vh]">
@@ -144,8 +146,16 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
                     </Button>
                 </div>
               )}
-               {filteredFoods.length === 0 && searchTerm && (
+               {filteredFoods.length === 0 && searchTerm && !showSearchAllButton && (
                     <p className="text-center text-sm text-muted-foreground py-4">{t('No foods match your search.')}</p>
+                )}
+                {showSearchAllButton && (
+                    <div className="text-center py-4">
+                        <p className="text-sm text-muted-foreground mb-2">{t('No results in favorites.')}</p>
+                        <Button variant="secondary" onClick={() => setSearchFavoritesOnly(false)}>
+                            {t('Search in all foods')}
+                        </Button>
+                    </div>
                 )}
             </div>
           </ScrollArea>
