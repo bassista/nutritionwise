@@ -113,6 +113,9 @@ export default function AnalyticsPage() {
                                     <ChartTooltip content={<ChartTooltipContent />} />
                                     <Legend />
                                     <Line type="monotone" dataKey="calories" stroke="var(--color-calories)" strokeWidth={2} dot={false} name={t('Calories')} />
+                                    <Line type="monotone" dataKey="protein" stroke="var(--color-protein)" strokeWidth={2} dot={false} name={t('Protein')} />
+                                    <Line type="monotone" dataKey="carbohydrates" stroke="var(--color-carbohydrates)" strokeWidth={2} dot={false} name={t('Carbohydrates')} />
+                                    <Line type="monotone" dataKey="fat" stroke="var(--color-fat)" strokeWidth={2} dot={false} name={t('Fat')} />
                                 </LineChart>
                             </ChartContainer>
                         </CardContent>
