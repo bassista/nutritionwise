@@ -62,7 +62,7 @@ export default function DisplaySettings() {
     const handleSliderChange = (value: number[]) => {
       displayForm.setValue('foodsPerPage', value[0]);
       // Use a debounce or submit on release if you don't want to submit on every change
-      displayForm.handleSubmit(onDisplaySubmit)();
+      onDisplaySubmit({ foodsPerPage: value[0] });
     }
 
 
@@ -84,23 +84,26 @@ export default function DisplaySettings() {
                     name="foodsPerPage"
                     render={({ field }) => (
                         <FormItem>
-                        <div className="flex justify-between">
                             <FormLabel>{t('Foods Per Page')}</FormLabel>
-                            <span className="text-sm font-medium">{foodsPerPageValue}</span>
-                        </div>
-                        <FormControl>
-                             <Slider
-                                min={4}
-                                max={48}
-                                step={4}
-                                value={[field.value]}
-                                onValueChange={handleSliderChange}
-                             />
-                        </FormControl>
-                        <FormDescription>
-                            {t('Set the number of food items to show on each page (4-48).')}
-                        </FormDescription>
-                        <FormMessage />
+                            <div className="flex flex-col md:flex-row md:items-center gap-4">
+                                <FormControl>
+                                    <Slider
+                                        min={4}
+                                        max={48}
+                                        step={4}
+                                        value={[field.value]}
+                                        onValueChange={handleSliderChange}
+                                        className="md:w-2/3"
+                                     />
+                                </FormControl>
+                                <span className="text-sm font-medium text-muted-foreground md:w-1/3 text-left md:text-right">
+                                    {foodsPerPageValue} {t('foods')}
+                                </span>
+                            </div>
+                            <FormDescription>
+                                {t('Set the number of food items to show on each page (4-48).')}
+                            </FormDescription>
+                            <FormMessage />
                         </FormItem>
                     )}
                     />
