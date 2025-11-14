@@ -1,16 +1,6 @@
 "use client";
 
 import { useSettings } from '@/context/SettingsContext';
-import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
   AccordionContent,
@@ -21,6 +11,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { Switch } from '@/components/ui/switch';
 import { useEffect, useState } from 'react';
 import type { HydrationSettings as HydrationSettingsType } from '@/lib/types';
+import { Label } from '@/components/ui/label';
 
 
 export default function HydrationSettings() {
@@ -59,73 +50,78 @@ export default function HydrationSettings() {
             <AccordionContent>
                 <div className="space-y-8">
                     <div className="grid grid-cols-2 gap-4">
-                        <FormItem>
-                            <FormLabel>{t('Daily Goal (Liters)')}</FormLabel>
+                        <div className="space-y-2">
+                            <Label htmlFor="goal-liters">{t('Daily Goal (Liters)')}</Label>
                             <Input 
+                                id="goal-liters"
                                 type="number" 
                                 step="0.1" 
                                 value={currentSettings.goalLiters}
                                 onBlur={() => handleUpdate({ goalLiters: currentSettings.goalLiters })}
                                 onChange={(e) => setCurrentSettings(s => ({...s, goalLiters: Number(e.target.value)}))}
                              />
-                        </FormItem>
-                         <FormItem>
-                            <FormLabel>{t('Glass Size (ml)')}</FormLabel>
-                            <Input 
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="glass-size">{t('Glass Size (ml)')}</Label>
+                            <Input
+                                id="glass-size"
                                 type="number" 
                                 value={currentSettings.glassSizeMl}
                                 onBlur={() => handleUpdate({ glassSizeMl: currentSettings.glassSizeMl })}
                                 onChange={(e) => setCurrentSettings(s => ({...s, glassSizeMl: Number(e.target.value)}))}
                             />
-                        </FormItem>
+                        </div>
                     </div>
                     
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
-                        <FormLabel className="text-base">
+                        <Label className="text-base">
                             {t('Enable Reminders')}
-                        </FormLabel>
-                        <FormDescription>
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
                             {t('Receive notifications to drink water.')}
-                        </FormDescription>
+                        </p>
                         </div>
                         <Switch
                             checked={currentSettings.remindersEnabled}
                             onCheckedChange={handleToggleReminders}
                         />
-                    </FormItem>
+                    </div>
                     
                     {currentSettings.remindersEnabled && (
                         <div className="space-y-4">
-                           <FormItem>
-                                <FormLabel>{t('Reminder Interval (minutes)')}</FormLabel>
-                                <Input 
+                           <div className="space-y-2">
+                                <Label htmlFor="reminder-interval">{t('Reminder Interval (minutes)')}</Label>
+                                <Input
+                                    id="reminder-interval" 
                                     type="number" 
                                     value={currentSettings.reminderIntervalMinutes}
                                     onBlur={() => handleUpdate({ reminderIntervalMinutes: currentSettings.reminderIntervalMinutes })}
                                     onChange={(e) => setCurrentSettings(s => ({...s, reminderIntervalMinutes: Number(e.target.value)}))}
                                 />
-                            </FormItem>
+                            </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <FormItem>
-                                    <FormLabel>{t('Reminders Start Time')}</FormLabel>
-                                     <Input 
+                                <div className="space-y-2">
+                                    <Label htmlFor="reminder-start">{t('Reminders Start Time')}</Label>
+                                     <Input
+                                        id="reminder-start" 
                                         type="time" 
                                         value={currentSettings.reminderStartTime}
                                         onBlur={() => handleUpdate({ reminderStartTime: currentSettings.reminderStartTime })}
                                         onChange={(e) => setCurrentSettings(s => ({...s, reminderStartTime: e.target.value}))}
                                      />
-                                </FormItem>
-                                <FormItem>
-                                    <FormLabel>{t('Reminders End Time')}</FormLabel>
-                                     <Input 
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="reminder-end">{t('Reminders End Time')}</Label>
+                                     <Input
+                                        id="reminder-end"
                                         type="time" 
                                         value={currentSettings.reminderEndTime}
                                         onBlur={() => handleUpdate({ reminderEndTime: currentSettings.reminderEndTime })}
                                         onChange={(e) => setCurrentSettings(s => ({...s, reminderEndTime: e.target.value}))}
                                     />
-                                </FormItem>
+                                </div>
                             </div>
                         </div>
                     )}
