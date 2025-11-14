@@ -56,11 +56,9 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         const newHydrationSettings = { ...settings.hydrationSettings, ...hydrationSettings };
 
         if (newHydrationSettings.remindersEnabled) {
-            // First, ask for permission
             const permission = await requestNotificationPermission();
-
+            
             if (permission === 'granted') {
-                // If permission is granted, save settings and schedule reminders
                 setSettings(prev => ({ ...prev, hydrationSettings: newHydrationSettings }));
                 scheduleWaterReminders(newHydrationSettings, t);
                  toast({
@@ -68,17 +66,17 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
                     description: t('Your hydration settings have been updated.'),
                 });
             } else {
-                // If permission is denied or dismissed, show a toast and revert the UI
                 toast({
                     variant: 'destructive',
                     title: t('Notifications Blocked'),
                     description: t('To enable reminders, please allow notifications in your browser settings.'),
                 });
+                // Revert the toggle in the UI by setting the state back
                 setSettings(prev => ({ ...prev, hydrationSettings: { ...prev.hydrationSettings, remindersEnabled: false }}));
                 cancelWaterReminders();
             }
         } else {
-            // If reminders are being disabled, just save and cancel any existing reminders
+            // If reminders are being disabled, just save and cancel
             setSettings(prev => ({ ...prev, hydrationSettings: newHydrationSettings }));
             cancelWaterReminders();
              toast({

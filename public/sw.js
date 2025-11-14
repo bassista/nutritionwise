@@ -1,79 +1,97 @@
+'use strict';
+
+const WATER_REMINDER_TAG = 'water-reminder';
+const TRANSLATIONS_CACHE_NAME = 'translations-cache-v1';
+const translationFiles = ['/locales/en.json', '/locales/it.json'];
+
+// 1. Install: Cache translation files
 self.addEventListener('install', (event) => {
-  event.waitUntil(self.skipWaiting()); // Attiva subito il nuovo Service Worker
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(TRANSLATIONS_CACHE_NAME);
+      await cache.addAll(translationFiles);
+      await self.skipWaiting();
+    })()
+  );
 });
 
+// 2. Activate: Take control of pages immediately
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim()); // Prende il controllo delle pagine aperte
+  event.waitUntil(self.clients.claim());
 });
 
-// Funzione per ottenere le impostazioni dal client
-const getSettingsFromClient = async () => {
-  const clients = await self.clients.matchAll({ type: 'window' });
+// Utility to get a value from localStorage via a client
+const getLocalStorageValue = async (key) => {
+  const clients = await self.clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true,
+  });
+
   if (clients && clients.length) {
     const client = clients[0];
-    return new Promise((resolve, reject) => {
-      const messageChannel = new MessageChannel();
-      messageChannel.port1.onmessage = (event) => {
-        if (event.data.error) {
-          reject(event.data.error);
-        } else {
-          try {
-            const settings = JSON.parse(event.data.value);
-            resolve(settings);
-          } catch (e) {
-            // Se il valore è null o non è un JSON valido, risolvi con null
-            resolve(null);
-          }
-        }
+    const channel = new MessageChannel();
+    client.postMessage({ type: 'GET_LOCALSTORAGE', key }, [channel.port2]);
+
+    return new Promise(resolve => {
+      channel.port1.onmessage = (e) => {
+        resolve(e.data.value ? JSON.parse(e.data.value) : null);
       };
-      client.postMessage({ type: 'GET_LOCALSTORAGE', key: 'settings' }, [messageChannel.port2]);
     });
   }
-  return null; // Nessun client trovato
+  // If no client is open, we cannot access localStorage.
+  // This is a limitation, but for periodic sync, the user often has the app open in the background.
+  return null;
 };
 
-const showNotification = (title, options) => {
-  return self.registration.showNotification(title, options);
-}
 
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'water-reminder') {
-    event.waitUntil((async () => {
-      try {
-        const settings = await getSettingsFromClient();
-        
-        if (settings && settings.hydrationSettings && settings.hydrationSettings.remindersEnabled) {
-          const { reminderStartTime, reminderEndTime } = settings.hydrationSettings;
-          const now = new Date();
-          const currentHour = now.getHours();
-          const currentMinute = now.getMinutes();
-          const currentTime = currentHour * 60 + currentMinute;
+const showNotification = async () => {
+    try {
+        const settings = await getLocalStorageValue('settings');
+        const locale = (await getLocalStorageValue('locale')) || 'en';
 
-          const [startHour, startMinute] = reminderStartTime.split(':').map(Number);
-          const startTime = startHour * 60 + startMinute;
-
-          const [endHour, endMinute] = reminderEndTime.split(':').map(Number);
-          const endTime = endHour * 60 + endMinute;
-
-          if (currentTime >= startTime && currentTime <= endTime) {
-             const translations = {
-                en: { title: "Time to Hydrate!", body: "Don't forget to drink a glass of water." },
-                it: { title: "È ora di idratarsi!", body: "Non dimenticare di bere un bicchiere d'acqua." }
-            };
-            const lang = settings.locale || 'en';
-            const notificationTitle = translations[lang].title;
-            const notificationBody = translations[lang].body;
-            
-            return showNotification(notificationTitle, {
-              body: notificationBody,
-              icon: '/icons/icon-192x192.png',
-              tag: 'water-reminder-notification'
-            });
-          }
+        if (!settings || !settings.hydrationSettings || !settings.hydrationSettings.remindersEnabled) {
+            console.log('Hydration reminders are disabled in settings.');
+            return;
         }
-      } catch (error) {
-        console.error('Failed to get settings for notification:', error);
-      }
-    })());
+
+        const { reminderStartTime, reminderEndTime } = settings.hydrationSettings;
+        const now = new Date();
+        const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+        if (currentTime < reminderStartTime || currentTime > reminderEndTime) {
+            console.log('Outside of reminder time window.');
+            return;
+        }
+        
+        // Fetch translations from cache
+        const cache = await caches.open(TRANSLATIONS_CACHE_NAME);
+        const response = await cache.match(`/locales/${locale}.json`);
+        
+        if (!response) {
+            console.error(`Translation file for locale "${locale}" not found in cache.`);
+            return;
+        }
+
+        const translations = await response.json();
+        
+        const title = translations['Time to Hydrate!'] || 'Time to Hydrate!';
+        const body = translations["Don't forget to drink a glass of water."] || "Don't forget to drink a glass of water.";
+
+        await self.registration.showNotification(title, {
+            body: body,
+            icon: '/icons/icon-192x192.png',
+            badge: '/icons/badge-72x72.png',
+        });
+    } catch (error) {
+        console.error('Error showing notification:', error);
+    }
+};
+
+
+// 3. Periodic Sync: Handle the reminder
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === WATER_REMINDER_TAG) {
+    console.log('Periodic sync event for water reminder received.');
+    event.waitUntil(showNotification());
   }
 });
