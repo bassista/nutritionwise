@@ -303,5 +303,7 @@
   "To enable reminders, please allow notifications in your browser settings.": "To enable reminders, please allow notifications in your browser settings.",
   "Background Sync Failed": "Background Sync Failed",
   "Could not schedule reminders. Installing the app on your device might solve the issue.": "Could not schedule reminders. Installing the app on your device might solve the issue.",
-  "foods": "foods"
+  "foods": "foods",
+  "Feature not available": "Feature not available",
+  "Notifications are temporarily disabled.": "Notifications are temporarily disabled."
 }

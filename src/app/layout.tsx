@@ -6,7 +6,6 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: 'NutritionWise',
   description: 'Track your nutrition smartly.',
-  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
