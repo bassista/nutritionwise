@@ -96,14 +96,14 @@ export default function MainLayoutClient({
   }, []);
   
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      const serviceWorkerPath = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/sw.js`;
-      navigator.serviceWorker.register(serviceWorkerPath)
-        .then(registration => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((registration) => {
           console.log('Service Worker registered with scope:', registration.scope);
-          registration.update();
+          registration.update(); // Attempt to update the service worker
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Service Worker registration failed:', error);
         });
     }
