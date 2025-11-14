@@ -1,9 +1,5 @@
-
 "use client";
 
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { useSettings } from '@/context/SettingsContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,39 +20,30 @@ import {
 import { useLocale } from '@/context/LocaleContext';
 import { Switch } from '@/components/ui/switch';
 import { useEffect, useState } from 'react';
+import type { HydrationSettings as HydrationSettingsType } from '@/lib/types';
 
-const hydrationSettingsSchema = z.object({
-    goalLiters: z.coerce.number().min(0.1, "Must be at least 0.1"),
-    glassSizeMl: z.coerce.number().int().min(1, "Must be at least 1"),
-    remindersEnabled: z.boolean(),
-    reminderIntervalMinutes: z.coerce.number().int().min(1, "Must be at least 1"),
-    reminderStartTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
-    reminderEndTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:mm)"),
-});
 
 export default function HydrationSettings() {
     const { settings, updateHydrationSettings } = useSettings();
     const { t } = useLocale();
 
-    const hydrationForm = useForm<z.infer<typeof hydrationSettingsSchema>>({
-        resolver: zodResolver(hydrationSettingsSchema),
-        defaultValues: settings.hydrationSettings,
-    });
+    const [currentSettings, setCurrentSettings] = useState<HydrationSettingsType>(settings.hydrationSettings);
     
-    const [remindersEnabled, setRemindersEnabled] = useState(settings.hydrationSettings.remindersEnabled);
-
     useEffect(() => {
-        hydrationForm.reset(settings.hydrationSettings);
-        setRemindersEnabled(settings.hydrationSettings.remindersEnabled);
-    }, [settings, hydrationForm]);
+      setCurrentSettings(settings.hydrationSettings);
+    }, [settings.hydrationSettings]);
 
-    function onHydrationSubmit(values: z.infer<typeof hydrationSettingsSchema>) {
-        updateHydrationSettings(values);
+    const handleUpdate = (update: Partial<HydrationSettingsType>) => {
+      const newSettings = { ...currentSettings, ...update };
+      setCurrentSettings(newSettings);
+      updateHydrationSettings(newSettings);
     }
     
-    const handleFormSubmit = () => {
-        hydrationForm.setValue('remindersEnabled', remindersEnabled);
-        hydrationForm.handleSubmit(onHydrationSubmit)();
+    const handleToggleReminders = (enabled: boolean) => {
+      const newSettings = { ...currentSettings, remindersEnabled: enabled };
+      setCurrentSettings(newSettings);
+      // The updateHydrationSettings function already handles the async permission logic
+      updateHydrationSettings(newSettings);
     }
 
     return (
@@ -70,35 +57,27 @@ export default function HydrationSettings() {
                 </div>
             </AccordionTrigger>
             <AccordionContent>
-                <Form {...hydrationForm}>
-                <form onSubmit={(e) => { e.preventDefault(); handleFormSubmit(); }} className="space-y-8">
+                <div className="space-y-8">
                     <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                        control={hydrationForm.control}
-                        name="goalLiters"
-                        render={({ field }) => (
-                            <FormItem>
+                        <FormItem>
                             <FormLabel>{t('Daily Goal (Liters)')}</FormLabel>
-                            <FormControl>
-                                <Input type="number" step="0.1" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={hydrationForm.control}
-                        name="glassSizeMl"
-                        render={({ field }) => (
-                            <FormItem>
+                            <Input 
+                                type="number" 
+                                step="0.1" 
+                                value={currentSettings.goalLiters}
+                                onBlur={() => handleUpdate({ goalLiters: currentSettings.goalLiters })}
+                                onChange={(e) => setCurrentSettings(s => ({...s, goalLiters: Number(e.target.value)}))}
+                             />
+                        </FormItem>
+                         <FormItem>
                             <FormLabel>{t('Glass Size (ml)')}</FormLabel>
-                            <FormControl>
-                                <Input type="number" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
+                            <Input 
+                                type="number" 
+                                value={currentSettings.glassSizeMl}
+                                onBlur={() => handleUpdate({ glassSizeMl: currentSettings.glassSizeMl })}
+                                onChange={(e) => setCurrentSettings(s => ({...s, glassSizeMl: Number(e.target.value)}))}
+                            />
+                        </FormItem>
                     </div>
                     
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
@@ -111,61 +90,46 @@ export default function HydrationSettings() {
                         </FormDescription>
                         </div>
                         <Switch
-                            checked={remindersEnabled}
-                            onCheckedChange={setRemindersEnabled}
+                            checked={currentSettings.remindersEnabled}
+                            onCheckedChange={handleToggleReminders}
                         />
                     </FormItem>
                     
-                    {remindersEnabled && (
+                    {currentSettings.remindersEnabled && (
                         <div className="space-y-4">
-                            <FormField
-                            control={hydrationForm.control}
-                            name="reminderIntervalMinutes"
-                            render={({ field }) => (
-                                <FormItem>
+                           <FormItem>
                                 <FormLabel>{t('Reminder Interval (minutes)')}</FormLabel>
-                                <FormControl>
-                                    <Input type="number" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                            />
+                                <Input 
+                                    type="number" 
+                                    value={currentSettings.reminderIntervalMinutes}
+                                    onBlur={() => handleUpdate({ reminderIntervalMinutes: currentSettings.reminderIntervalMinutes })}
+                                    onChange={(e) => setCurrentSettings(s => ({...s, reminderIntervalMinutes: Number(e.target.value)}))}
+                                />
+                            </FormItem>
+
                             <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={hydrationForm.control}
-                                name="reminderStartTime"
-                                render={({ field }) => (
-                                    <FormItem>
+                                <FormItem>
                                     <FormLabel>{t('Reminders Start Time')}</FormLabel>
-                                    <FormControl>
-                                        <Input type="time" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField
-                                control={hydrationForm.control}
-                                name="reminderEndTime"
-                                render={({ field }) => (
-                                    <FormItem>
+                                     <Input 
+                                        type="time" 
+                                        value={currentSettings.reminderStartTime}
+                                        onBlur={() => handleUpdate({ reminderStartTime: currentSettings.reminderStartTime })}
+                                        onChange={(e) => setCurrentSettings(s => ({...s, reminderStartTime: e.target.value}))}
+                                     />
+                                </FormItem>
+                                <FormItem>
                                     <FormLabel>{t('Reminders End Time')}</FormLabel>
-                                    <FormControl>
-                                        <Input type="time" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
+                                     <Input 
+                                        type="time" 
+                                        value={currentSettings.reminderEndTime}
+                                        onBlur={() => handleUpdate({ reminderEndTime: currentSettings.reminderEndTime })}
+                                        onChange={(e) => setCurrentSettings(s => ({...s, reminderEndTime: e.target.value}))}
+                                    />
+                                </FormItem>
                             </div>
                         </div>
                     )}
-
-
-                    <Button type="submit">{t('Save Hydration Settings')}</Button>
-                </form>
-                </Form>
+                </div>
             </AccordionContent>
         </AccordionItem>
     )
