@@ -15,7 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import {
   AccordionContent,
@@ -24,13 +23,14 @@ import {
 } from "@/components/ui/accordion";
 import { useLocale } from '@/context/LocaleContext';
 import { useEffect } from 'react';
+import { Slider } from '@/components/ui/slider';
 
 const settingsSchema = z.object({
   foodsPerPage: z.coerce
     .number()
     .int()
-    .min(1, 'Must be at least 1')
-    .max(50, 'Must be 50 or less'),
+    .min(4, 'Must be at least 4')
+    .max(48, 'Must be 48 or less'),
 });
 
 export default function DisplaySettings() {
@@ -44,6 +44,8 @@ export default function DisplaySettings() {
             foodsPerPage: settings.foodsPerPage,
         },
     });
+    
+    const foodsPerPageValue = displayForm.watch('foodsPerPage');
 
     useEffect(() => {
         displayForm.reset({ foodsPerPage: settings.foodsPerPage });
@@ -56,6 +58,13 @@ export default function DisplaySettings() {
             description: t('Your preferences have been updated.'),
         });
     }
+    
+    const handleSliderChange = (value: number[]) => {
+      displayForm.setValue('foodsPerPage', value[0]);
+      // Use a debounce or submit on release if you don't want to submit on every change
+      displayForm.handleSubmit(onDisplaySubmit)();
+    }
+
 
     return (
         <AccordionItem value="display">
@@ -75,18 +84,26 @@ export default function DisplaySettings() {
                     name="foodsPerPage"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>{t('Foods Per Page')}</FormLabel>
+                        <div className="flex justify-between">
+                            <FormLabel>{t('Foods Per Page')}</FormLabel>
+                            <span className="text-sm font-medium">{foodsPerPageValue}</span>
+                        </div>
                         <FormControl>
-                            <Input type="number" {...field} />
+                             <Slider
+                                min={4}
+                                max={48}
+                                step={4}
+                                value={[field.value]}
+                                onValueChange={handleSliderChange}
+                             />
                         </FormControl>
                         <FormDescription>
-                            {t('Set the number of food items to show on each page (1-50).')}
+                            {t('Set the number of food items to show on each page (4-48).')}
                         </FormDescription>
                         <FormMessage />
                         </FormItem>
                     )}
                     />
-                    <Button type="submit">{t('Save Preferences')}</Button>
                 </form>
                 </Form>
             </AccordionContent>
