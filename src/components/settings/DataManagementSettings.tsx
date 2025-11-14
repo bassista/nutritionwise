@@ -27,6 +27,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useLocale } from '@/context/LocaleContext';
 import { Download, Upload, Info, Loader2 } from 'lucide-react';
