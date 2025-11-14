@@ -185,7 +185,7 @@
   "Your average daily nutrient intake compared to your goals.": "Your average daily nutrient intake compared to your goals.",
   "No Data for Analysis": "No Data for Analysis",
   "Start logging your meals in the diary to see your analytics.": "Start logging your meals in the diary to see your analytics.",
-"Not enough data": "Not enough data",
+  "Not enough data": "Not enough data",
   "CSV Food Data": "CSV Food Data",
   "Download Foods (CSV)": "Download in CSV",
   "CSV Exported": "CSV Exported",
@@ -293,5 +293,7 @@
   "Load More": "Load More",
   "remaining": "remaining",
   "No results in favorites.": "No results in favorites.",
-  "Search in all foods": "Search in all foods"
+  "Search in all foods": "Search in all foods",
+  "Meal Added to Diary": "Meal Added to Diary",
+  "The ingredients for \"{mealName}\" have been added to your diary.": "The ingredients for \"{mealName}\" have been added to your diary."
 }

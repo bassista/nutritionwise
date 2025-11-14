@@ -10,6 +10,8 @@ import { defaultSettings } from '@/lib/settings';
 
 const dataAdapter: IDataAdapter = new LocalStorageAdapter();
 
+export type LogItemInput = { type: 'food' | 'meal', itemId: string, grams?: number };
+
 export interface AppState extends AppData {
   // Actions
   // Food actions
@@ -31,7 +33,7 @@ export interface AppState extends AppData {
   setFavoriteFoodIds: (ids: string[]) => void;
 
   // DailyLog actions
-  addLogEntry: (date: string, mealType: MealType, item: { type: 'food' | 'meal', itemId: string, grams?: number }) => void;
+  addLogEntry: (date: string, mealType: MealType, items: LogItemInput | LogItemInput[]) => void;
   removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
   addWaterIntake: (date: string, amountMl: number) => void;
   updateWeight: (date: string, weight?: number) => void;
@@ -177,12 +179,22 @@ const useAppStore = create<AppState>((set, get) => {
         setFavoriteFoodIds: (ids) => setStateAndSave(() => ({ favoriteFoodIds: ids })),
 
         // --- DailyLog Actions ---
-        addLogEntry: (date, mealType, item) => setStateAndSave(state => {
-            const newLogItem: LoggedItem = { ...item, id: `${Date.now()}-${Math.random()}`, timestamp: Date.now() };
+        addLogEntry: (date, mealType, items) => setStateAndSave(state => {
+            const itemsArray = Array.isArray(items) ? items : [items];
+            if (itemsArray.length === 0) return {};
+            
+            const newLogItems: LoggedItem[] = itemsArray.map(item => ({
+                ...item,
+                id: `${Date.now()}-${Math.random()}`,
+                timestamp: Date.now(),
+            }));
+            
             const newLogs = { ...state.dailyLogs };
             const dayLog = newLogs[date] || {};
             const mealLog = dayLog[mealType] || [];
-            newLogs[date] = { ...dayLog, [mealType]: [...mealLog, newLogItem] };
+            
+            newLogs[date] = { ...dayLog, [mealType]: [...mealLog, ...newLogItems] };
+            
             return { dailyLogs: newLogs };
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {

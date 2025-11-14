@@ -293,5 +293,7 @@
   "Load More": "Carica Altri",
   "remaining": "rimanenti",
   "No results in favorites.": "Nessun risultato nei preferiti.",
-  "Search in all foods": "Cerca in tutti gli alimenti"
+  "Search in all foods": "Cerca in tutti gli alimenti",
+  "Meal Added to Diary": "Pasto Aggiunto al Diario",
+  "The ingredients for \"{mealName}\" have been added to your diary.": "Gli ingredienti di \"{mealName}\" sono stati aggiunti al tuo diario."
 }

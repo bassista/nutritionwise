@@ -24,7 +24,7 @@ type GetFoodById = (id: string) => Food | undefined;
 type GetMealById = (id: string) => Meal | undefined;
 
 export const calculateTotalNutrientsForItems = (
-    items: LoggedItem[], 
+    items: (LoggedItem | { type: 'food', itemId: string, grams?: number })[],
     getFoodById: GetFoodById, 
     getMealById: GetMealById
 ) => {
@@ -45,24 +45,14 @@ export const calculateTotalNutrientsForItems = (
         } else if (loggedItem.type === 'meal') {
             const meal = getMealById(loggedItem.itemId);
             if (meal) {
-                const totalMealGrams = meal.foods.reduce((acc, mf) => acc + mf.grams, 0);
-                const mealFactor = (loggedItem.grams && totalMealGrams > 0) ? loggedItem.grams / totalMealGrams : 1;
-
-                meal.foods.forEach(mealFood => {
-                    const food = getFoodById(mealFood.foodId);
-                    if (food) {
-                        const foodFactorInMeal = mealFood.grams / (food.serving_size_g || 100);
-                        const finalFactor = foodFactorInMeal * mealFactor;
-                        
-                        totals.calories += (food.calories || 0) * finalFactor;
-                        totals.protein += (food.protein || 0) * finalFactor;
-                        totals.carbohydrates += (food.carbohydrates || 0) * finalFactor;
-                        totals.fat += (food.fat || 0) * finalFactor;
-                        totals.fiber += (food.fiber || 0) * finalFactor;
-                        totals.sugar += (food.sugar || 0) * finalFactor;
-                        totals.sodium += (food.sodium || 0) * finalFactor;
-                    }
-                });
+                const mealNutrients = calculateTotalNutrientsForMeal(meal, getFoodById);
+                totals.calories += mealNutrients.calories;
+                totals.protein += mealNutrients.protein;
+                totals.carbohydrates += mealNutrients.carbohydrates;
+                totals.fat += mealNutrients.fat;
+                totals.fiber += mealNutrients.fiber;
+                totals.sugar += mealNutrients.sugar;
+                totals.sodium += mealNutrients.sodium;
             }
         }
     });

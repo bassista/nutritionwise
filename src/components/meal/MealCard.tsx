@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo, useState } from 'react';
-import type { Meal, MealType } from '@/lib/types';
+import type { Meal, MealFood, MealType } from '@/lib/types';
 import useAppStore from '@/context/AppStore';
 import {
   Card,
@@ -80,10 +80,19 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
       deleteMeal(meal.id);
     };
 
-     const handleAddToDiary = (e: React.MouseEvent, mealType: MealType) => {
+    const handleAddToDiary = (e: React.MouseEvent, mealType: MealType) => {
         e.stopPropagation();
         const today = formatISO(startOfToday(), { representation: 'date' });
-        addLogEntry(today, mealType, { type: 'meal', itemId: meal.id });
+        const itemsToAdd = meal.foods.map(food => ({
+            type: 'food' as const,
+            itemId: food.foodId,
+            grams: food.grams,
+        }));
+        addLogEntry(today, mealType, itemsToAdd);
+        toast({
+            title: t('Meal Added to Diary'),
+            description: t('The ingredients for "{mealName}" have been added to your diary.', { mealName: meal.name }),
+        });
     };
 
     const handleAddToShoppingList = (e: React.MouseEvent) => {
