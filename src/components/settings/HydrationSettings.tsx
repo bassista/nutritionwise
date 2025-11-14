@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSettings } from '@/context/SettingsContext';
@@ -12,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { useEffect, useState } from 'react';
 import type { HydrationSettings as HydrationSettingsType } from '@/lib/types';
 import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 
 
 export default function HydrationSettings() {
@@ -75,14 +77,15 @@ export default function HydrationSettings() {
                     
                     <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
-                        <Label className="text-base">
+                        <label htmlFor="reminders-switch" className="text-base font-medium">
                             {t('Enable Reminders')}
-                        </Label>
+                        </label>
                         <p className="text-sm text-muted-foreground">
                             {t('Receive notifications to drink water.')}
                         </p>
                         </div>
                         <Switch
+                            id="reminders-switch"
                             checked={currentSettings.remindersEnabled}
                             onCheckedChange={handleToggleReminders}
                         />
@@ -91,13 +94,17 @@ export default function HydrationSettings() {
                     {currentSettings.remindersEnabled && (
                         <div className="space-y-4">
                            <div className="space-y-2">
-                                <Label htmlFor="reminder-interval">{t('Reminder Interval (minutes)')}</Label>
-                                <Input
-                                    id="reminder-interval" 
-                                    type="number" 
-                                    value={currentSettings.reminderIntervalMinutes}
-                                    onBlur={() => handleUpdate({ reminderIntervalMinutes: currentSettings.reminderIntervalMinutes })}
-                                    onChange={(e) => setCurrentSettings(s => ({...s, reminderIntervalMinutes: Number(e.target.value)}))}
+                                <div className="flex justify-between">
+                                    <Label htmlFor="reminder-interval">{t('Reminder Interval (minutes)')}</Label>
+                                    <span className="text-sm font-medium">{currentSettings.reminderIntervalMinutes} min</span>
+                                </div>
+                                <Slider
+                                    id="reminder-interval"
+                                    min={30}
+                                    max={240}
+                                    step={15}
+                                    value={[currentSettings.reminderIntervalMinutes]}
+                                    onValueChange={(value) => handleUpdate({ reminderIntervalMinutes: value[0]})}
                                 />
                             </div>
 
