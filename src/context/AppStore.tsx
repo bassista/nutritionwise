@@ -7,6 +7,7 @@ import { IDataAdapter } from '@/lib/adapters/IDataAdapter';
 import { LocalStorageAdapter } from '@/lib/adapters/LocalStorageAdapter';
 import { defaultFoods } from '@/lib/data';
 import { defaultSettings } from '@/lib/settings';
+import { arrayMove } from '@dnd-kit/sortable';
 
 const dataAdapter: IDataAdapter = new LocalStorageAdapter();
 
@@ -35,6 +36,7 @@ export interface AppState extends AppData {
   // DailyLog actions
   addLogEntry: (date: string, mealType: MealType, items: LogItemInput | LogItemInput[]) => void;
   removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
+  moveLogEntry: (date: string, logId: string, fromMealType: MealType, toMealType: MealType, fromIndex: number, toIndex: number) => void;
   addWaterIntake: (date: string, amountMl: number) => void;
   updateWeight: (date: string, weight?: number) => void;
   
@@ -187,28 +189,25 @@ const useAppStore = create<AppState>((set, get) => {
             const dayLog = newLogs[date] || {};
             const mealLog = dayLog[mealType] ? [...dayLog[mealType]!] : [];
             
-            const newItemsToAdd: LoggedItem[] = [];
+            const itemsToAdd: LoggedItem[] = [];
 
             itemsArray.forEach(item => {
                 if (item.type === 'food') {
                     const existingEntryIndex = mealLog.findIndex(logged => logged.type === 'food' && logged.itemId === item.itemId);
                     
                     if (existingEntryIndex !== -1) {
-                        // Update existing food entry by overwriting the grams
                         const existingEntry = mealLog[existingEntryIndex];
-                        const newGrams = item.grams || 0; // Use the new value
+                        const newGrams = item.grams || 0; // Use the new value, overwriting the old one
                         mealLog[existingEntryIndex] = { ...existingEntry, grams: newGrams };
                     } else {
-                        // Add new food entry to the list of items to be added
-                        newItemsToAdd.push({
+                        itemsToAdd.push({
                             ...item,
                             id: `${Date.now()}-${Math.random()}`,
                             timestamp: Date.now(),
                         });
                     }
                 } else {
-                     // Add new meal entry
-                    newItemsToAdd.push({
+                    itemsToAdd.push({
                         ...item,
                         id: `${Date.now()}-${Math.random()}`,
                         timestamp: Date.now(),
@@ -216,7 +215,7 @@ const useAppStore = create<AppState>((set, get) => {
                 }
             });
 
-            newLogs[date] = { ...dayLog, [mealType]: [...mealLog, ...newItemsToAdd] };
+            newLogs[date] = { ...dayLog, [mealType]: [...mealLog, ...itemsToAdd] };
             return { dailyLogs: newLogs };
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {
@@ -226,6 +225,35 @@ const useAppStore = create<AppState>((set, get) => {
                 if (newLogs[date][mealType]!.length === 0) delete newLogs[date][mealType];
                 if (Object.keys(newLogs[date]).length === 0) delete newLogs[date];
             }
+            return { dailyLogs: newLogs };
+        }),
+        moveLogEntry: (date, logId, fromMealType, toMealType, fromIndex, toIndex) => setStateAndSave(state => {
+            const newLogs = { ...state.dailyLogs };
+            const dayLog = newLogs[date];
+            if (!dayLog) return {};
+
+            const sourceList = dayLog[fromMealType] ? [...dayLog[fromMealType]!] : [];
+            const destinationList = dayLog[toMealType] && fromMealType !== toMealType ? [...dayLog[toMealType]!] : sourceList;
+
+            const movedItem = sourceList.find(item => item.id === logId);
+            if (!movedItem) return {};
+            
+            const newSourceList = sourceList.filter(item => item.id !== logId);
+
+            if (fromMealType === toMealType) {
+                 const reorderedList = arrayMove(newSourceList, fromIndex, toIndex);
+                 newLogs[date] = { ...dayLog, [fromMealType]: reorderedList };
+            } else {
+                const newDestinationList = [...destinationList];
+                newDestinationList.splice(toIndex, 0, movedItem);
+                newLogs[date] = { ...dayLog, [fromMealType]: newSourceList, [toMealType]: newDestinationList };
+            }
+            
+            // Clean up empty meal logs
+            if (newLogs[date][fromMealType]?.length === 0) {
+              delete newLogs[date][fromMealType];
+            }
+
             return { dailyLogs: newLogs };
         }),
         addWaterIntake: (date, amountMl) => setStateAndSave(state => {
