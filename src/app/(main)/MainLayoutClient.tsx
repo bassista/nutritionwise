@@ -24,6 +24,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import Spinner from '@/components/ui/spinner';
+import { useToast } from '@/hooks/use-toast';
 
 function SidebarHeaderContent() {
   const { open } = useSidebar();
@@ -90,9 +91,23 @@ export default function MainLayoutClient({
   const { isMealBuilderOpen, setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const [isMounted, setIsMounted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('SW registered: ', registration);
+          registration.update();
+        }).catch(registrationError => {
+          console.log('SW registration failed: ', registrationError);
+        });
+      });
+    }
   }, []);
   
 
