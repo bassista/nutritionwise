@@ -4,8 +4,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useSettings } from '@/context/SettingsContext';
-import { Button } from '@/components/ui/button';
+import useAppStore from '@/context/AppStore';
 import {
   Form,
   FormControl,
@@ -15,7 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useToast } from '@/hooks/use-toast';
 import {
   AccordionContent,
   AccordionItem,
@@ -34,8 +32,7 @@ const settingsSchema = z.object({
 });
 
 export default function DisplaySettings() {
-    const { settings, updateSettings } = useSettings();
-    const { toast } = useToast();
+    const { settings, updateSettings } = useAppStore();
     const { t } = useLocale();
 
     const displayForm = useForm<z.infer<typeof settingsSchema>>({
@@ -53,10 +50,6 @@ export default function DisplaySettings() {
 
     function onDisplaySubmit(values: z.infer<typeof settingsSchema>) {
         updateSettings({foodsPerPage: values.foodsPerPage});
-        toast({
-            title: t('Settings Saved'),
-            description: t('Your preferences have been updated.'),
-        });
     }
     
     const handleSliderChange = (value: number[]) => {

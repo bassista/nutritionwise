@@ -1,4 +1,5 @@
 
+
 import { AppSettings, NutritionalGoals, HydrationSettings } from "./types";
 
 export const defaultGoals: NutritionalGoals = {
@@ -14,10 +15,6 @@ export const defaultGoals: NutritionalGoals = {
 export const defaultHydrationSettings: HydrationSettings = {
   goalLiters: 2,
   glassSizeMl: 200,
-  remindersEnabled: false,
-  reminderIntervalMinutes: 120,
-  reminderStartTime: '08:00',
-  reminderEndTime: '20:00',
 };
 
 export const defaultSettings: AppSettings = {

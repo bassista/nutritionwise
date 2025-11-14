@@ -4,7 +4,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useSettings } from '@/context/SettingsContext';
+import useAppStore from '@/context/AppStore';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -36,7 +36,7 @@ const nutritionalGoalsSchema = z.object({
 });
 
 export default function NutritionalGoalsSettings() {
-  const { settings, updateNutritionalGoals } = useSettings();
+  const { settings, updateNutritionalGoals } = useAppStore();
   const { toast } = useToast();
   const { t } = useLocale();
 

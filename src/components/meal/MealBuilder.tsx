@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -15,12 +15,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useFoods } from '@/context/FoodContext';
-import { useMeals } from '@/context/MealContext';
+import useAppStore from '@/context/AppStore';
 import { useToast } from '@/hooks/use-toast';
 import type { Meal, MealFood, Food } from '@/lib/types';
 import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown } from 'lucide-react';
-import FoodSelectorForMeal from './FoodSelectorForMeal';
+import FoodSelectorForMeal from '../food/FoodSelectorForMeal';
 import { useLocale } from '@/context/LocaleContext';
 import { getFoodName, calculateTotalNutrientsForMeal } from '@/lib/utils';
 
@@ -31,8 +30,7 @@ interface MealBuilderProps {
 }
 
 export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuilderProps) {
-  const { getFoodById } = useFoods();
-  const { addMeal, updateMeal } = useMeals();
+  const { getFoodById, addMeal, updateMeal } = useAppStore();
   const { toast } = useToast();
   const { t, locale } = useLocale();
 

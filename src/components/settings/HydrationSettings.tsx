@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useSettings } from '@/context/SettingsContext';
+import useAppStore from '@/context/AppStore';
 import { Input } from '@/components/ui/input';
 import {
   AccordionContent,
@@ -9,15 +9,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLocale } from '@/context/LocaleContext';
-import { Switch } from '@/components/ui/switch';
 import { useEffect, useState } from 'react';
 import type { HydrationSettings as HydrationSettingsType } from '@/lib/types';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
 
 
 export default function HydrationSettings() {
-    const { settings, updateHydrationSettings } = useSettings();
+    const { settings, updateHydrationSettings } = useAppStore();
     const { t } = useLocale();
 
     const [currentSettings, setCurrentSettings] = useState<HydrationSettingsType>(settings.hydrationSettings);
@@ -29,13 +27,6 @@ export default function HydrationSettings() {
     const handleUpdate = (update: Partial<HydrationSettingsType>) => {
       const newSettings = { ...currentSettings, ...update };
       setCurrentSettings(newSettings);
-      updateHydrationSettings(newSettings);
-    }
-    
-    const handleToggleReminders = (enabled: boolean) => {
-      const newSettings = { ...currentSettings, remindersEnabled: enabled };
-      setCurrentSettings(newSettings);
-      // The updateHydrationSettings function already handles the async permission logic
       updateHydrationSettings(newSettings);
     }
 

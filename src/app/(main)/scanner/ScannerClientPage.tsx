@@ -8,8 +8,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { useFoods } from '@/context/FoodContext';
-import { useFavorites } from '@/context/FavoriteContext';
+import useAppStore from '@/context/AppStore';
 import { FoodForm } from '@/components/food/FoodForm';
 import { getFoodName } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,8 +23,7 @@ export default function ScannerClientPage() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { foods } = useFoods();
-  const { favoriteFoodIds, toggleFavorite } = useFavorites();
+  const { foods, favoriteFoodIds, toggleFavorite } = useAppStore();
   
   const [foodToCreate, setFoodToCreate] = useState<Partial<Food> | undefined>(undefined);
   const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);

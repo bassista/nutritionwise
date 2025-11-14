@@ -8,8 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Heart, GripVertical, Flame, Wheat, Minus, Trash2, Edit, PlusCircle, CalendarPlus } from 'lucide-react';
 import type { Food, MealType } from '@/lib/types';
-import { useFavorites } from '@/context/FavoriteContext';
-import { useDailyLogs } from '@/context/DailyLogContext';
+import useAppStore from '@/context/AppStore';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
@@ -47,8 +46,7 @@ interface FoodCardProps {
 
 const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
   ({ food, reorderable, onDelete, onEdit, style, attributes, listeners }, ref) => {
-    const { favoriteFoodIds, toggleFavorite } = useFavorites();
-    const { addLogEntry } = useDailyLogs();
+    const { favoriteFoodIds, toggleFavorite, addLogEntry } = useAppStore();
     const { t, locale } = useLocale();
     const isFavorite = favoriteFoodIds.includes(food.id);
     

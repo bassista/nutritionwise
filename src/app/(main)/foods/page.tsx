@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useFoods } from '@/context/FoodContext';
+import useAppStore from '@/context/AppStore';
 import { useUIState } from '@/context/UIStateContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Plus, ScanLine } from 'lucide-react';
@@ -16,7 +16,7 @@ import FoodListPage from '@/components/food/FoodListPage';
 
 
 export default function FoodsPage() {
-  const { foods, deleteFood } = useFoods();
+  const { foods, deleteFood } = useAppStore();
   const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const { toast } = useToast();

@@ -1,4 +1,5 @@
 
+
 export interface NutritionalInfo {
   calories: number;
   protein: number;
@@ -30,10 +31,6 @@ export interface Meal {
 export interface HydrationSettings {
   goalLiters: number;
   glassSizeMl: number;
-  remindersEnabled: boolean;
-  reminderIntervalMinutes: number;
-  reminderStartTime: string; // "HH:mm"
-  reminderEndTime: string; // "HH:mm"
 }
 
 export interface AppSettings {
@@ -101,7 +98,6 @@ export interface AppData {
   meals: Meal[];
   favoriteFoodIds: string[];
   settings: AppSettings;
-  locale: 'en' | 'it';
   dailyLogs: DailyLog;
   shoppingLists: ShoppingList[];
   userAchievements: UserAchievement[];

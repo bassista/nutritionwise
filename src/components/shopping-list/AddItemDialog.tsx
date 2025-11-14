@@ -6,8 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useFoods } from '@/context/FoodContext';
-import { useFavorites } from '@/context/FavoriteContext';
+import useAppStore from '@/context/AppStore';
 import { useLocale } from '@/context/LocaleContext';
 import { Food } from '@/lib/types';
 import { getFoodName } from '@/lib/utils';
@@ -24,8 +23,7 @@ interface AddItemDialogProps {
 
 export default function AddItemDialog({ open, onOpenChange, onAddItem, existingItemIds }: AddItemDialogProps) {
   const { t, locale } = useLocale();
-  const { foods } = useFoods();
-  const { favoriteFoodIds } = useFavorites();
+  const { foods, favoriteFoodIds } = useAppStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'search' | 'manual'>('search');
   const [searchFavoritesOnly, setSearchFavoritesOnly] = useState(false);

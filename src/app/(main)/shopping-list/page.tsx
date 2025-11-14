@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { useShoppingLists } from '@/context/ShoppingListContext';
+import useAppStore from '@/context/AppStore';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -29,7 +29,7 @@ import type { ShoppingList } from '@/lib/types';
 
 
 export default function ShoppingListPage() {
-  const { shoppingLists, setShoppingLists } = useShoppingLists();
+  const { shoppingLists, setShoppingLists } = useAppStore();
   const { t } = useLocale();
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [newListName, setNewListName] = useState('');
@@ -51,7 +51,8 @@ export default function ShoppingListPage() {
       const oldIndex = userLists.findIndex((list) => list.id === active.id);
       const newIndex = userLists.findIndex((list) => list.id === over.id);
       const reorderedUserLists = arrayMove(userLists, oldIndex, newIndex);
-      setShoppingLists(defaultList ? [defaultList, ...reorderedUserLists] : reorderedUserLists);
+      const newShoppingLists = defaultList ? [defaultList, ...reorderedUserLists] : reorderedUserLists;
+      setShoppingLists(() => newShoppingLists);
     }
   };
 

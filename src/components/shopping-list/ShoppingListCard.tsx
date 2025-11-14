@@ -3,8 +3,7 @@
 
 import React, { useState } from 'react';
 import { ShoppingList } from '@/lib/types';
-import { useFoods } from '@/context/FoodContext';
-import { useShoppingLists } from '@/context/ShoppingListContext';
+import useAppStore from '@/context/AppStore';
 import { useLocale } from '@/context/LocaleContext';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,21 +28,22 @@ const ShoppingListCardComponent = React.forwardRef<
   HTMLDivElement,
   ShoppingListCardProps & { style?: React.CSSProperties; attributes?: ReturnType<typeof useSortable>['attributes']; listeners?: ReturnType<typeof useSortable>['listeners']; }
 >(({ list, reorderable, style, attributes, listeners }, ref) => {
-  const { getFoodById } = useFoods();
-  const {
-    deleteShoppingList,
+  const { 
+    getFoodById,
+    setShoppingLists,
     renameShoppingList,
     addShoppingListItem,
     updateShoppingListItem,
     removeShoppingListItem,
     toggleAllShoppingListItems,
-  } = useShoppingLists();
+  } = useAppStore();
   const { t } = useLocale();
 
   const [isAddItemOpen, setAddItemOpen] = useState(false);
   const [isRenameOpen, setRenameOpen] = useState(false);
   const [isDeleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [newListName, setNewListName] = useState(list.name);
+  
 
   const handleAddItem = (item: { foodId: string } | { text: string }) => {
     addShoppingListItem(list.id, item);
@@ -65,7 +65,7 @@ const ShoppingListCardComponent = React.forwardRef<
   };
 
   const handleDelete = () => {
-    deleteShoppingList(list.id);
+    setShoppingLists((prev) => prev.filter(l => l.id !== list.id));
     setDeleteConfirmOpen(false);
   };
 

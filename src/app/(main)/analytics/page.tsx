@@ -1,10 +1,7 @@
 
 "use client";
 import { useMemo, useState } from 'react';
-import { useDailyLogs } from '@/context/DailyLogContext';
-import { useFoods } from '@/context/FoodContext';
-import { useMeals } from '@/context/MealContext';
-import { useSettings } from '@/context/SettingsContext';
+import useAppStore from '@/context/AppStore';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, AreaChart, Area } from 'recharts';
@@ -28,10 +25,7 @@ type TopFoodsMetric = 'calories' | 'protein' | 'carbohydrates' | 'fat' | 'count'
 
 
 export default function AnalyticsPage() {
-    const { dailyLogs } = useDailyLogs();
-    const { getFoodById } = useFoods();
-    const { getMealById } = useMeals();
-    const { settings } = useSettings();
+    const { dailyLogs, getFoodById, getMealById, settings } = useAppStore();
     const { t, locale } = useLocale();
     const [period, setPeriod] = useState<AnalysisPeriod>('last7days');
     const [topFoodsMetric, setTopFoodsMetric] = useState<TopFoodsMetric>('calories');

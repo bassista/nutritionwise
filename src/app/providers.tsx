@@ -1,36 +1,42 @@
 
 'use client';
-import type {ReactNode} from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { LocaleProvider } from '@/context/LocaleContext';
-import { SettingsProvider } from '@/context/SettingsContext';
-import { FoodProvider } from '@/context/FoodContext';
-import { MealProvider } from '@/context/MealContext';
-import { FavoriteProvider } from '@/context/FavoriteContext';
-import { DailyLogProvider } from '@/context/DailyLogContext';
+import useAppStore from '@/context/AppStore';
 import { UIStateProvider } from '@/context/UIStateContext';
-import { ShoppingListProvider } from '@/context/ShoppingListContext';
-import { AchievementProvider } from '@/context/AchievementContext';
+import Spinner from '@/components/ui/spinner';
 
-export function Providers({children}: {children: ReactNode}) {
+function AppInitializer({ children }: { children: ReactNode }) {
+    const [isInitialized, setIsInitialized] = useState(false);
+    const { load } = useAppStore();
+
+    useEffect(() => {
+        const initialize = async () => {
+            await load();
+            setIsInitialized(true);
+        };
+        initialize();
+    }, [load]);
+
+    if (!isInitialized) {
+        return (
+            <div className="flex h-screen w-full items-center justify-center">
+                <Spinner className="h-8 w-8" />
+            </div>
+        );
+    }
+    return <>{children}</>;
+}
+
+
+export function Providers({ children }: { children: ReactNode }) {
   return (
     <LocaleProvider>
-      <SettingsProvider>
-        <MealProvider>
-          <FavoriteProvider>
-            <FoodProvider>
-              <ShoppingListProvider>
-                <DailyLogProvider>
-                  <AchievementProvider>
-                    <UIStateProvider>
-                      {children}
-                    </UIStateProvider>
-                  </AchievementProvider>
-                </DailyLogProvider>
-              </ShoppingListProvider>
-            </FoodProvider>
-          </FavoriteProvider>
-        </MealProvider>
-      </SettingsProvider>
+        <AppInitializer>
+          <UIStateProvider>
+            {children}
+          </UIStateProvider>
+        </AppInitializer>
     </LocaleProvider>
   );
 }

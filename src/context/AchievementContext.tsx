@@ -1,34 +1,26 @@
 
 "use client";
 
-import React, { createContext, useContext, ReactNode, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import React, { useEffect } from 'react';
 import { UserAchievement } from '@/lib/types';
-import { useDailyLogs } from './DailyLogContext';
-import { useSettings } from './SettingsContext';
-import { useMeals } from './MealContext';
-import { useFavorites } from './FavoriteContext';
-import { useShoppingLists } from './ShoppingListContext';
-import { useFoods } from './FoodContext';
 import { allBadges, evaluateAchievements } from '@/lib/gamification';
 import { useToast } from '@/hooks/use-toast';
 import { useLocale } from './LocaleContext';
+import useAppStore from './AppStore';
 
-interface AchievementContextType {
-    userAchievements: UserAchievement[];
-    setAchievements: (achievements: UserAchievement[]) => void;
-}
-
-const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
-
-export const AchievementProvider = ({ children }: { children: ReactNode }) => {
-    const [userAchievements, setUserAchievements] = useLocalStorage<UserAchievement[]>('userAchievements', []);
-    const { dailyLogs } = useDailyLogs();
-    const { settings } = useSettings();
-    const { meals } = useMeals();
-    const { favoriteFoodIds } = useFavorites();
-    const { shoppingLists } = useShoppingLists();
-    const { foods } = useFoods();
+// This is not a provider anymore, but a hook that encapsulates the achievement logic
+export const useAchievementObserver = () => {
+    const { 
+        userAchievements, 
+        setAchievements, 
+        dailyLogs, 
+        settings, 
+        meals, 
+        favoriteFoodIds, 
+        shoppingLists, 
+        foods 
+    } = useAppStore();
+    
     const { toast } = useToast();
     const { t } = useLocale();
 
@@ -40,7 +32,7 @@ export const AchievementProvider = ({ children }: { children: ReactNode }) => {
             earnedBadgeIds
         );
         if (newAchievements.length > 0) {
-            setUserAchievements(prev => [...prev, ...newAchievements]);
+            setAchievements([...userAchievements, ...newAchievements]);
             newAchievements.forEach(achievement => {
                 const badge = allBadges.find(b => b.id === achievement.badgeId);
                 if (badge) {
@@ -51,19 +43,6 @@ export const AchievementProvider = ({ children }: { children: ReactNode }) => {
                 }
             });
         }
-    }, [dailyLogs, settings, meals, favoriteFoodIds, shoppingLists, foods, userAchievements, setUserAchievements, t, toast]);
-
-    return (
-        <AchievementContext.Provider value={{ userAchievements, setAchievements: setUserAchievements }}>
-            {children}
-        </AchievementContext.Provider>
-    );
-};
-
-export const useAchievements = () => {
-    const context = useContext(AchievementContext);
-    if (context === undefined) {
-        throw new Error('useAchievements must be used within an AchievementProvider');
-    }
-    return context;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dailyLogs, settings, meals, favoriteFoodIds, shoppingLists, foods]); // userAchievements is omitted to prevent loop
 };

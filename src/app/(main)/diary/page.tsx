@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { format, startOfToday } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useLocale } from '@/context/LocaleContext';
 import { PageHeader } from '@/components/PageHeader';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
-import FoodSelectorForMeal from '@/components/meal/FoodSelectorForMeal';
+import FoodSelectorForMeal from '@/components/food/FoodSelectorForMeal';
 import LogFoodDialog from '@/components/diary/LogFoodDialog';
 import { Food, MealType } from '@/lib/types';
 import WaterTracker from '@/components/diary/WaterTracker';
@@ -68,8 +68,6 @@ export default function DiaryPage() {
                        <MealLog 
                           selectedDateString={selectedDateString} 
                           onAddFoodClick={handleAddFoodClick}
-                          setFoodToLog={setFoodToLog}
-                          setMealTypeToAdd={setMealTypeToAdd}
                        />
                     </div>
                 </div>

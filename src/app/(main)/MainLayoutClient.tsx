@@ -24,7 +24,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import Spinner from '@/components/ui/spinner';
-import { useToast } from '@/hooks/use-toast';
+import { useAchievementObserver } from '@/context/AchievementContext';
 
 function SidebarHeaderContent() {
   const { open } = useSidebar();
@@ -90,18 +90,8 @@ export default function MainLayoutClient({
 }) {
   const { isMealBuilderOpen, setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
-  const [isMounted, setIsMounted] = useState(false);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  useAchievementObserver(); // Initialize the achievement observer
   
-
-  if (!isMounted) {
-    return <div className="flex h-screen w-full items-center justify-center"><Spinner className="h-8 w-8" /></div>;
-  }
-
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">

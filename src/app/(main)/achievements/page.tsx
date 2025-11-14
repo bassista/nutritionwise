@@ -4,10 +4,10 @@
 import { useMemo, useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { useLocale } from '@/context/LocaleContext';
-import { useAchievements } from '@/context/AchievementContext';
+import useAppStore from '@/context/AppStore';
 import { allBadges } from '@/lib/gamification';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Trophy, Lock } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -21,7 +21,7 @@ type AchievementFilter = "all" | "earned" | "not-earned";
 
 export default function AchievementsPage() {
   const { t } = useLocale();
-  const { userAchievements } = useAchievements();
+  const { userAchievements } = useAppStore();
   const [filter, setFilter] = useState<AchievementFilter>("all");
 
   const achievementsWithStatus = useMemo(() => {

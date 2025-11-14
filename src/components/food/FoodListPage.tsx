@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { useSettings } from '@/context/SettingsContext';
+import useAppStore from '@/context/AppStore';
 import FoodList from '@/components/food/FoodList';
 import { Input } from '@/components/ui/input';
 import { Search, Lightbulb, Heart } from 'lucide-react';
@@ -39,7 +39,7 @@ export default function FoodListPage({
   enableSorting = false,
   pageType,
 }: FoodListPageProps) {
-  const { settings } = useSettings();
+  const { settings } = useAppStore();
   const { t, locale } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');

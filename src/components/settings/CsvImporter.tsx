@@ -5,13 +5,12 @@ import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { useFoods } from '@/context/FoodContext';
-import type { Food } from '@/lib/types';
+import useAppStore from '@/context/AppStore';
 import { Upload } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
 
 export default function CsvImporter() {
-  const { importFoods } = useFoods();
+  const { importFoods } = useAppStore();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useLocale();

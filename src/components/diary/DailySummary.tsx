@@ -4,10 +4,7 @@
 import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
-import { useSettings } from '@/context/SettingsContext';
-import { useDailyLogs } from '@/context/DailyLogContext';
-import { useFoods } from '@/context/FoodContext';
-import { useMeals } from '@/context/MealContext';
+import useAppStore from '@/context/AppStore';
 import { useLocale } from '@/context/LocaleContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -21,10 +18,7 @@ interface DailySummaryProps {
 }
 
 export default function DailySummary({ selectedDate }: DailySummaryProps) {
-    const { settings } = useSettings();
-    const { dailyLogs } = useDailyLogs();
-    const { getFoodById } = useFoods();
-    const { getMealById } = useMeals();
+    const { settings, dailyLogs, getFoodById, getMealById } = useAppStore();
     const { t, locale } = useLocale();
 
     const selectedDateString = format(selectedDate, 'yyyy-MM-dd');

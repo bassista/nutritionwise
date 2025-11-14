@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useLocale } from '@/context/LocaleContext';
-import { useDailyLogs } from '@/context/DailyLogContext';
+import useAppStore from '@/context/AppStore';
 import { Food, MealType } from '@/lib/types';
 import { getFoodName } from '@/lib/utils';
 
@@ -29,7 +29,7 @@ interface LogFoodDialogProps {
 
 export default function LogFoodDialog({ open, onOpenChange, food, mealType, selectedDateString, onLogSuccess }: LogFoodDialogProps) {
   const { t, locale } = useLocale();
-  const { addLogEntry } = useDailyLogs();
+  const { addLogEntry } = useAppStore();
   const [grams, setGrams] = useState(food.serving_size_g || 100);
 
   useEffect(() => {

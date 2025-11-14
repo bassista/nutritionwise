@@ -2,11 +2,9 @@
 "use client";
 
 import { useMemo } from 'react';
-import { useSettings } from '@/context/SettingsContext';
-import { useDailyLogs } from '@/context/DailyLogContext';
+import useAppStore from '@/context/AppStore';
 import { useLocale } from '@/context/LocaleContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Droplets, GlassWater } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { calculateHydrationScore } from '@/lib/scoring';
@@ -18,8 +16,7 @@ interface WaterTrackerProps {
 }
 
 export default function WaterTracker({ selectedDate }: WaterTrackerProps) {
-  const { settings } = useSettings();
-  const { dailyLogs, addWaterIntake } = useDailyLogs();
+  const { settings, dailyLogs, addWaterIntake } = useAppStore();
   const { t } = useLocale();
 
   const { goalLiters, glassSizeMl } = settings.hydrationSettings;

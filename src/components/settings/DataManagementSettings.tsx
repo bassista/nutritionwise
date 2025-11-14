@@ -1,13 +1,7 @@
 
 "use client";
 
-import { useSettings } from '@/context/SettingsContext';
-import { useFoods } from '@/context/FoodContext';
-import { useMeals } from '@/context/MealContext';
-import { useFavorites } from '@/context/FavoriteContext';
-import { useDailyLogs } from '@/context/DailyLogContext';
-import { useShoppingLists } from '@/context/ShoppingListContext';
-import { useAchievements } from '@/context/AchievementContext';
+import useAppStore from '@/context/AppStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -34,6 +28,7 @@ import { Download, Upload, Info, Loader2 } from 'lucide-react';
 import { useRef, useCallback, useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import useSWR from 'swr';
+import { AppData } from '@/lib/types';
 
 const fetcher = (url: string) => fetch(url).then((res) => {
     if (!res.ok) {
@@ -43,41 +38,39 @@ const fetcher = (url: string) => fetch(url).then((res) => {
 });
 
 export default function DataManagementSettings() {
-    const { settings } = useSettings();
-    const { foods, setFoods, exportFoodsToCsv, importFoods: importFoodsFromContext } = useFoods();
-    const { setMeals } = useMeals();
-    const { setFavoriteFoodIds } = useFavorites();
-    const { setDailyLogs } = useDailyLogs();
-    const { setShoppingLists } = useShoppingLists();
-    const { setAchievements } = useAchievements();
+    const { 
+        exportFoodsToCsv,
+        importFoods,
+        reset,
+        setAppData,
+        load: loadAppData,
+        ...appData
+    } = useAppStore();
+    
     const { toast } = useToast();
     const { t, setLocale, locale } = useLocale();
     const backupFileRef = useRef<HTMLInputElement>(null);
     const [loadBaseFoods, setLoadBaseFoods] = useState(false);
     const { data: baseFoodsData, error: baseFoodsError, isLoading: isLoadingBaseFoods } = useSWR(loadBaseFoods ? '/base-food-data.csv' : null, fetcher);
 
-    const clearAllData = () => {
-        setFoods([]);
-        setMeals([]);
-        setFavoriteFoodIds([]);
-        setDailyLogs({});
-        setShoppingLists([]);
-        setAchievements([]);
+
+    const clearAllData = async () => {
+        await reset();
         toast({ title: t('Data Cleared'), description: t('All your entries have been deleted.') });
     };
 
     const exportData = () => {
-        const data = {
-            foods,
-            meals: useMeals.getState().meals,
-            favoriteFoodIds: useFavorites.getState().favoriteFoodIds,
-            settings,
-            dailyLogs: useDailyLogs.getState().dailyLogs,
-            shoppingLists: useShoppingLists.getState().shoppingLists,
-            userAchievements: useAchievements.getState().userAchievements,
-            locale
+        const dataToExport: AppData = {
+            foods: appData.foods,
+            meals: appData.meals,
+            favoriteFoodIds: appData.favoriteFoodIds,
+            settings: appData.settings,
+            dailyLogs: appData.dailyLogs,
+            shoppingLists: appData.shoppingLists,
+            userAchievements: appData.userAchievements,
         };
-        const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
+
+        const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(dataToExport, null, 2))}`;
         const link = document.createElement("a");
         link.href = jsonString;
         link.download = `nutrition-wise-backup-${new Date().toISOString().split('T')[0]}.json`;
@@ -90,15 +83,13 @@ export default function DataManagementSettings() {
     };
 
     const importData = (data: any) => {
-        if (data.foods) setFoods(data.foods);
-        if (data.meals) setMeals(data.meals);
-        if (data.favoriteFoodIds) setFavoriteFoodIds(data.favoriteFoodIds);
-        if (data.settings) useSettings.getState().setSettings(data.settings);
-        if (data.dailyLogs) setDailyLogs(data.dailyLogs);
-        if (data.shoppingLists) setShoppingLists(data.shoppingLists);
-        if (data.userAchievements) setAchievements(data.userAchievements);
-        if (data.locale) setLocale(data.locale);
-        toast({ title: t('Import Successful'), description: t('Your data has been restored from the backup.') });
+        if (data.foods && data.settings) { // Basic check for valid backup
+            setAppData(data);
+            if (data.locale) setLocale(data.locale);
+            toast({ title: t('Import Successful'), description: t('Your data has been restored from the backup.') });
+        } else {
+            throw new Error(t('The selected file is not a valid JSON backup.'));
+        }
     };
 
     const handleBackupFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,11 +102,11 @@ export default function DataManagementSettings() {
             const text = e.target?.result as string;
             const data = JSON.parse(text);
             importData(data);
-        } catch (error) {
+        } catch (error: any) {
             toast({
             variant: 'destructive',
             title: t('Import Failed'),
-            description: t('The selected file is not a valid JSON backup.'),
+            description: error.message || t('The selected file is not a valid JSON backup.'),
             });
         } finally {
             if(backupFileRef.current) {
@@ -167,7 +158,7 @@ export default function DataManagementSettings() {
                     return foodObject;
                 });
 
-                const newFoodsCount = importFoodsFromContext(parsedFoods);
+                const newFoodsCount = importFoods(parsedFoods);
 
                 toast({
                 title: t('Import Successful'),
@@ -192,7 +183,7 @@ export default function DataManagementSettings() {
             });
             setLoadBaseFoods(false);
         }
-    }, [baseFoodsData, baseFoodsError, importFoodsFromContext, t, toast]);
+    }, [baseFoodsData, baseFoodsError, importFoods, t, toast]);
 
     return (
         <AccordionItem value="data-management">

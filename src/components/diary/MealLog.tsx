@@ -2,9 +2,7 @@
 "use client";
 
 import { useMemo } from 'react';
-import { useDailyLogs } from '@/context/DailyLogContext';
-import { useFoods } from '@/context/FoodContext';
-import { useMeals } from '@/context/MealContext';
+import useAppStore from '@/context/AppStore';
 import { useLocale } from '@/context/LocaleContext';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -15,14 +13,10 @@ import { getFoodName, calculateTotalNutrientsForItems } from '@/lib/utils';
 interface MealLogProps {
     selectedDateString: string;
     onAddFoodClick: (mealType: MealType) => void;
-    setFoodToLog: (food: any) => void;
-    setMealTypeToAdd: (mealType: MealType | null) => void;
 }
 
 export default function MealLog({ selectedDateString, onAddFoodClick }: MealLogProps) {
-    const { dailyLogs, removeLogEntry } = useDailyLogs();
-    const { getFoodById } = useFoods();
-    const { getMealById } = useMeals();
+    const { dailyLogs, removeLogEntry, getFoodById, getMealById } = useAppStore();
     const { t, locale } = useLocale();
 
     const todaysLog = useMemo(() => dailyLogs[selectedDateString] || {}, [dailyLogs, selectedDateString]);

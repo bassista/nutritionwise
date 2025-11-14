@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useDailyLogs } from '@/context/DailyLogContext';
+import useAppStore from '@/context/AppStore';
 import { useLocale } from '@/context/LocaleContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,7 +15,7 @@ interface WeightTrackerProps {
 }
 
 export default function WeightTracker({ selectedDate }: WeightTrackerProps) {
-  const { dailyLogs, updateWeight } = useDailyLogs();
+  const { dailyLogs, updateWeight } = useAppStore();
   const { t } = useLocale();
   const { toast } = useToast();
   

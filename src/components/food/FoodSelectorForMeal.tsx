@@ -12,8 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { useFoods } from '@/context/FoodContext';
-import { useFavorites } from '@/context/FavoriteContext';
+import useAppStore from '@/context/AppStore';
 import type { Food } from '@/lib/types';
 import { Search, Plus } from 'lucide-react';
 import { useLocale } from '@/context/LocaleContext';
@@ -34,8 +33,7 @@ export default function FoodSelectorForMeal({
   onSelectFood,
   currentFoodIds,
 }: FoodSelectorProps) {
-  const { foods } = useFoods();
-  const { favoriteFoodIds } = useFavorites();
+  const { foods, favoriteFoodIds } = useAppStore();
   const { mealBuilderContext } = useUIState();
   const { t, locale } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
