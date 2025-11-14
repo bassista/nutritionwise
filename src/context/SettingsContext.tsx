@@ -1,12 +1,10 @@
 
 "use client";
 
-import React, { createContext, useContext, ReactNode, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { AppSettings, NutritionalGoals, HydrationSettings } from '@/lib/types';
 import { defaultSettings } from '@/lib/settings';
-import { useLocale } from './LocaleContext';
-import { useToast } from '@/hooks/use-toast';
 
 interface SettingsContextType {
     settings: AppSettings;
@@ -20,8 +18,6 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
-    const { t } = useLocale();
-    const { toast } = useToast();
 
     const updateSettings = useCallback((newSettings: Partial<Omit<AppSettings, 'nutritionalGoals' | 'hydrationSettings'>>) => {
         setSettings(prev => ({ ...prev, ...newSettings }));
@@ -32,19 +28,11 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     }, [setSettings]);
 
     const updateHydrationSettings = useCallback((hydrationSettings: Partial<HydrationSettings>) => {
-        const newHydrationSettings = { ...settings.hydrationSettings, ...hydrationSettings };
-        
-        if (newHydrationSettings.remindersEnabled) {
-            toast({
-                variant: 'destructive',
-                title: t('Feature not available'),
-                description: t('Notifications are temporarily disabled.'),
-            });
-            setSettings(prev => ({ ...prev, hydrationSettings: { ...prev.hydrationSettings, remindersEnabled: false }}));
-        } else {
-            setSettings(prev => ({ ...prev, hydrationSettings: newHydrationSettings }));
-        }
-    }, [settings.hydrationSettings, setSettings, t, toast]);
+        setSettings(prev => ({ 
+            ...prev, 
+            hydrationSettings: { ...prev.hydrationSettings, ...hydrationSettings } 
+        }));
+    }, [setSettings]);
     
     return (
         <SettingsContext.Provider value={{ settings, setSettings, updateSettings, updateNutritionalGoals, updateHydrationSettings }}>
