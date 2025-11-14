@@ -7,6 +7,7 @@ import { AppSettings, NutritionalGoals, HydrationSettings } from '@/lib/types';
 import { defaultSettings } from '@/lib/settings';
 import { scheduleWaterReminders, cancelWaterReminders, requestNotificationPermission } from '@/lib/notifications';
 import { useLocale } from './LocaleContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface SettingsContextType {
     settings: AppSettings;
@@ -21,6 +22,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
     const { t } = useLocale();
+    const { toast } = useToast();
 
     const updateSettings = useCallback((newSettings: Partial<Omit<AppSettings, 'nutritionalGoals' | 'hydrationSettings'>>) => {
         setSettings(prev => ({ ...prev, ...newSettings }));
@@ -38,13 +40,20 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
             const permission = await requestNotificationPermission();
             if (permission === 'granted') {
                 scheduleWaterReminders(newHydrationSettings, t);
-            } else {
+            } else if (permission === 'denied') {
+                toast({
+                    variant: 'destructive',
+                    title: t('Notifications Blocked'),
+                    description: t('To enable reminders, please allow notifications in your browser settings.'),
+                });
                 setSettings(prev => ({ ...prev, hydrationSettings: { ...prev.hydrationSettings, remindersEnabled: false }}));
             }
+            // If permission is 'default', the browser prompt is shown. The state will be updated if the user grants/denies.
+            // We leave the switch enabled optimistically. The user can toggle it off if they deny permission.
         } else {
             cancelWaterReminders();
         }
-    }, [settings.hydrationSettings, setSettings, t]);
+    }, [settings.hydrationSettings, setSettings, t, toast]);
     
     return (
         <SettingsContext.Provider value={{ settings, setSettings, updateSettings, updateNutritionalGoals, updateHydrationSettings }}>

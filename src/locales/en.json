@@ -178,9 +178,7 @@
   "Last 30 Days": "Last 30 Days",
   "All Time": "All Time",
   "Nutrient Trend": "Nutrient Trend",
-  "Calorie and macronutrient intake over the last {days} days.": "Calorie and macronutrient intake over the last {days} days.",
   "Calorie and macronutrient intake": "Calorie and macronutrient intake",
-  "over all time.": "over all time.",
   "Avg. Macro Distribution": "Avg. Macro Distribution",
   "Average daily macronutrient calorie distribution.": "Average daily macronutrient calorie distribution.",
   "Average Daily Intake": "Average Daily Intake",
@@ -283,6 +281,7 @@
   "Your weight trend": "Your weight trend",
   "Weight (kg)": "Weight (kg)",
   "over the last {days} days.": "over the last {days} days.",
+  "over all time.": "over all time.",
   "Data Cleared": "Data Cleared",
   "All your entries have been deleted.": "All your entries have been deleted.",
   "Top 10 Foods": "Top 10 Foods",
@@ -299,5 +298,7 @@
   "Wed": "Wed",
   "Thu": "Thu",
   "Fri": "Fri",
-  "Sat": "Sat"
+  "Sat": "Sat",
+  "Notifications Blocked": "Notifications Blocked",
+  "To enable reminders, please allow notifications in your browser settings.": "To enable reminders, please allow notifications in your browser settings."
 }

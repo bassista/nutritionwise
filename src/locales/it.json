@@ -178,9 +178,7 @@
   "Last 30 Days": "Ultimi 30 giorni",
   "All Time": "Tutto",
   "Nutrient Trend": "Andamento nutrienti",
-  "Calorie and macronutrient intake over the last {days} days.": "Assunzione di calorie e macronutrienti negli ultimi {days} giorni.",
   "Calorie and macronutrient intake": "Assunzione di calorie e macronutrienti",
-  "over all time.": "su tutto il periodo.",
   "Avg. Macro Distribution": "Distribuzione media macro",
   "Average daily macronutrient calorie distribution.": "Distribuzione calorica media giornaliera dei macronutrienti.",
   "Average Daily Intake": "Assunzione media giornaliera",
@@ -283,7 +281,8 @@
   "Your weight trend": "Il tuo andamento del peso",
   "Weight (kg)": "Peso (kg)",
   "over the last {days} days.": "negli ultimi {days} giorni.",
-  "Data Cleared": "Dati Cancellati",
+  "over all time.": "su tutto il periodo.",
+  "Data Cleared": "Dati cancellati",
   "All your entries have been deleted.": "Tutte le tue voci sono state eliminate.",
   "Top 10 Foods": "Top 10 Alimenti",
   "Your most frequently consumed foods, ranked by": "I tuoi alimenti più consumati, classificati per",
@@ -299,5 +298,7 @@
   "Wed": "Mer",
   "Thu": "Gio",
   "Fri": "Ven",
-  "Sat": "Sab"
+  "Sat": "Sab",
+  "Notifications Blocked": "Notifiche Bloccate",
+  "To enable reminders, please allow notifications in your browser settings.": "Per abilitare i promemoria, consenti le notifiche nelle impostazioni del tuo browser."
 }
