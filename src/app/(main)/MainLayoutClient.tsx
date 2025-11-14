@@ -22,7 +22,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/context/LocaleContext';
 import { Button } from '@/components/ui/button';
-import { SheetTitle } from '@/components/ui/sheet';
+import { SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import Spinner from '@/components/ui/spinner';
 
 function SidebarHeaderContent() {
@@ -93,11 +93,14 @@ export default function MainLayoutClient({
 
   useEffect(() => {
     setIsMounted(true);
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
+  }, []);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      const serviceWorkerPath = `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/sw.js`;
+      navigator.serviceWorker.register(serviceWorkerPath)
         .then(registration => {
           console.log('Service Worker registered with scope:', registration.scope);
-          // Controlla la presenza di aggiornamenti del Service Worker
           registration.update();
         })
         .catch(error => {
