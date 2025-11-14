@@ -182,19 +182,41 @@ const useAppStore = create<AppState>((set, get) => {
         addLogEntry: (date, mealType, items) => setStateAndSave(state => {
             const itemsArray = Array.isArray(items) ? items : [items];
             if (itemsArray.length === 0) return {};
-            
-            const newLogItems: LoggedItem[] = itemsArray.map(item => ({
-                ...item,
-                id: `${Date.now()}-${Math.random()}`,
-                timestamp: Date.now(),
-            }));
-            
+
             const newLogs = { ...state.dailyLogs };
             const dayLog = newLogs[date] || {};
-            const mealLog = dayLog[mealType] || [];
+            const mealLog = dayLog[mealType] ? [...dayLog[mealType]!] : [];
             
-            newLogs[date] = { ...dayLog, [mealType]: [...mealLog, ...newLogItems] };
-            
+            const newItemsToAdd: LoggedItem[] = [];
+
+            itemsArray.forEach(item => {
+                if (item.type === 'food') {
+                    const existingEntryIndex = mealLog.findIndex(logged => logged.type === 'food' && logged.itemId === item.itemId);
+                    
+                    if (existingEntryIndex !== -1) {
+                        // Update existing food entry
+                        const existingEntry = mealLog[existingEntryIndex];
+                        const newGrams = (existingEntry.grams || 0) + (item.grams || 0);
+                        mealLog[existingEntryIndex] = { ...existingEntry, grams: newGrams };
+                    } else {
+                        // Add new food entry to the list of items to be added
+                        newItemsToAdd.push({
+                            ...item,
+                            id: `${Date.now()}-${Math.random()}`,
+                            timestamp: Date.now(),
+                        });
+                    }
+                } else {
+                     // Add new meal entry
+                    newItemsToAdd.push({
+                        ...item,
+                        id: `${Date.now()}-${Math.random()}`,
+                        timestamp: Date.now(),
+                    });
+                }
+            });
+
+            newLogs[date] = { ...dayLog, [mealType]: [...mealLog, ...newItemsToAdd] };
             return { dailyLogs: newLogs };
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {
