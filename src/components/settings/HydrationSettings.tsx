@@ -16,7 +16,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
 import {
   AccordionContent,
   AccordionItem,
@@ -37,7 +36,6 @@ const hydrationSettingsSchema = z.object({
 
 export default function HydrationSettings() {
     const { settings, updateHydrationSettings } = useSettings();
-    const { toast } = useToast();
     const { t } = useLocale();
 
     const hydrationForm = useForm<z.infer<typeof hydrationSettingsSchema>>({
@@ -51,10 +49,6 @@ export default function HydrationSettings() {
 
     function onHydrationSubmit(values: z.infer<typeof hydrationSettingsSchema>) {
         updateHydrationSettings(values);
-        toast({
-            title: t('Hydration Settings Saved'),
-            description: t('Your hydration settings have been updated.'),
-        });
     }
 
     return (

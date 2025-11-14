@@ -54,29 +54,37 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
 
     const updateHydrationSettings = useCallback(async (hydrationSettings: Partial<HydrationSettings>) => {
         const newHydrationSettings = { ...settings.hydrationSettings, ...hydrationSettings };
-        
+
         if (newHydrationSettings.remindersEnabled) {
+            // First, ask for permission
             const permission = await requestNotificationPermission();
+
             if (permission === 'granted') {
+                // If permission is granted, save settings and schedule reminders
                 setSettings(prev => ({ ...prev, hydrationSettings: newHydrationSettings }));
                 scheduleWaterReminders(newHydrationSettings, t);
-            } else if (permission === 'denied') {
+                 toast({
+                    title: t('Hydration Settings Saved'),
+                    description: t('Your hydration settings have been updated.'),
+                });
+            } else {
+                // If permission is denied or dismissed, show a toast and revert the UI
                 toast({
                     variant: 'destructive',
                     title: t('Notifications Blocked'),
                     description: t('To enable reminders, please allow notifications in your browser settings.'),
                 });
-                // Revert the toggle if permission is denied
                 setSettings(prev => ({ ...prev, hydrationSettings: { ...prev.hydrationSettings, remindersEnabled: false }}));
                 cancelWaterReminders();
-            } else { // permission is 'default'
-                 // Keep the switch enabled optimistically while the prompt is open.
-                 // The user's choice will either keep it on or trigger the 'denied' flow if they block it.
-                 setSettings(prev => ({ ...prev, hydrationSettings: newHydrationSettings }));
             }
         } else {
+            // If reminders are being disabled, just save and cancel any existing reminders
             setSettings(prev => ({ ...prev, hydrationSettings: newHydrationSettings }));
             cancelWaterReminders();
+             toast({
+                title: t('Hydration Settings Saved'),
+                description: t('Your hydration settings have been updated.'),
+            });
         }
     }, [settings.hydrationSettings, setSettings, t, toast]);
     
