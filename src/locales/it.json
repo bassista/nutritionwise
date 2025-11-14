@@ -302,5 +302,6 @@
   "Notifications Blocked": "Notifiche Bloccate",
   "To enable reminders, please allow notifications in your browser settings.": "Per abilitare i promemoria, consenti le notifiche nelle impostazioni del tuo browser.",
   "Background Sync Failed": "Sincronizzazione in Background Fallita",
-  "Could not schedule reminders. Installing the app on your device might solve the issue.": "Impossibile programmare i promemoria. Installare l'app sul tuo dispositivo potrebbe risolvere il problema."
+  "Could not schedule reminders. Installing the app on your device might solve the issue.": "Impossibile programmare i promemoria. Installare l'app sul tuo dispositivo potrebbe risolvere il problema.",
+  "foods": "alimenti"
 }

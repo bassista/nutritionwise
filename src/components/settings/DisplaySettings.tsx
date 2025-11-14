@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -61,7 +60,6 @@ export default function DisplaySettings() {
     
     const handleSliderChange = (value: number[]) => {
       displayForm.setValue('foodsPerPage', value[0]);
-      // Use a debounce or submit on release if you don't want to submit on every change
       onDisplaySubmit({ foodsPerPage: value[0] });
     }
 
