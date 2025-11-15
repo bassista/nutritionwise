@@ -58,6 +58,10 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
   }, []);
 
   useEffect(() => {
+    isScanningRef.current = isScanning;
+  }, [isScanning]);
+
+  useEffect(() => {
     const getCameraPermission = async () => {
       if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
         toast({ variant: 'destructive', title: t('Camera not supported'), description: t('Your browser does not support camera access.') });
@@ -91,13 +95,12 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     let detector: BarcodeDetector | undefined;
     let animationFrameId: number;
 
-    if (!hasCameraPermission) {
+    if (!hasCameraPermission || !isScanning) {
       return;
     }
     
     if (typeof window.BarcodeDetector === 'undefined') {
       toast({ variant: 'destructive', title: t('Scanner Not Supported'), description: t('The Barcode Detector API is not supported in this browser.') });
-      isScanningRef.current = false;
       setIsScanning(false);
       return;
     }
@@ -106,7 +109,6 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
       detector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
     } catch (e) {
       toast({ variant: 'destructive', title: t('Scanner Init Failed'), description: t('Could not initialize the barcode scanner.') });
-      isScanningRef.current = false;
       setIsScanning(false);
       return;
     }
@@ -131,9 +133,7 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
       animationFrameId = requestAnimationFrame(scanLoop);
     };
 
-    if (isScanning) {
-        scanLoop();
-    }
+    scanLoop();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
