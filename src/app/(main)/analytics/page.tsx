@@ -72,11 +72,6 @@ export default function AnalyticsPage() {
         }));
     }, [analysisData.avgNutrients, settings.nutritionalGoals, t]);
 
-    const weightDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.weight !== undefined && d.weight !== null), [analysisData.lineChartData]);
-    const glucoseDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.glucose !== undefined && d.glucose !== null), [analysisData.lineChartData]);
-    const insulinDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.insulin !== undefined && d.insulin !== null), [analysisData.lineChartData]);
-
-
     if (noData) {
         return (
              <>
@@ -323,4 +318,5 @@ export default function AnalyticsPage() {
                 </div>
             </div>
         </>
-    
+    );
+}
