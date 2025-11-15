@@ -251,6 +251,28 @@ export default function AnalyticsPage() {
                             </CardContent>
                         </Card>
                     )}
+                    
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Weekly Consistency')}</CardTitle>
+                            <CardDescription>{t('Average diet score by day of the week.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           {analysisData.consistencyData.some(d => d.score > 0) ? (
+                            <ChartContainer config={chartConfig} className="h-52 w-full">
+                                <BarChart data={analysisData.consistencyData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
+                                    <YAxis domain={[0, 100]} />
+                                    <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+                                    <Bar dataKey="score" fill="var(--color-score)" name={t('Score')} radius={4} />
+                                </BarChart>
+                            </ChartContainer>
+                           ) : (
+                                <div className="flex items-center justify-center h-52 text-muted-foreground"><Trophy className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
+                        </CardContent>
+                    </Card>
 
                     {glucoseDataAvailable && (
                         <Card>
@@ -303,33 +325,13 @@ export default function AnalyticsPage() {
                             </CardContent>
                         </Card>
                     )}
-                    
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t('Weekly Consistency')}</CardTitle>
-                            <CardDescription>{t('Average diet score by day of the week.')}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                           {analysisData.consistencyData.some(d => d.score > 0) ? (
-                            <ChartContainer config={chartConfig} className="h-52 w-full">
-                                <BarChart data={analysisData.consistencyData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                                    <CartesianGrid vertical={false} />
-                                    <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
-                                    <YAxis domain={[0, 100]} />
-                                    <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-                                    <Bar dataKey="score" fill="var(--color-score)" name={t('Score')} radius={4} />
-                                </BarChart>
-                            </ChartContainer>
-                           ) : (
-                                <div className="flex items-center justify-center h-52 text-muted-foreground"><Trophy className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
-                           )}
-                        </CardContent>
-                    </Card>
 
                 </div>
             </div>
         </>
     );
 }
+
+    
 
     
