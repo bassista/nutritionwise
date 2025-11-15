@@ -4,31 +4,16 @@
 import { useMemo } from 'react';
 import useAppStore from '@/context/AppStore';
 import { useLocale } from '@/context/LocaleContext';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Utensils } from 'lucide-react';
 import { MealType } from '@/lib/types';
-import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import MealLogItem from './MealLogItem';
-import { cn } from '@/lib/utils';
+import DiaryLogItem from './DiaryLogItem';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 
 interface MealLogProps {
     selectedDateString: string;
-    onAddFoodClick: (mealType: MealType) => void;
-}
-
-function DroppableMealSection({ mealType, children }: { mealType: MealType; children: React.ReactNode }) {
-    const { setNodeRef, isOver } = useDroppable({
-        id: mealType,
-        data: { mealType, isContainer: true }
-    });
-
-    return (
-        <div ref={setNodeRef} className={cn("p-2 rounded-lg", isOver ? "bg-primary/10" : "")}>
-            {children}
-        </div>
-    );
+    onAddFoodClick: () => void;
 }
 
 export default function MealLog({ selectedDateString, onAddFoodClick }: MealLogProps) {
@@ -37,54 +22,63 @@ export default function MealLog({ selectedDateString, onAddFoodClick }: MealLogP
 
     const todaysLog = useMemo(() => dailyLogs[selectedDateString] || {}, [dailyLogs, selectedDateString]);
 
-    const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
-    const mealTypeTranslations: Record<MealType, string> = {
-        breakfast: t('Breakfast'),
-        lunch: t('Lunch'),
-        dinner: t('Dinner'),
-        snack: t('Snacks')
+    const allLoggedItems = useMemo(() => {
+        return (['breakfast', 'lunch', 'dinner', 'snack'] as MealType[])
+            .flatMap(mealType => todaysLog[mealType] || [])
+            .sort((a, b) => a.timestamp - b.timestamp);
+    }, [todaysLog]);
+
+    // This function is needed to find the original mealType when removing an item.
+    // This is a temporary workaround due to the data structure.
+    const findMealTypeForItem = (logId: string): MealType | undefined => {
+        for (const mealType of ['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]) {
+            if (todaysLog[mealType]?.some(item => item.id === logId)) {
+                return mealType;
+            }
+        }
+        return undefined;
     };
 
     return (
-        <Accordion type="multiple" defaultValue={mealTypes} className="w-full">
-            {mealTypes.map(mealType => {
-                const loggedItems = todaysLog[mealType] || [];
-                return (
-                    <AccordionItem value={mealType} key={mealType}>
-                        <AccordionTrigger>
-                            <div className="flex justify-between items-center w-full">
-                                <span className="text-lg font-semibold">{mealTypeTranslations[mealType]}</span>
+        <Card>
+            <CardHeader>
+                <CardTitle>
+                    <div className="flex justify-between items-center w-full">
+                        <span className="text-lg font-semibold">{t('Daily Meal')}</span>
+                    </div>
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <SortableContext items={allLoggedItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-3">
+                        {allLoggedItems.length > 0 ? (
+                            allLoggedItems.map((item, index) => (
+                                <DiaryLogItem
+                                    key={item.id}
+                                    item={item}
+                                    food={getFoodById(item.itemId)}
+                                    onRemove={() => {
+                                        const mealType = findMealTypeForItem(item.id);
+                                        if (mealType) {
+                                            removeLogEntry(selectedDateString, mealType, item.id);
+                                        }
+                                    }}
+                                />
+                            ))
+                        ) : (
+                            <div className="text-sm text-center text-muted-foreground py-4 flex flex-col items-center gap-2">
+                                <Utensils className="w-8 h-8" />
+                                <p>{t('Nothing logged yet.')}</p>
                             </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                             <DroppableMealSection mealType={mealType}>
-                                <SortableContext items={loggedItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
-                                    <div className="space-y-3">
-                                        {loggedItems.length > 0 ? (
-                                            loggedItems.map((item, index) => (
-                                                <MealLogItem
-                                                    key={item.id}
-                                                    item={item}
-                                                    food={getFoodById(item.itemId)}
-                                                    mealType={mealType}
-                                                    index={index}
-                                                    onRemove={() => removeLogEntry(selectedDateString, mealType, item.id)}
-                                                />
-                                            ))
-                                        ) : (
-                                            <p className="text-sm text-center text-muted-foreground py-4">{t('Nothing logged yet.')}</p>
-                                        )}
-                                        <Button variant="outline" size="sm" className="w-full border-dashed" onClick={() => onAddFoodClick(mealType)}>
-                                            <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
-                                        </Button>
-                                    </div>
-                                </SortableContext>
-                             </DroppableMealSection>
-                        </AccordionContent>
-                    </AccordionItem>
-                )
-            })}
-        </Accordion>
+                        )}
+                        <Button variant="outline" size="sm" className="w-full border-dashed" onClick={onAddFoodClick}>
+                            <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
+                        </Button>
+                    </div>
+                </SortableContext>
+            </CardContent>
+        </Card>
     );
 }
 
+    

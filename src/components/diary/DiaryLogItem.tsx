@@ -11,39 +11,18 @@ import { GripVertical, Trash2 } from 'lucide-react';
 import useAppStore from '@/context/AppStore';
 import React from 'react';
 
-interface MealLogItemProps {
+interface DiaryLogItemProps {
   item: LoggedItem;
   food?: Food;
-  mealType?: MealType;
-  index?: number;
   onRemove?: () => void;
   isDragging?: boolean;
 }
 
-const MealLogItem = React.forwardRef<HTMLDivElement, MealLogItemProps>(
-  ({ item, food, mealType, index, onRemove, isDragging }, ref) => {
+const DiaryLogItem = React.forwardRef<HTMLDivElement, DiaryLogItemProps>(
+  ({ item, food, onRemove, isDragging }, ref) => {
     const { getFoodById, getMealById } = useAppStore();
     const { locale } = useLocale();
 
-    if (item.type === 'meal' || !food) {
-        // Simplified rendering for meals or if food data is missing
-        const name = item.type === 'meal' ? getMealById(item.itemId)?.name : 'Unknown Food';
-        const itemNutrients = calculateTotalNutrientsForItems([item], getFoodById, getMealById);
-         return (
-             <div ref={ref} className={cn("flex items-center justify-between p-2 rounded-md", isDragging ? "bg-card shadow-lg" : "bg-muted/50")}>
-                <div>
-                    <p className="font-medium">{name}</p>
-                    <p className="text-sm text-muted-foreground">{item.grams ? `${item.grams}g` : ''} {itemNutrients.calories.toFixed(0)} kcal</p>
-                </div>
-                 {onRemove && (
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                 )}
-            </div>
-         );
-    }
-    
     const {
         attributes,
         listeners,
@@ -53,17 +32,23 @@ const MealLogItem = React.forwardRef<HTMLDivElement, MealLogItemProps>(
         isDragging: isSorting,
     } = useSortable({
         id: item.id,
-        data: { item, mealType, index },
+        data: { item },
     });
-
+    
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isSorting ? 0.5 : 1,
     };
     
-    const name = getFoodName(food, locale);
     const itemNutrients = calculateTotalNutrientsForItems([item], getFoodById, getMealById);
+    let name: string;
+    
+    if (item.type === 'meal') {
+      name = getMealById(item.itemId)?.name || 'Unknown Meal';
+    } else {
+      name = food ? getFoodName(food, locale) : 'Unknown Food';
+    }
 
     return (
         <div ref={setNodeRef} style={style} {...attributes}>
@@ -75,16 +60,18 @@ const MealLogItem = React.forwardRef<HTMLDivElement, MealLogItemProps>(
                     <p className="font-medium">{name}</p>
                     <p className="text-sm text-muted-foreground">{item.grams ? `${item.grams}g` : ''} {itemNutrients.calories.toFixed(0)} kcal</p>
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                {onRemove && (
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                )}
             </div>
         </div>
     );
 });
 
-MealLogItem.displayName = 'MealLogItem';
+DiaryLogItem.displayName = 'DiaryLogItem';
 
-export default MealLogItem;
+export default DiaryLogItem;
 
     

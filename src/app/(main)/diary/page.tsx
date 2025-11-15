@@ -17,8 +17,7 @@ import DailySummary from '@/components/diary/DailySummary';
 import MealLog from '@/components/diary/MealLog';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from '@dnd-kit/core';
 import useAppStore from '@/context/AppStore';
-import { arrayMove } from '@dnd-kit/sortable';
-import MealLogItem from '@/components/diary/MealLogItem';
+import DiaryLogItem from '@/components/diary/DiaryLogItem';
 import GlucoseTracker from '@/components/diary/GlucoseTracker';
 import InsulinTracker from '@/components/diary/InsulinTracker';
 
@@ -29,14 +28,12 @@ export default function DiaryPage() {
     const [isFoodSelectorOpen, setFoodSelectorOpen] = useState(false);
     const [isLogFoodDialogOpen, setLogFoodDialogOpen] = useState(false);
     const [foodToLog, setFoodToLog] = useState<Food | null>(null);
-    const [mealTypeToAdd, setMealTypeToAdd] = useState<MealType | null>(null);
     const [activeDragItem, setActiveDragItem] = useState<LoggedItem | null>(null);
     const { getFoodById, moveLogEntry } = useAppStore();
 
     const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
 
-    const handleAddFoodClick = (mealType: MealType) => {
-        setMealTypeToAdd(mealType);
+    const handleAddFoodClick = () => {
         setFoodSelectorOpen(true);
     };
 
@@ -60,17 +57,9 @@ export default function DiaryPage() {
     const handleDragEnd = (event: DragEndEvent) => {
         setActiveDragItem(null);
         const { active, over } = event;
-
-        if (!over || !active.data.current || !over.data.current) return;
-        
-        const sourceMealType = active.data.current.mealType as MealType;
-        const sourceIndex = active.data.current.index as number;
-        const destinationMealType = over.data.current.mealType as MealType;
-        const destinationIndex = over.data.current.index as number;
-        const logId = active.id as string;
-        
-        if (active.id !== over.id) {
-           moveLogEntry(selectedDateString, logId, sourceMealType, destinationMealType, sourceIndex, destinationIndex);
+    
+        if (over && active.id !== over.id) {
+          moveLogEntry(selectedDateString, String(active.id), String(over.id));
         }
     };
 
@@ -112,23 +101,22 @@ export default function DiaryPage() {
                 onSelectFood={handleSelectFood}
                 currentFoodIds={[]}
               />
-              {foodToLog && mealTypeToAdd && (
+              {foodToLog && (
                 <LogFoodDialog
                     open={isLogFoodDialogOpen}
                     onOpenChange={handleLogDialogClose}
                     food={foodToLog}
-                    mealType={mealTypeToAdd}
+                    mealType={'snack'} // Default to snack as sections are merged
                     selectedDateString={selectedDateString}
                     onLogSuccess={() => {
                       setLogFoodDialogOpen(false);
                       setFoodToLog(null);
-                      setMealTypeToAdd(null);
                     }}
                 />
               )}
                <DragOverlay>
                 {activeDragItem ? (
-                  <MealLogItem
+                  <DiaryLogItem
                     item={activeDragItem}
                     food={getFoodById(activeDragItem.itemId)}
                     isDragging
@@ -138,3 +126,5 @@ export default function DiaryPage() {
         </DndContext>
     );
 }
+
+    

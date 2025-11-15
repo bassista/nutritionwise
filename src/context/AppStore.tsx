@@ -36,7 +36,7 @@ export interface AppState extends AppData {
   // DailyLog actions
   addLogEntry: (date: string, mealType: MealType, items: LogItemInput | LogItemInput[]) => void;
   removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
-  moveLogEntry: (date: string, logId: string, fromMealType: MealType, toMealType: MealType, fromIndex: number, toIndex: number) => void;
+  moveLogEntry: (date: string, activeId: string, overId: string) => void;
   addWaterIntake: (date: string, amountMl: number) => void;
   updateWeight: (date: string, weight?: number) => void;
   updateGlucose: (date: string, glucose?: number) => void;
@@ -189,40 +189,77 @@ const useAppStore = create<AppState>((set, get) => {
 
             const newLogs = { ...state.dailyLogs };
             const dayLog = { ...(newLogs[date] || {}) };
-            const mealLog = [...(dayLog[mealType] || [])];
             
-            const itemsToAdd: LoggedItem[] = [];
             const updatedItemsMap = new Map<string, LoggedItem>();
+            const allCurrentItems = (Object.keys(dayLog) as MealType[])
+                .filter(key => key !== 'waterIntakeMl' && key !== 'weight' && key !== 'glucose' && key !== 'insulin')
+                .flatMap(key => dayLog[key] as LoggedItem[]);
 
-            mealLog.forEach(item => updatedItemsMap.set(item.id, item));
+            allCurrentItems.forEach(item => updatedItemsMap.set(item.id, item));
 
-            itemsArray.forEach(item => {
-                if (item.type === 'food') {
-                    const existingEntry = mealLog.find(logged => logged.type === 'food' && logged.itemId === item.itemId);
+            const itemsToAdd: { item: LoggedItem; mealType: MealType }[] = [];
+
+            itemsArray.forEach(itemInput => {
+                if (itemInput.type === 'food') {
+                    // Try to find if this food item already exists anywhere in the day's log
+                    const existingEntry = allCurrentItems.find(logged => logged.type === 'food' && logged.itemId === itemInput.itemId);
                     
                     if (existingEntry) {
                         // Item exists, so update its grams by overwriting
-                        const newGrams = item.grams || 0;
+                        const newGrams = itemInput.grams || 0;
                         updatedItemsMap.set(existingEntry.id, { ...existingEntry, grams: newGrams });
                     } else {
                         // Item doesn't exist, so add it to the list to be added
                         itemsToAdd.push({
-                            ...item,
-                            id: `${Date.now()}-${Math.random()}`,
-                            timestamp: Date.now(),
+                            item: {
+                                ...itemInput,
+                                id: `${Date.now()}-${Math.random()}`,
+                                timestamp: Date.now(),
+                            },
+                            mealType: mealType
                         });
                     }
                 } else { // For meals, we don't merge, just add
                     itemsToAdd.push({
-                        ...item,
+                      item: {
+                        ...itemInput,
                         id: `${Date.now()}-${Math.random()}`,
                         timestamp: Date.now(),
+                      },
+                      mealType: mealType
                     });
                 }
             });
 
-            dayLog[mealType] = [...Array.from(updatedItemsMap.values()), ...itemsToAdd];
-            newLogs[date] = dayLog;
+            // Reconstruct the day log from the map
+            const newDayLog: { [key: string]: any } = {
+              waterIntakeMl: dayLog.waterIntakeMl,
+              weight: dayLog.weight,
+              glucose: dayLog.glucose,
+              insulin: dayLog.insulin,
+            };
+            
+            updatedItemsMap.forEach((item, id) => {
+              // Find original mealType. This is inefficient but necessary with the current data structure.
+              // A better structure would be a single list of items with a mealType property.
+              let originalMealType: MealType = 'snack';
+              for (const mt of ['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]) {
+                  if (dayLog[mt]?.some(i => i.id === id)) {
+                      originalMealType = mt;
+                      break;
+                  }
+              }
+              if (!newDayLog[originalMealType]) newDayLog[originalMealType] = [];
+              newDayLog[originalMealType].push(item);
+            });
+            
+            // Add completely new items
+            itemsToAdd.forEach(({ item, mealType: mt }) => {
+                if (!newDayLog[mt]) newDayLog[mt] = [];
+                newDayLog[mt].push(item);
+            });
+
+            newLogs[date] = newDayLog;
 
             return { dailyLogs: newLogs };
         }),
@@ -235,36 +272,51 @@ const useAppStore = create<AppState>((set, get) => {
             }
             return { dailyLogs: newLogs };
         }),
-        moveLogEntry: (date, logId, fromMealType, toMealType, fromIndex, toIndex) => setStateAndSave(state => {
-            const newLogs = { ...state.dailyLogs };
-            const dayLog = newLogs[date];
+        moveLogEntry: (date, activeId, overId) => setStateAndSave(state => {
+            const dayLog = state.dailyLogs[date];
             if (!dayLog) return {};
         
-            const sourceList = dayLog[fromMealType] ? [...dayLog[fromMealType]!] : [];
-            const movedItem = sourceList.find(item => item.id === logId);
+            const allItems = (['breakfast', 'lunch', 'dinner', 'snack'] as MealType[])
+                .flatMap(mt => dayLog[mt] || [])
+                .sort((a, b) => a.timestamp - b.timestamp);
         
-            if (!movedItem) return {};
+            const oldIndex = allItems.findIndex(item => item.id === activeId);
+            const newIndex = allItems.findIndex(item => item.id === overId);
         
-            // Remove from source
-            const newSourceList = sourceList.filter(item => item.id !== logId);
+            if (oldIndex === -1 || newIndex === -1) return {};
         
-            if (fromMealType === toMealType) {
-              // Reorder within the same list
-              const reorderedList = arrayMove(newSourceList, fromIndex, toIndex > fromIndex ? toIndex -1 : toIndex);
-              newLogs[date] = { ...dayLog, [fromMealType]: reorderedList };
-            } else {
-              // Move to a different list
-              const destinationList = dayLog[toMealType] ? [...dayLog[toMealType]!] : [];
-              destinationList.splice(toIndex, 0, movedItem);
-              newLogs[date] = { ...dayLog, [fromMealType]: newSourceList, [toMealType]: destinationList };
-            }
+            const reorderedItems = arrayMove(allItems, oldIndex, newIndex);
         
-            // Clean up empty meal logs
-            if (newLogs[date][fromMealType]?.length === 0) {
-              delete newLogs[date][fromMealType];
-            }
+            // Re-assign timestamps to preserve the new order
+            const updatedItems = reorderedItems.map((item, index) => ({
+                ...item,
+                timestamp: Date.now() + index, // Ensure unique and ordered timestamps
+            }));
         
-            return { dailyLogs: newLogs };
+            const newDayLog: typeof dayLog = {
+                waterIntakeMl: dayLog.waterIntakeMl,
+                weight: dayLog.weight,
+                glucose: dayLog.glucose,
+                insulin: dayLog.insulin,
+            };
+
+            // Distribute items back into their original meal types.
+            // This simplification keeps them in their original meal categories but reorders them for display.
+            // A better data model would have a single list with a `mealType` property on each item.
+            const itemToMealTypeMap = new Map<string, MealType>();
+            (['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).forEach(mt => {
+                dayLog[mt]?.forEach(item => itemToMealTypeMap.set(item.id, mt));
+            });
+
+            updatedItems.forEach(item => {
+                const mealType = itemToMealTypeMap.get(item.id) || 'snack';
+                if (!newDayLog[mealType]) {
+                    newDayLog[mealType] = [];
+                }
+                newDayLog[mealType]!.push(item);
+            });
+        
+            return { dailyLogs: { ...state.dailyLogs, [date]: newDayLog } };
         }),
         addWaterIntake: (date, amountMl) => setStateAndSave(state => {
             const newLogs = { ...state.dailyLogs };
@@ -399,3 +451,5 @@ const useAppStore = create<AppState>((set, get) => {
 });
 
 export default useAppStore;
+
+    
