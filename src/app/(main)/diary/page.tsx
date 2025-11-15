@@ -12,14 +12,11 @@ import FoodSelectorForMeal from '@/components/food/FoodSelectorForMeal';
 import LogFoodDialog from '@/components/diary/LogFoodDialog';
 import { Food, LoggedItem, MealType } from '@/lib/types';
 import WaterTracker from '@/components/diary/WaterTracker';
-import WeightTracker from '@/components/diary/WeightTracker';
 import DailySummary from '@/components/diary/DailySummary';
 import MealLog from '@/components/diary/MealLog';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from '@dnd-kit/core';
 import useAppStore from '@/context/AppStore';
 import DiaryLogItem from '@/components/diary/DiaryLogItem';
-import GlucoseTracker from '@/components/diary/GlucoseTracker';
-import InsulinTracker from '@/components/diary/InsulinTracker';
 
 export default function DiaryPage() {
     const { t, locale } = useLocale();
@@ -82,9 +79,6 @@ export default function DiaryPage() {
                             </CardContent>
                         </Card>
                          <WaterTracker selectedDate={selectedDateString} />
-                         <WeightTracker selectedDate={selectedDateString} />
-                         <GlucoseTracker selectedDate={selectedDateString} />
-                         <InsulinTracker selectedDate={selectedDateString} />
                     </div>
                     <div className="flex-1 min-w-[300px] space-y-6">
                        <DailySummary selectedDate={selectedDate} />

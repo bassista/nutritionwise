@@ -51,6 +51,7 @@ function SidebarNav() {
     
     const navItems = useMemo(() => [
       { href: '/diary', icon: BookOpen, label: t('Diary') },
+      { href: '/health', icon: HeartPulse, label: t('Health') },
       { href: '/analytics', icon: LineChart, label: t('Analytics') },
       { href: '/foods', icon: Wheat, label: t('Foods') },
       { href: '/scanner', icon: ScanLine, label: t('Scanner') },
