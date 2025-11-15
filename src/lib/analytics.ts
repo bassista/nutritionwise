@@ -43,26 +43,27 @@ export function processAnalyticsData(
 
     let totalNutrientsOverPeriod = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, count: 0 };
     
+    // Find the last known values before the start date
     let lastKnownWeight: number | undefined = undefined;
     let lastKnownGlucose: number | undefined = undefined;
     let lastKnownInsulin: number | undefined = undefined;
     
-    for (let i = allLoggedDates.length - 1; i >= 0; i--) {
-        const date = allLoggedDates[i];
-        if (date < format(startDate, 'yyyy-MM-dd')) {
-            if (dailyLogs[date]?.weight) {
-                lastKnownWeight = dailyLogs[date]?.weight;
-            }
-             if (dailyLogs[date]?.glucose) {
-                lastKnownGlucose = dailyLogs[date]?.glucose;
-            }
-            if (dailyLogs[date]?.insulin) {
-                lastKnownInsulin = dailyLogs[date]?.insulin;
-            }
-        }
-        if(lastKnownWeight !== undefined && lastKnownGlucose !== undefined && lastKnownInsulin !== undefined) break;
-    }
+    const intervalStartDateString = format(startDate, 'yyyy-MM-dd');
+    const datesBeforeInterval = allLoggedDates.filter(d => d < intervalStartDateString).sort((a, b) => b.localeCompare(a));
     
+    for (const date of datesBeforeInterval) {
+        if (lastKnownWeight === undefined && dailyLogs[date]?.weight) {
+            lastKnownWeight = dailyLogs[date]?.weight;
+        }
+        if (lastKnownGlucose === undefined && dailyLogs[date]?.glucose) {
+            lastKnownGlucose = dailyLogs[date]?.glucose;
+        }
+        if (lastKnownInsulin === undefined && dailyLogs[date]?.insulin) {
+            lastKnownInsulin = dailyLogs[date]?.insulin;
+        }
+        if (lastKnownWeight !== undefined && lastKnownGlucose !== undefined && lastKnownInsulin !== undefined) break;
+    }
+
     const topFoodsMap = new Map<string, TopFoodInfo>();
     const consistencyScores: { [day: number]: { scores: number[], count: number } } = { 0: {scores: [], count: 0}, 1: {scores: [], count: 0}, 2: {scores: [], count: 0}, 3: {scores: [], count: 0}, 4: {scores: [], count: 0}, 5: {scores: [], count: 0}, 6: {scores: [], count: 0} };
 
@@ -71,10 +72,6 @@ export function processAnalyticsData(
         const log = dailyLogs[dateString];
         
         let dailyTotals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
-        let weightData: number | undefined = undefined;
-        let glucoseData: number | undefined = undefined;
-        let insulinData: number | undefined = undefined;
-
 
         if (log) {
             const allItems = Object.values(log).flat().filter(item => typeof item === 'object' && item !== null && 'type' in item) as LoggedItem[];
@@ -116,35 +113,18 @@ export function processAnalyticsData(
                 totalNutrientsOverPeriod.fat += nutrients.fat;
                 totalNutrientsOverPeriod.count++;
             }
-            if (log.weight) {
-                weightData = log.weight;
-                lastKnownWeight = log.weight;
-            } else {
-                weightData = lastKnownWeight;
-            }
-            if (log.glucose) {
-                glucoseData = log.glucose;
-                lastKnownGlucose = log.glucose;
-            } else {
-                glucoseData = lastKnownGlucose;
-            }
-            if (log.insulin) {
-                insulinData = log.insulin;
-                lastKnownInsulin = log.insulin;
-            } else {
-                insulinData = lastKnownInsulin;
-            }
-        } else {
-             weightData = lastKnownWeight;
-             glucoseData = lastKnownGlucose;
-             insulinData = lastKnownInsulin;
         }
+        
+        // Update last known values with the current day's log, if available
+        if (log?.weight !== undefined) lastKnownWeight = log.weight;
+        if (log?.glucose !== undefined) lastKnownGlucose = log.glucose;
+        if (log?.insulin !== undefined) lastKnownInsulin = log.insulin;
         
         return {
             date: format(date, 'MMM d'),
-            weight: weightData,
-            glucose: glucoseData,
-            insulin: insulinData,
+            weight: lastKnownWeight,
+            glucose: lastKnownGlucose,
+            insulin: lastKnownInsulin,
             ...dailyTotals
         };
     });
