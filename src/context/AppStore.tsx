@@ -27,6 +27,7 @@ export interface AppState extends AppData {
   addMeal: (meal: Meal) => void;
   updateMeal: (updatedMeal: Meal) => void;
   deleteMeal: (mealId: string) => void;
+  setMeals: (meals: Meal[]) => void;
 
   // Favorite actions
   toggleFavorite: (foodId: string) => void;
@@ -173,6 +174,7 @@ const useAppStore = create<AppState>((set, get) => {
             meals: state.meals.map(m => (m.id === updatedMeal.id ? updatedMeal : m)),
         })),
         deleteMeal: (mealId) => setStateAndSave(state => ({ meals: state.meals.filter(m => m.id !== mealId) })),
+        setMeals: (meals) => setStateAndSave(() => ({ meals })),
 
         // --- Favorite Actions ---
         toggleFavorite: (foodId) => setStateAndSave(state => ({
@@ -186,18 +188,18 @@ const useAppStore = create<AppState>((set, get) => {
         addLogEntry: (date, mealType, items) => setStateAndSave(state => {
             const newLogs = { ...state.dailyLogs };
             const dayLog = { ...(newLogs[date] || {}) };
-
+            
             const itemsArray = Array.isArray(items) ? items : [items];
             const newLogItems = itemsArray.map(itemInput => ({
                 ...itemInput,
                 id: `${Date.now()}-${Math.random()}`,
                 timestamp: Date.now(),
             }));
-
+    
             const updatedMealLog = [...(dayLog[mealType] || []), ...newLogItems];
             dayLog[mealType] = updatedMealLog;
             newLogs[date] = dayLog;
-
+    
             return { dailyLogs: newLogs };
         }),
         updateLogEntry: (date, logId, updates) => setStateAndSave(state => {
@@ -220,10 +222,10 @@ const useAppStore = create<AppState>((set, get) => {
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {
             const newLogs = { ...state.dailyLogs };
-            const dayLog = newLogs[date];
+            const dayLog = newLogs[date] ? { ...newLogs[date] } : undefined;
         
             if (!dayLog || !dayLog[mealType]) {
-                return {}; 
+                return {};
             }
         
             const updatedMealTypeLog = dayLog[mealType]!.filter(item => item.id !== logId);
