@@ -213,7 +213,10 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
               ))}
             </div>
             <Separator className="my-4" />
-              <div className="flex-grow space-y-2">
+              <div 
+                className="flex-grow space-y-2 cursor-pointer rounded-md -m-2 p-2 hover:bg-muted/50"
+                onClick={() => setIsEditing(true)}
+              >
                   <h4 className="text-sm font-medium mb-2">{t('Ingredients')}</h4>
                   <ScrollArea className="h-24 pr-3">
                       <ul className="text-sm text-muted-foreground list-disc list-inside">
