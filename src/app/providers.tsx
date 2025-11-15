@@ -5,6 +5,7 @@ import { LocaleProvider } from '@/context/LocaleContext';
 import useAppStore from '@/context/AppStore';
 import { UIStateProvider } from '@/context/UIStateContext';
 import Spinner from '@/components/ui/spinner';
+import { AchievementProvider } from '@/context/AchievementContext';
 
 function AppInitializer({ children }: { children: ReactNode }) {
     const [isInitialized, setIsInitialized] = useState(false);
@@ -34,7 +35,9 @@ export function Providers({ children }: { children: ReactNode }) {
     <LocaleProvider>
         <AppInitializer>
           <UIStateProvider>
-            {children}
+            <AchievementProvider>
+                {children}
+            </AchievementProvider>
           </UIStateProvider>
         </AppInitializer>
     </LocaleProvider>
