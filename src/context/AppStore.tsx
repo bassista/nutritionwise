@@ -192,15 +192,18 @@ const useAppStore = create<AppState>((set, get) => {
             const mealLog = [...(dayLog[mealType] || [])];
             
             const itemsToAdd: LoggedItem[] = [];
+            const updatedItemsMap = new Map<string, LoggedItem>();
+
+            mealLog.forEach(item => updatedItemsMap.set(item.id, item));
 
             itemsArray.forEach(item => {
                 if (item.type === 'food') {
-                    const existingEntryIndex = mealLog.findIndex(logged => logged.type === 'food' && logged.itemId === item.itemId);
+                    const existingEntry = mealLog.find(logged => logged.type === 'food' && logged.itemId === item.itemId);
                     
-                    if (existingEntryIndex !== -1) {
-                        // Item exists, so update its grams
-                        const newGrams = item.grams || 0; // Use the new value, overwriting the old one
-                        mealLog[existingEntryIndex] = { ...mealLog[existingEntryIndex], grams: newGrams };
+                    if (existingEntry) {
+                        // Item exists, so update its grams by overwriting
+                        const newGrams = item.grams || 0;
+                        updatedItemsMap.set(existingEntry.id, { ...existingEntry, grams: newGrams });
                     } else {
                         // Item doesn't exist, so add it to the list to be added
                         itemsToAdd.push({
@@ -218,7 +221,7 @@ const useAppStore = create<AppState>((set, get) => {
                 }
             });
 
-            dayLog[mealType] = [...mealLog, ...itemsToAdd];
+            dayLog[mealType] = [...Array.from(updatedItemsMap.values()), ...itemsToAdd];
             newLogs[date] = dayLog;
 
             return { dailyLogs: newLogs };
@@ -247,7 +250,7 @@ const useAppStore = create<AppState>((set, get) => {
         
             if (fromMealType === toMealType) {
               // Reorder within the same list
-              const reorderedList = arrayMove(sourceList, fromIndex, toIndex);
+              const reorderedList = arrayMove(newSourceList, fromIndex, toIndex > fromIndex ? toIndex -1 : toIndex);
               newLogs[date] = { ...dayLog, [fromMealType]: reorderedList };
             } else {
               // Move to a different list

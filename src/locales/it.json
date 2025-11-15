@@ -275,7 +275,7 @@
   "Data Cleared": "Dati cancellati",
   "All your entries have been deleted.": "Tutte le tue voci sono state eliminate.",
   "Top 10 Foods": "Top 10 Alimenti",
-  "Your most frequently consumed foods, classified per": "I tuoi alimenti più consumati, classificati per",
+  "Your most frequently consumed foods, ranked by": "I tuoi alimenti più consumati, classificati per",
   "Frequency": "Frequenza",
   "Food": "Alimento",
   "Count": "Conteggio",
@@ -311,9 +311,8 @@
   "Glucose (mg/dL)": "Glicemia (mg/dL)",
   "Insulin Trend": "Andamento Insulina",
   "Your insulin trend": "Il tuo andamento dell'insulina",
-  "Insulin (unità)": "Insulina (unità)",
+  "Insulin (units)": "Insulina (unità)",
   "Average Intake": "Assunzione Media",
-  "Goal": "Obiettivo"
+  "Goal": "Obiettivo",
+  "units": "unità"
 }
-
-    
