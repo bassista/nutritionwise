@@ -33,7 +33,6 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
   const [isScanning, setIsScanning] = useState(true);
   const streamRef = useRef<MediaStream | null>(null);
 
-
   const stopScan = useCallback(() => {
     setIsScanning(false);
     if (streamRef.current) {
@@ -44,31 +43,34 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
       videoRef.current.srcObject = null;
     }
   }, []);
-  
-  const startScan = useCallback(async () => {
-    if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      streamRef.current = stream;
-      setHasCameraPermission(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+
+  const startScan = useCallback(() => {
+    async function getCameraPermission() {
+      if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
+        setHasCameraPermission(false);
+        toast({ variant: 'destructive', title: t('Scanner Not Supported'), description: t('This device does not support camera access.') });
+        return;
       }
-      setIsScanning(true);
-    } catch (error) {
-      console.error('Error starting camera:', error);
-      setHasCameraPermission(false);
-      toast({ variant: 'destructive', title: t('Camera Access Denied'), description: t('Please enable camera permissions in your browser settings to use this app.') });
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        streamRef.current = stream;
+        setHasCameraPermission(true);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setIsScanning(true);
+      } catch (error) {
+        console.error('Error starting camera:', error);
+        setHasCameraPermission(false);
+        toast({ variant: 'destructive', title: t('Camera Access Denied'), description: t('Please enable camera permissions in your browser settings to use this app.') });
+      }
     }
+    getCameraPermission();
   }, [t, toast]);
 
   useEffect(() => {
     startScan();
-
     return () => {
-      // Cleanup function to stop tracks when component unmounts
       stopScan();
     };
   }, [startScan, stopScan]);
@@ -78,7 +80,7 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     let animationFrameId: number;
 
     if (typeof window.BarcodeDetector === 'undefined') {
-      if (isScanning) {
+      if (isScanning && hasCameraPermission) {
         toast({ variant: 'destructive', title: t('Scanner Not Supported'), description: t('The Barcode Detector API is not supported in this browser.') });
         setIsScanning(false);
       }
@@ -88,7 +90,7 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     try {
       detector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
     } catch (e) {
-      if (isScanning) {
+      if (isScanning && hasCameraPermission) {
         toast({ variant: 'destructive', title: t('Scanner Init Failed'), description: t('Could not initialize the barcode scanner.') });
         setIsScanning(false);
       }
@@ -96,7 +98,7 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
     }
 
     const scanLoop = async () => {
-      if (!isScanning || !videoRef.current || videoRef.current.readyState < 2 || videoRef.current.paused) {
+      if (!isScanning || !videoRef.current || videoRef.current.readyState < 2) {
         if(isScanning) animationFrameId = requestAnimationFrame(scanLoop);
         return;
       }
@@ -113,7 +115,7 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
         console.error('Barcode detection failed:', e);
       }
       
-      animationFrameId = requestAnimationFrame(scanLoop);
+      if(isScanning) animationFrameId = requestAnimationFrame(scanLoop);
     };
 
     if (isScanning && hasCameraPermission) {

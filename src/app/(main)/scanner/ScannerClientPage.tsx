@@ -64,7 +64,7 @@ export default function ScannerClientPage() {
             router.push('/favorites');
         }
     }
-  }, [scannedBarcode, existingFood, foodData, isFetching, error, fromFavorites, favoriteFoodIds, toggleFavorite, router]);
+  }, [scannedBarcode, existingFood, foodData, isFetching, error, fromFavorites, favoriteFoodIds, toggleFavorite, router, t]);
 
   const handleScanAgain = () => {
     setScannedBarcode(null);
@@ -114,24 +114,22 @@ export default function ScannerClientPage() {
             </Alert>
           )}
 
-          {hasCameraPermission && (
-            <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center">
-              <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
-              {isScanning && (
-                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-3/4 h-1/2 border-4 border-dashed border-primary rounded-lg" />
+          <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center">
+            <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
+            {isScanning && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-3/4 h-1/2 border-4 border-dashed border-primary rounded-lg" />
+              </div>
+            )}
+              {showScanResult && (
+                <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white">
+                  {isFetching ? <Spinner className="h-8 w-8" /> : <p className="text-lg font-bold">{t('scan complete')}</p>}
                 </div>
               )}
-               {showScanResult && (
-                 <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white">
-                    {isFetching ? <Spinner className="h-8 w-8" /> : <p className="text-lg font-bold">{t('scan complete')}</p>}
-                 </div>
-               )}
-            </div>
-          )}
+          </div>
 
           <div className="mt-4">
-            {!scannedBarcode && isScanning && (
+            {!scannedBarcode && isScanning && hasCameraPermission && (
                 <p className="text-center text-muted-foreground">{t('Align a barcode within the frame to scan it.')}</p>
             )}
 
