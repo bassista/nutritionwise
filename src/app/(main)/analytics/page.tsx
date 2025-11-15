@@ -44,6 +44,8 @@ export default function AnalyticsPage() {
         insulin: { label: t('Insulin'), color: 'hsl(var(--chart-2))' },
         consistency: { label: t('Consistency'), color: 'hsl(var(--chart-1))' },
         score: { label: t('Score'), color: 'hsl(var(--chart-2))' },
+        average: { label: t('Average Intake'), color: 'hsl(var(--chart-1))'},
+        goal: { label: t('Goal'), color: 'hsl(var(--chart-2))'},
     };
 
     const noData = Object.keys(dailyLogs).length === 0;
@@ -64,6 +66,15 @@ export default function AnalyticsPage() {
     const topFoodsSorted = useMemo(() => {
         return [...analysisData.topFoods].sort((a, b) => b[topFoodsMetric] - a[topFoodsMetric]).slice(0, 10);
     }, [analysisData.topFoods, topFoodsMetric]);
+
+    const averageIntakeComparisonData = useMemo(() => {
+        const nutrients = ['calories', 'protein', 'carbohydrates', 'fat'];
+        return nutrients.map(nutrient => ({
+            name: t(nutrient.charAt(0).toUpperCase() + nutrient.slice(1)),
+            average: analysisData.avgNutrients[nutrient as keyof typeof analysisData.avgNutrients],
+            goal: settings.nutritionalGoals[nutrient as keyof typeof settings.nutritionalGoals],
+        }));
+    }, [analysisData.avgNutrients, settings.nutritionalGoals, t]);
 
     if (noData) {
         return (
@@ -298,19 +309,21 @@ export default function AnalyticsPage() {
                             <CardDescription>{t('Your average daily nutrient intake compared to your goals.')}</CardDescription>
                         </CardHeader>
                         <CardContent>
-                             <ChartContainer config={chartConfig} className="h-52 w-full">
-                                <BarChart data={[{ name: 'average', ...analysisData.avgNutrients, ...settings.nutritionalGoals }]} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
-                                    <CartesianGrid vertical={false} />
-                                    <XAxis dataKey="name" tickLine={false} axisLine={false} />
-                                    <YAxis />
-                                    <ChartTooltip content={<ChartTooltipContent />} />
-                                    <Legend />
-                                    <Bar dataKey="calories" fill="var(--color-calories)" name={t('Calories')} radius={4} />
-                                    <Bar dataKey="protein" fill="var(--color-protein)" name={t('Protein')} radius={4} />
-                                    <Bar dataKey="carbohydrates" fill="var(--color-carbohydrates)" name={t('Carbohydrates')} radius={4} />
-                                    <Bar dataKey="fat" fill="var(--color-fat)" name={t('Fat')} radius={4} />
-                                </BarChart>
-                            </ChartContainer>
+                            {analysisData.avgNutrients.calories > 0 ? (
+                                <ChartContainer config={chartConfig} className="h-52 w-full">
+                                    <BarChart data={averageIntakeComparisonData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                                        <YAxis />
+                                        <ChartTooltip content={<ChartTooltipContent />} />
+                                        <Legend />
+                                        <Bar dataKey="average" fill="var(--color-average)" name={chartConfig.average.label} radius={4} />
+                                        <Bar dataKey="goal" fill="var(--color-goal)" name={chartConfig.goal.label} radius={4} />
+                                    </BarChart>
+                                </ChartContainer>
+                            ) : (
+                                <div className="flex items-center justify-center h-52 text-muted-foreground">{t('Not enough data')}</div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -318,3 +331,5 @@ export default function AnalyticsPage() {
         </>
     );
 }
+
+    
