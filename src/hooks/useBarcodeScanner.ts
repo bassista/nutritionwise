@@ -31,109 +31,94 @@ export function useBarcodeScanner({ onScanSuccess, toast }: UseBarcodeScannerPro
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isScanning, setIsScanning] = useState(true);
-  const isScanningRef = useRef(true);
+  const streamRef = useRef<MediaStream | null>(null);
+
 
   const stopScan = useCallback(() => {
-    isScanningRef.current = false;
     setIsScanning(false);
-    if (videoRef.current && videoRef.current.srcObject) {
-      (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
   }, []);
   
   const startScan = useCallback(async () => {
-    isScanningRef.current = true;
-    setIsScanning(true);
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error restarting camera:', error);
-      }
+    if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
+      return;
     }
-  }, []);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      streamRef.current = stream;
+      setHasCameraPermission(true);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setIsScanning(true);
+    } catch (error) {
+      console.error('Error starting camera:', error);
+      setHasCameraPermission(false);
+      toast({ variant: 'destructive', title: t('Camera Access Denied'), description: t('Please enable camera permissions in your browser settings to use this app.') });
+    }
+  }, [t, toast]);
 
   useEffect(() => {
-    isScanningRef.current = isScanning;
-  }, [isScanning]);
-
-  useEffect(() => {
-    const getCameraPermission = async () => {
-      if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
-        toast({ variant: 'destructive', title: t('Camera not supported'), description: t('Your browser does not support camera access.') });
-        setHasCameraPermission(false);
-        return;
-      }
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        setHasCameraPermission(true);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        toast({ variant: 'destructive', title: t('Camera Access Denied'), description: t('Please enable camera permissions in your browser settings to use this app.') });
-      }
-    };
-
-    getCameraPermission();
+    startScan();
 
     return () => {
-      // Ensure all tracks are stopped on unmount
-      if (videoRef.current && videoRef.current.srcObject) {
-        (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
-      }
+      // Cleanup function to stop tracks when component unmounts
+      stopScan();
     };
-  }, [t, toast]);
+  }, [startScan, stopScan]);
 
   useEffect(() => {
     let detector: BarcodeDetector | undefined;
     let animationFrameId: number;
 
-    if (!hasCameraPermission || !isScanning) {
-      return;
-    }
-    
     if (typeof window.BarcodeDetector === 'undefined') {
-      toast({ variant: 'destructive', title: t('Scanner Not Supported'), description: t('The Barcode Detector API is not supported in this browser.') });
-      setIsScanning(false);
+      if (isScanning) {
+        toast({ variant: 'destructive', title: t('Scanner Not Supported'), description: t('The Barcode Detector API is not supported in this browser.') });
+        setIsScanning(false);
+      }
       return;
     }
 
     try {
       detector = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
     } catch (e) {
-      toast({ variant: 'destructive', title: t('Scanner Init Failed'), description: t('Could not initialize the barcode scanner.') });
-      setIsScanning(false);
+      if (isScanning) {
+        toast({ variant: 'destructive', title: t('Scanner Init Failed'), description: t('Could not initialize the barcode scanner.') });
+        setIsScanning(false);
+      }
       return;
     }
 
     const scanLoop = async () => {
-      if (!isScanningRef.current) return;
-
-      if (videoRef.current && videoRef.current.readyState >= 2 && !videoRef.current.paused && detector) {
-        try {
-          const barcodes = await detector.detect(videoRef.current);
-          if (barcodes.length > 0) {
-            const detectedBarcode = barcodes[0].rawValue;
-            stopScan();
-            onScanSuccess(detectedBarcode);
-            return;
-          }
-        } catch (e) {
-          console.error('Barcode detection failed:', e);
+      if (!isScanning || !videoRef.current || videoRef.current.readyState < 2 || videoRef.current.paused) {
+        if(isScanning) animationFrameId = requestAnimationFrame(scanLoop);
+        return;
+      }
+      
+      try {
+        const barcodes = await detector.detect(videoRef.current);
+        if (barcodes.length > 0) {
+          const detectedBarcode = barcodes[0].rawValue;
+          onScanSuccess(detectedBarcode);
+          stopScan(); 
+          return;
         }
+      } catch (e) {
+        console.error('Barcode detection failed:', e);
       }
       
       animationFrameId = requestAnimationFrame(scanLoop);
     };
 
-    scanLoop();
+    if (isScanning && hasCameraPermission) {
+      scanLoop();
+    }
 
     return () => {
       cancelAnimationFrame(animationFrameId);

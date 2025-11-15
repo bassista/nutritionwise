@@ -15,7 +15,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Food } from '@/lib/types';
 import Spinner from '@/components/ui/spinner';
 import { useBarcodeScanner } from '@/hooks/useBarcodeScanner';
-import { useOpenFoodFacts } from '@/hooks/useOpenFoodFacts';
 
 
 export default function ScannerClientPage() {
@@ -33,8 +32,6 @@ export default function ScannerClientPage() {
   const fromFavorites = useMemo(() => searchParams.get('from') === 'favorites', [searchParams]);
   const existingFood = scannedBarcode ? foods.find(f => f.id === scannedBarcode) : undefined;
   
-  const { foodData, isFetching, error } = useOpenFoodFacts(existingFood ? null : scannedBarcode);
-
   const handleScanSuccess = useCallback((barcode: string) => {
     toast({
       title: t('Barcode detected!'),
@@ -42,6 +39,8 @@ export default function ScannerClientPage() {
     });
     setScannedBarcode(barcode);
   }, [t, toast]);
+  
+  const { foodData, isFetching, error } = useOpenFoodFacts(existingFood ? null : scannedBarcode);
 
   const {
     videoRef,
