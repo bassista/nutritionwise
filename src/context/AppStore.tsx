@@ -7,7 +7,6 @@ import { IDataAdapter } from '@/lib/adapters/IDataAdapter';
 import { LocalStorageAdapter } from '@/lib/adapters/LocalStorageAdapter';
 import { defaultFoods } from '@/lib/data';
 import { defaultSettings } from '@/lib/settings';
-import { arrayMove } from '@dnd-kit/sortable';
 
 const dataAdapter: IDataAdapter = new LocalStorageAdapter();
 
@@ -35,8 +34,8 @@ export interface AppState extends AppData {
 
   // DailyLog actions
   addLogEntry: (date: string, mealType: MealType, items: LogItemInput | LogItemInput[]) => void;
+  updateLogEntry: (date: string, logId: string, updates: Partial<LoggedItem>) => void;
   removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
-  moveLogEntry: (date: string, activeId: string, overId: string) => void;
   addWaterIntake: (date: string, amountMl: number) => void;
   updateWeight: (date: string, weight?: number) => void;
   updateGlucose: (date: string, glucose?: number) => void;
@@ -184,37 +183,50 @@ const useAppStore = create<AppState>((set, get) => {
 
         // --- DailyLog Actions ---
         addLogEntry: (date, mealType, items) => setStateAndSave(state => {
-            const itemsArray = Array.isArray(items) ? items : [items];
-            if (itemsArray.length === 0) return {};
-
             const newLogs = { ...state.dailyLogs };
             const dayLog = { ...(newLogs[date] || {}) };
-            
+
+            const itemsArray = Array.isArray(items) ? items : [items];
             const newLogItems = itemsArray.map(itemInput => ({
                 ...itemInput,
                 id: `${Date.now()}-${Math.random()}`,
                 timestamp: Date.now(),
             }));
-            
-            dayLog[mealType] = [...(dayLog[mealType] || []), ...newLogItems];
+
+            const updatedMealLog = [...(dayLog[mealType] || []), ...newLogItems];
+            dayLog[mealType] = updatedMealLog;
             newLogs[date] = dayLog;
-            
+
+            return { dailyLogs: newLogs };
+        }),
+        updateLogEntry: (date, logId, updates) => setStateAndSave(state => {
+            const newLogs = { ...state.dailyLogs };
+            const dayLog = newLogs[date];
+            if (!dayLog) return {};
+
+            for (const mealType of ['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]) {
+                if (dayLog[mealType]) {
+                    const itemIndex = dayLog[mealType]!.findIndex(item => item.id === logId);
+                    if (itemIndex !== -1) {
+                        const newMealLog = [...dayLog[mealType]!];
+                        newMealLog[itemIndex] = { ...newMealLog[itemIndex], ...updates };
+                        newLogs[date] = { ...dayLog, [mealType]: newMealLog };
+                        break;
+                    }
+                }
+            }
             return { dailyLogs: newLogs };
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {
-            const currentLogs = state.dailyLogs;
-            const dayLog = currentLogs[date];
+            const newLogs = { ...state.dailyLogs };
+            const dayLog = { ...(newLogs[date]) };
         
             if (!dayLog || !dayLog[mealType]) {
-                return {}; // No changes if the log doesn't exist
+                return {}; 
             }
         
             const updatedMealTypeLog = dayLog[mealType]!.filter(item => item.id !== logId);
-        
-            const newDayLog = {
-                ...dayLog,
-                [mealType]: updatedMealTypeLog,
-            };
+            const newDayLog = { ...dayLog, [mealType]: updatedMealTypeLog };
         
             if (newDayLog[mealType]!.length === 0) {
                 delete newDayLog[mealType];
@@ -222,8 +234,6 @@ const useAppStore = create<AppState>((set, get) => {
         
             const remainingKeys = Object.keys(newDayLog).filter(k => k !== 'waterIntakeMl' && k !== 'weight' && k !== 'glucose' && k !== 'insulin');
             
-            const newLogs = { ...currentLogs };
-
             if (remainingKeys.every(key => !newDayLog[key as keyof typeof newDayLog] || (Array.isArray(newDayLog[key as keyof typeof newDayLog]) && (newDayLog[key as keyof typeof newDayLog] as any[]).length === 0))) {
                  delete newLogs[date];
             } else {
@@ -231,52 +241,6 @@ const useAppStore = create<AppState>((set, get) => {
             }
         
             return { dailyLogs: newLogs };
-        }),
-        moveLogEntry: (date, activeId, overId) => setStateAndSave(state => {
-            const dayLog = state.dailyLogs[date];
-            if (!dayLog) return {};
-        
-            const allItems = (['breakfast', 'lunch', 'dinner', 'snack'] as MealType[])
-                .flatMap(mt => dayLog[mt] || [])
-                .sort((a, b) => a.timestamp - b.timestamp);
-        
-            const oldIndex = allItems.findIndex(item => item.id === activeId);
-            const newIndex = allItems.findIndex(item => item.id === overId);
-        
-            if (oldIndex === -1 || newIndex === -1) return {};
-        
-            const reorderedItems = arrayMove(allItems, oldIndex, newIndex);
-        
-            // Re-assign timestamps to preserve the new order
-            const updatedItems = reorderedItems.map((item, index) => ({
-                ...item,
-                timestamp: Date.now() + index, // Ensure unique and ordered timestamps
-            }));
-        
-            const newDayLog: typeof dayLog = {
-                waterIntakeMl: dayLog.waterIntakeMl,
-                weight: dayLog.weight,
-                glucose: dayLog.glucose,
-                insulin: dayLog.insulin,
-            };
-
-            // Distribute items back into their original meal types.
-            // This simplification keeps them in their original meal categories but reorders them for display.
-            // A better data model would have a single list with a `mealType` property on each item.
-            const itemToMealTypeMap = new Map<string, MealType>();
-            (['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).forEach(mt => {
-                dayLog[mt]?.forEach(item => itemToMealTypeMap.set(item.id, mt));
-            });
-
-            updatedItems.forEach(item => {
-                const mealType = itemToMealTypeMap.get(item.id) || 'snack';
-                if (!newDayLog[mealType]) {
-                    newDayLog[mealType] = [];
-                }
-                newDayLog[mealType]!.push(item);
-            });
-        
-            return { dailyLogs: { ...state.dailyLogs, [date]: newDayLog } };
         }),
         addWaterIntake: (date, amountMl) => setStateAndSave(state => {
             const newLogs = { ...state.dailyLogs };
@@ -411,7 +375,3 @@ const useAppStore = create<AppState>((set, get) => {
 });
 
 export default useAppStore;
-
-    
-
-    

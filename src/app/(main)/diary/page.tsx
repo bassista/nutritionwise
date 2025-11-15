@@ -10,13 +10,11 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import FoodSelectorForMeal from '@/components/food/FoodSelectorForMeal';
 import LogFoodDialog from '@/components/diary/LogFoodDialog';
+import EditLogItemDialog from '@/components/diary/EditLogItemDialog';
 import { Food, LoggedItem, MealType } from '@/lib/types';
 import WaterTracker from '@/components/diary/WaterTracker';
 import DailySummary from '@/components/diary/DailySummary';
 import MealLog from '@/components/diary/MealLog';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from '@dnd-kit/core';
-import useAppStore from '@/context/AppStore';
-import DiaryLogItem from '@/components/diary/DiaryLogItem';
 
 export default function DiaryPage() {
     const { t, locale } = useLocale();
@@ -24,9 +22,9 @@ export default function DiaryPage() {
     
     const [isFoodSelectorOpen, setFoodSelectorOpen] = useState(false);
     const [isLogFoodDialogOpen, setLogFoodDialogOpen] = useState(false);
+    const [isEditLogItemDialogOpen, setEditLogItemDialogOpen] = useState(false);
     const [foodToLog, setFoodToLog] = useState<Food | null>(null);
-    const [activeDragItem, setActiveDragItem] = useState<LoggedItem | null>(null);
-    const { getFoodById, moveLogEntry } = useAppStore();
+    const [itemToEdit, setItemToEdit] = useState<LoggedItem | null>(null);
 
     const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
 
@@ -44,25 +42,19 @@ export default function DiaryPage() {
         setLogFoodDialogOpen(false);
         setFoodToLog(null);
     }
-    
-     const handleDragStart = (event: DragStartEvent) => {
-        const { active } = event;
-        const item = active.data.current?.item as LoggedItem;
-        setActiveDragItem(item);
+
+    const handleEditItemClick = (item: LoggedItem) => {
+        setItemToEdit(item);
+        setEditLogItemDialogOpen(true);
     };
 
-    const handleDragEnd = (event: DragEndEvent) => {
-        setActiveDragItem(null);
-        const { active, over } = event;
-    
-        if (over && active.id !== over.id) {
-          moveLogEntry(selectedDateString, String(active.id), String(over.id));
-        }
+    const handleEditDialogClose = () => {
+        setEditLogItemDialogOpen(false);
+        setItemToEdit(null);
     };
-
 
     return (
-        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
+        <>
             <PageHeader title={t('Food Diary')} />
             <div className="container mx-auto px-4 flex-grow overflow-auto py-4">
                 <div className="flex flex-wrap lg:flex-nowrap gap-6">
@@ -85,6 +77,7 @@ export default function DiaryPage() {
                        <MealLog 
                           selectedDateString={selectedDateString} 
                           onAddFoodClick={handleAddFoodClick}
+                          onEditItemClick={handleEditItemClick}
                        />
                     </div>
                 </div>
@@ -108,16 +101,16 @@ export default function DiaryPage() {
                     }}
                 />
               )}
-               <DragOverlay>
-                {activeDragItem ? (
-                  <DiaryLogItem
-                    item={activeDragItem}
-                    food={getFoodById(activeDragItem.itemId)}
-                    isDragging
+              {itemToEdit && (
+                  <EditLogItemDialog
+                      open={isEditLogItemDialogOpen}
+                      onOpenChange={handleEditDialogClose}
+                      item={itemToEdit}
+                      selectedDateString={selectedDateString}
+                      onLogSuccess={handleEditDialogClose}
                   />
-                ) : null}
-              </DragOverlay>
-        </DndContext>
+              )}
+        </>
     );
 }
 

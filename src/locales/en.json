@@ -316,5 +316,7 @@
   "Goal": "Goal",
   "units": "units",
   "Daily Meal": "Daily Meal",
-  "Health": "Health"
+  "Health": "Health",
+  "Edit Logged Food": "Edit Logged Food",
+  "Quantity Updated": "Quantity Updated"
 }
