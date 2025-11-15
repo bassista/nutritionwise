@@ -27,15 +27,13 @@ export function processAnalyticsData(
 ) {
     const endDate = new Date();
     let startDate: Date;
-    let days: number;
 
     const allLoggedDates = Object.keys(dailyLogs).sort();
 
     if (period === 'all' && allLoggedDates.length > 0) {
         startDate = parseISO(allLoggedDates[0]);
-        days = differenceInDays(endDate, startDate) + 1;
     } else {
-        days = period === 'last7days' ? 7 : 30;
+        const days = period === 'last7days' ? 7 : 30;
         startDate = subDays(endDate, days - 1);
     }
     
@@ -67,11 +65,11 @@ export function processAnalyticsData(
     const topFoodsMap = new Map<string, TopFoodInfo>();
     const consistencyScores: { [day: number]: { scores: number[], count: number } } = { 0: {scores: [], count: 0}, 1: {scores: [], count: 0}, 2: {scores: [], count: 0}, 3: {scores: [], count: 0}, 4: {scores: [], count: 0}, 5: {scores: [], count: 0}, 6: {scores: [], count: 0} };
 
-    const data = dateInterval.map(date => {
+    const lineChartData = dateInterval.map(date => {
         const dateString = format(date, 'yyyy-MM-dd');
         const log = dailyLogs[dateString];
         
-        let dailyTotals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
+        let dailyNutrientTotals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
 
         if (log) {
             const allItems = Object.values(log).flat().filter(item => typeof item === 'object' && item !== null && 'type' in item) as LoggedItem[];
@@ -100,7 +98,7 @@ export function processAnalyticsData(
             });
 
 
-            dailyTotals = {
+            dailyNutrientTotals = {
                 calories: nutrients.calories,
                 protein: nutrients.protein,
                 carbohydrates: nutrients.carbohydrates,
@@ -125,7 +123,7 @@ export function processAnalyticsData(
             weight: lastKnownWeight,
             glucose: lastKnownGlucose,
             insulin: lastKnownInsulin,
-            ...dailyTotals
+            ...dailyNutrientTotals
         };
     });
     
@@ -151,12 +149,10 @@ export function processAnalyticsData(
     });
     const reorderedConsistencyData = [...consistencyData.slice(1), consistencyData[0]];
 
-
     return {
-        lineChartData: data,
+        lineChartData,
         avgNutrients,
         macroDistribution,
-        days,
         topFoods: Array.from(topFoodsMap.values()),
         consistencyData: reorderedConsistencyData
     };
