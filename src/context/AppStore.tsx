@@ -190,109 +190,46 @@ const useAppStore = create<AppState>((set, get) => {
             const newLogs = { ...state.dailyLogs };
             const dayLog = { ...(newLogs[date] || {}) };
             
-            const updatedItemsMap = new Map<string, LoggedItem>();
-            const allCurrentItems = (Object.keys(dayLog) as MealType[])
-                .filter(key => key !== 'waterIntakeMl' && key !== 'weight' && key !== 'glucose' && key !== 'insulin')
-                .flatMap(key => dayLog[key] as LoggedItem[]);
-
-            allCurrentItems.forEach(item => updatedItemsMap.set(item.id, item));
-
-            const itemsToAdd: { item: LoggedItem; mealType: MealType }[] = [];
-
-            itemsArray.forEach(itemInput => {
-                if (itemInput.type === 'food') {
-                    // Try to find if this food item already exists anywhere in the day's log
-                    const existingEntry = allCurrentItems.find(logged => logged.type === 'food' && logged.itemId === itemInput.itemId);
-                    
-                    if (existingEntry) {
-                        // Item exists, so update its grams by overwriting
-                        const newGrams = itemInput.grams || 0;
-                        updatedItemsMap.set(existingEntry.id, { ...existingEntry, grams: newGrams });
-                    } else {
-                        // Item doesn't exist, so add it to the list to be added
-                        itemsToAdd.push({
-                            item: {
-                                ...itemInput,
-                                id: `${Date.now()}-${Math.random()}`,
-                                timestamp: Date.now(),
-                            },
-                            mealType: mealType
-                        });
-                    }
-                } else { // For meals, we don't merge, just add
-                    itemsToAdd.push({
-                      item: {
-                        ...itemInput,
-                        id: `${Date.now()}-${Math.random()}`,
-                        timestamp: Date.now(),
-                      },
-                      mealType: mealType
-                    });
-                }
-            });
-
-            // Reconstruct the day log from the map
-            const newDayLog: { [key: string]: any } = {
-              waterIntakeMl: dayLog.waterIntakeMl,
-              weight: dayLog.weight,
-              glucose: dayLog.glucose,
-              insulin: dayLog.insulin,
-            };
+            const newLogItems = itemsArray.map(itemInput => ({
+                ...itemInput,
+                id: `${Date.now()}-${Math.random()}`,
+                timestamp: Date.now(),
+            }));
             
-            updatedItemsMap.forEach((item, id) => {
-              // Find original mealType. This is inefficient but necessary with the current data structure.
-              // A better structure would be a single list of items with a mealType property on each item.
-              let originalMealType: MealType = 'snack';
-              for (const mt of ['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]) {
-                  if (dayLog[mt]?.some(i => i.id === id)) {
-                      originalMealType = mt;
-                      break;
-                  }
-              }
-              if (!newDayLog[originalMealType]) newDayLog[originalMealType] = [];
-              newDayLog[originalMealType].push(item);
-            });
+            dayLog[mealType] = [...(dayLog[mealType] || []), ...newLogItems];
+            newLogs[date] = dayLog;
             
-            // Add completely new items
-            itemsToAdd.forEach(({ item, mealType: mt }) => {
-                if (!newDayLog[mt]) newDayLog[mt] = [];
-                newDayLog[mt].push(item);
-            });
-
-            newLogs[date] = newDayLog;
-
             return { dailyLogs: newLogs };
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {
             const currentLogs = state.dailyLogs;
             const dayLog = currentLogs[date];
-
+        
             if (!dayLog || !dayLog[mealType]) {
                 return {}; // No changes if the log doesn't exist
             }
-
-            // Create a new day log object for immutability
-            const newDayLog = { ...dayLog };
-            
-            // Filter out the item to be removed
-            newDayLog[mealType] = dayLog[mealType]!.filter(item => item.id !== logId);
-
-            // If the meal type array is now empty, remove the meal type key
+        
+            const updatedMealTypeLog = dayLog[mealType]!.filter(item => item.id !== logId);
+        
+            const newDayLog = {
+                ...dayLog,
+                [mealType]: updatedMealTypeLog,
+            };
+        
             if (newDayLog[mealType]!.length === 0) {
                 delete newDayLog[mealType];
             }
-
-            // Create a new dailyLogs object
+        
+            const remainingKeys = Object.keys(newDayLog).filter(k => k !== 'waterIntakeMl' && k !== 'weight' && k !== 'glucose' && k !== 'insulin');
+            
             const newLogs = { ...currentLogs };
 
-            // If the day log is now empty (only has keys we ignore or no keys), remove the date entry
-            const remainingKeys = Object.keys(newDayLog).filter(k => k !== 'waterIntakeMl' && k !== 'weight' && k !== 'glucose' && k !== 'insulin');
-            if (remainingKeys.length === 0) {
-                delete newLogs[date];
+            if (remainingKeys.every(key => !newDayLog[key as keyof typeof newDayLog] || (Array.isArray(newDayLog[key as keyof typeof newDayLog]) && (newDayLog[key as keyof typeof newDayLog] as any[]).length === 0))) {
+                 delete newLogs[date];
             } else {
                 newLogs[date] = newDayLog;
             }
-
+        
             return { dailyLogs: newLogs };
         }),
         moveLogEntry: (date, activeId, overId) => setStateAndSave(state => {
@@ -474,5 +411,7 @@ const useAppStore = create<AppState>((set, get) => {
 });
 
 export default useAppStore;
+
+    
 
     
