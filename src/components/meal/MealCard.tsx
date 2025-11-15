@@ -53,6 +53,7 @@ import { calculateMealScore } from '@/lib/scoring';
 interface MealCardProps {
   meal: Meal;
   reorderable?: boolean;
+  isCollapsed?: boolean;
   style?: React.CSSProperties;
   attributes?: ReturnType<typeof useSortable>['attributes'];
   listeners?: ReturnType<typeof useSortable>['listeners'];
@@ -60,7 +61,7 @@ interface MealCardProps {
 
 
 const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
-  ({ meal, reorderable, style, attributes, listeners }, ref) => {
+  ({ meal, reorderable, isCollapsed, style, attributes, listeners }, ref) => {
     const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList, settings } = useAppStore();
     const [isEditing, setIsEditing] = useState(false);
     const { t, locale } = useLocale();
@@ -110,6 +111,36 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
       { Icon: Wheat, value: totalNutrients.carbohydrates.toFixed(1), label: 'g', color: 'text-yellow-400', name: t('Carbohydrates') },
       { Icon: Droplets, value: totalNutrients.fat.toFixed(1), label: 'g', color: 'text-purple-400', name: t('Fat') }
     ];
+
+    if (isCollapsed) {
+        return (
+             <div ref={ref} style={style} className="h-full">
+                <Card className="flex items-center p-2">
+                    {reorderable && (
+                        <div
+                            className="p-2 cursor-grab active:cursor-grabbing touch-none"
+                            {...attributes}
+                            {...listeners}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <GripVertical className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                    )}
+                    <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
+                        <Edit className="h-4 w-4" />
+                    </Button>
+                </Card>
+                 {isEditing && (
+                  <MealBuilder
+                    open={isEditing}
+                    onOpenChange={setIsEditing}
+                    mealToEdit={meal}
+                  />
+                )}
+            </div>
+        )
+    }
 
 
     return (
@@ -250,7 +281,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
 );
 MealCardComponent.displayName = 'MealCard';
 
-function SortableMealCard({ meal }: { meal: Meal }) {
+function SortableMealCard({ meal, isCollapsed }: { meal: Meal; isCollapsed?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: meal.id });
 
@@ -264,6 +295,7 @@ function SortableMealCard({ meal }: { meal: Meal }) {
       ref={setNodeRef}
       meal={meal}
       reorderable={true}
+      isCollapsed={isCollapsed}
       style={style}
       attributes={attributes}
       listeners={listeners}
@@ -271,9 +303,9 @@ function SortableMealCard({ meal }: { meal: Meal }) {
   );
 }
 
-export default function MealCard({ meal, reorderable }: Omit<MealCardProps, 'style' | 'attributes' | 'listeners'>) {
+export default function MealCard({ meal, reorderable, isCollapsed }: Omit<MealCardProps, 'style' | 'attributes' | 'listeners'>) {
   if (reorderable) {
-    return <SortableMealCard meal={meal} />;
+    return <SortableMealCard meal={meal} isCollapsed={isCollapsed} />;
   }
-  return <MealCardComponent meal={meal} />;
+  return <MealCardComponent meal={meal} isCollapsed={isCollapsed} />;
 }

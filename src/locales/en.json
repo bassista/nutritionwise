@@ -322,7 +322,7 @@
   "Add to today's diary": "Add to today's diary",
   "Add to shopping list": "Add to shopping list",
   "Ingredient Added to Shopping List": "Ingredient Added to Shopping List",
-  "{foodName} has been added to your shopping list.": "{foodName} has been added to your shopping list."
+  "{foodName} has been added to your shopping list.": "{foodName} has been added to your shopping list.",
+  "Grid View": "Grid View",
+  "List View": "List View"
 }
-
-    

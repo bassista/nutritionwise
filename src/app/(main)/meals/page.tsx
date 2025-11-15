@@ -7,7 +7,7 @@ import { useUIState } from '@/context/UIStateContext';
 import { PageHeader } from '@/components/PageHeader';
 import MealCard from '@/components/meal/MealCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { UtensilsCrossed, Plus, Search } from 'lucide-react';
+import { UtensilsCrossed, Plus, Search, Rows, Grid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLocale } from '@/context/LocaleContext';
@@ -24,15 +24,19 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-  arrayMove,
+  rectSortingStrategy
 } from '@dnd-kit/sortable';
 import type { Meal } from '@/lib/types';
+import { arrayMove } from '@dnd-kit/sortable';
+import { cn } from '@/lib/utils';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 export default function MealsPage() {
   const { meals, setMeals } = useAppStore();
   const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -64,9 +68,23 @@ export default function MealsPage() {
   return (
     <>
       <PageHeader title={t('My Meals')}>
-        <Button onClick={() => setMealBuilderOpen(true, 'all')}>
-          <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
-        </Button>
+        <div className="flex items-center gap-2">
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)}>
+                            {isCollapsed ? <Grid /> : <Rows />}
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{isCollapsed ? t('Grid View') : t('List View')}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+            <Button onClick={() => setMealBuilderOpen(true, 'all')}>
+              <Plus className="mr-2 h-4 w-4" /> {t('Create Meal')}
+            </Button>
+        </div>
       </PageHeader>
       <div className="sticky top-16 bg-background/80 backdrop-blur-sm z-10 -mb-4">
         <div className="container mx-auto px-4">
@@ -92,10 +110,13 @@ export default function MealsPage() {
               onDragEnd={handleDragEnd}
               id="meals-dnd-context"
             >
-              <SortableContext items={meals.map(m => m.id)} strategy={verticalListSortingStrategy}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <SortableContext items={meals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy}>
+                <div className={cn(
+                    "grid gap-4",
+                    isCollapsed ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                )}>
                   {filteredMeals.map(meal => (
-                    <MealCard key={meal.id} meal={meal} reorderable={!isSearching} />
+                    <MealCard key={meal.id} meal={meal} reorderable={!isSearching} isCollapsed={isCollapsed} />
                   ))}
                 </div>
               </SortableContext>
