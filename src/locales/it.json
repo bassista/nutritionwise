@@ -318,5 +318,8 @@
   "Daily Meal": "Pasto Giornaliero",
   "Health": "Salute",
   "Edit Logged Food": "Modifica Alimento Registrato",
-  "Quantity Updated": "Quantità Aggiornata"
+  "Quantity Updated": "Quantità Aggiornata",
+  "Ingredient Added to Diary": "Ingrediente Aggiunto al Diario",
+  "{foodName} ({grams}g) has been added to today's diary.": "{foodName} ({grams}g) è stato aggiunto al diario di oggi.",
+  "Add to today's diary": "Aggiungi al diario di oggi"
 }

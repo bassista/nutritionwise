@@ -107,8 +107,6 @@
   "No meals match your search.": "No meals match your search.",
   "Save": "Save",
   "Name cannot be empty": "Name cannot be empty",
-  "Food Updated": "Food Updated",
-  "The food name has been updated.": "The food name has been updated.",
   "Edit food name": "Edit food name",
   "New Food": "New Food",
   "Edit Food": "Edit Food",
@@ -213,7 +211,7 @@
   "Search Food": "Search Food",
   "Add Manually": "Add Manually",
   "Enter item name...": "Enter item name...",
-  "Type the name of the item you want to add and press Enter or click the button below.": "Type the name of the item you want to add and press Enter or the button below.",
+  "Type the name of the item you want to add and press Enter or click the button below.": "Type the name of the item to add and press Enter or the button below.",
   "Add \"{item}\"": "Add \"{item}\"",
   "Close": "Close",
   "Ingredients Added": "Ingredients Added",
@@ -318,7 +316,10 @@
   "Daily Meal": "Daily Meal",
   "Health": "Health",
   "Edit Logged Food": "Edit Logged Food",
-  "Quantity Updated": "Quantity Updated"
+  "Quantity Updated": "Quantity Updated",
+  "Ingredient Added to Diary": "Ingredient Added to Diary",
+  "{foodName} ({grams}g) has been added to today's diary.": "{foodName} ({grams}g) has been added to today's diary.",
+  "Add to today's diary": "Add to today's diary"
 }
 
     
