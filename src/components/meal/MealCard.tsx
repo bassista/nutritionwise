@@ -80,7 +80,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
       deleteMeal(meal.id);
     };
 
-    const handleAddToDiary = (e: React.MouseEvent, mealType: MealType) => {
+    const handleAddToDiary = (e: React.MouseEvent) => {
         e.stopPropagation();
         const today = formatISO(startOfToday(), { representation: 'date' });
         const itemsToAdd = meal.foods.map(food => ({
@@ -88,7 +88,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
             itemId: food.foodId,
             grams: food.grams,
         }));
-        addLogEntry(today, mealType, itemsToAdd);
+        addLogEntry(today, 'snack', itemsToAdd); // Default to snack
         toast({
             title: t('Meal Added to Diary'),
             description: t('The ingredients for "{mealName}" have been added to your diary.', { mealName: meal.name }),
@@ -152,21 +152,9 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                     <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'breakfast')}>
+                     <DropdownMenuItem onClick={handleAddToDiary}>
                         <CalendarPlus className="mr-2 h-4 w-4" />
-                        <span>{t('Add to Breakfast')}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'lunch')}>
-                        <CalendarPlus className="mr-2 h-4 w-4" />
-                        <span>{t('Add to Lunch')}</span>
-                    </DropdownMenuItem>
-                     <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'dinner')}>
-                        <CalendarPlus className="mr-2 h-4 w-4" />
-                        <span>{t('Add to Dinner')}</span>
-                    </DropdownMenuItem>
-                     <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'snack')}>
-                        <CalendarPlus className="mr-2 h-4 w-4" />
-                        <span>{t('Add to Snack')}</span>
+                        <span>{t('Add to Diary')}</span>
                     </DropdownMenuItem>
                      <DropdownMenuItem onClick={(e) => handleAddToShoppingList(e)}>
                         <ShoppingCart className="mr-2 h-4 w-4" />

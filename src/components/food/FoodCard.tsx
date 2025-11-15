@@ -70,10 +70,10 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
       e.stopPropagation();
     };
 
-    const handleAddToDiary = (e: React.MouseEvent, mealType: MealType) => {
+    const handleAddToDiary = (e: React.MouseEvent) => {
         e.stopPropagation();
         const today = formatISO(startOfToday(), { representation: 'date' });
-        addLogEntry(today, mealType, { type: 'food', itemId: food.id, grams: food.serving_size_g || 100 });
+        addLogEntry(today, 'snack', { type: 'food', itemId: food.id, grams: food.serving_size_g || 100 });
     };
 
     return (
@@ -120,27 +120,15 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
             </div>
             <div className="flex-grow" />
             <div className="mt-4 flex justify-end gap-1">
-               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-8 h-8" onClick={(e) => e.stopPropagation()}>
-                    <CalendarPlus className="w-5 h-5 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'breakfast')}>
-                    {t('Add to Breakfast')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'lunch')}>
-                    {t('Add to Lunch')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'dinner')}>
-                    {t('Add to Dinner')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e) => handleAddToDiary(e, 'snack')}>
-                    {t('Add to Snack')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+               <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8"
+                onClick={handleAddToDiary}
+                aria-label={t('Add to Diary')}
+              >
+                <CalendarPlus className="w-5 h-5 text-muted-foreground" />
+              </Button>
               {onEdit && (
                 <Button
                   variant="ghost"
