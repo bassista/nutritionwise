@@ -49,6 +49,7 @@ export interface AppState extends AppData {
   removeShoppingListItem: (listId: string, itemId: string) => void;
   toggleAllShoppingListItems: (listId: string, check: boolean) => void;
   addMealToShoppingList: (mealId: string) => void;
+  addFoodToShoppingList: (foodId: string) => void;
 
   // Settings actions
   updateNutritionalGoals: (goals: NutritionalGoals) => void;
@@ -219,7 +220,7 @@ const useAppStore = create<AppState>((set, get) => {
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {
             const newLogs = { ...state.dailyLogs };
-            const dayLog = { ...(newLogs[date]) };
+            const dayLog = newLogs[date];
         
             if (!dayLog || !dayLog[mealType]) {
                 return {}; 
@@ -232,14 +233,7 @@ const useAppStore = create<AppState>((set, get) => {
                 delete newDayLog[mealType];
             }
         
-            const remainingKeys = Object.keys(newDayLog).filter(k => k !== 'waterIntakeMl' && k !== 'weight' && k !== 'glucose' && k !== 'insulin');
-            
-            if (remainingKeys.every(key => !newDayLog[key as keyof typeof newDayLog] || (Array.isArray(newDayLog[key as keyof typeof newDayLog]) && (newDayLog[key as keyof typeof newDayLog] as any[]).length === 0))) {
-                 delete newLogs[date];
-            } else {
-                newLogs[date] = newDayLog;
-            }
-        
+            newLogs[date] = newDayLog;
             return { dailyLogs: newLogs };
         }),
         addWaterIntake: (date, amountMl) => setStateAndSave(state => {
@@ -341,6 +335,29 @@ const useAppStore = create<AppState>((set, get) => {
                 }),
             }));
         },
+        addFoodToShoppingList: (foodId: string) => {
+            setStateAndSave(state => {
+                const lists = [...state.shoppingLists];
+                // Find the first deletable list, or the first list if none are deletable
+                let targetList = lists.find(l => l.isDeletable);
+                if (!targetList && lists.length > 0) {
+                    targetList = lists[0];
+                }
+        
+                if (targetList) {
+                    const listIndex = lists.findIndex(l => l.id === targetList!.id);
+                    const list = lists[listIndex];
+                    
+                    // Avoid duplicates
+                    if (!list.items.some(item => item.foodId === foodId)) {
+                        const newItem: ShoppingListItem = { id: `sli-${Date.now()}`, foodId, checked: false };
+                        const updatedItems = [...list.items, newItem];
+                        lists[listIndex] = { ...list, items: updatedItems };
+                    }
+                }
+                return { shoppingLists: lists };
+            });
+        },
 
         // --- Settings Actions ---
         updateNutritionalGoals: (goals) => setStateAndSave(state => ({ settings: { ...state.settings, nutritionalGoals: goals } })),
@@ -375,3 +392,5 @@ const useAppStore = create<AppState>((set, get) => {
 });
 
 export default useAppStore;
+
+    

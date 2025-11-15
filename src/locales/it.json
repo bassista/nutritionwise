@@ -321,5 +321,10 @@
   "Quantity Updated": "Quantità Aggiornata",
   "Ingredient Added to Diary": "Ingrediente Aggiunto al Diario",
   "{foodName} ({grams}g) has been added to today's diary.": "{foodName} ({grams}g) è stato aggiunto al diario di oggi.",
-  "Add to today's diary": "Aggiungi al diario di oggi"
+  "Add to today's diary": "Aggiungi al diario di oggi",
+  "Add to shopping list": "Aggiungi alla lista della spesa",
+  "Ingredient Added to Shopping List": "Ingrediente Aggiunto alla Lista Spesa",
+  "{foodName} has been added to your shopping list.": "{foodName} è stato aggiunto alla tua lista della spesa."
 }
+
+    

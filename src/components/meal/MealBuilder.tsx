@@ -18,7 +18,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import useAppStore from '@/context/AppStore';
 import { useToast } from '@/hooks/use-toast';
 import type { Meal, MealFood, Food } from '@/lib/types';
-import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown, CalendarPlus } from 'lucide-react';
+import { Plus, Trash2, Flame, Beef, Wheat, Droplets, ArrowUp, ArrowDown, CalendarPlus, ShoppingCart } from 'lucide-react';
 import FoodSelectorForMeal from '../food/FoodSelectorForMeal';
 import { useLocale } from '@/context/LocaleContext';
 import { getFoodName, calculateTotalNutrientsForMeal } from '@/lib/utils';
@@ -32,7 +32,7 @@ interface MealBuilderProps {
 }
 
 export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuilderProps) {
-  const { getFoodById, addMeal, updateMeal, addLogEntry } = useAppStore();
+  const { getFoodById, addMeal, updateMeal, addLogEntry, addFoodToShoppingList } = useAppStore();
   const { toast } = useToast();
   const { t, locale } = useLocale();
 
@@ -73,6 +73,14 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
      toast({
         title: t('Ingredient Added to Diary'),
         description: t('{foodName} ({grams}g) has been added to today\'s diary.', { foodName: getFoodName(food, locale), grams: grams }),
+    });
+  };
+
+  const handleAddToShoppingList = (food: Food) => {
+    addFoodToShoppingList(food.id);
+    toast({
+        title: t('Ingredient Added to Shopping List'),
+        description: t('{foodName} has been added to your shopping list.', { foodName: getFoodName(food, locale) }),
     });
   };
 
@@ -181,6 +189,17 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                             </TooltipContent>
                           </Tooltip>
 
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => handleAddToShoppingList(food)}>
+                                <ShoppingCart className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{t('Add to shopping list')}</p>
+                            </TooltipContent>
+                          </Tooltip>
+
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveFood(foodId)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -225,3 +244,5 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
     </>
   );
 }
+
+    

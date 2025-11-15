@@ -319,7 +319,10 @@
   "Quantity Updated": "Quantity Updated",
   "Ingredient Added to Diary": "Ingredient Added to Diary",
   "{foodName} ({grams}g) has been added to today's diary.": "{foodName} ({grams}g) has been added to today's diary.",
-  "Add to today's diary": "Add to today's diary"
+  "Add to today's diary": "Add to today's diary",
+  "Add to shopping list": "Add to shopping list",
+  "Ingredient Added to Shopping List": "Ingredient Added to Shopping List",
+  "{foodName} has been added to your shopping list.": "{foodName} has been added to your shopping list."
 }
 
     
