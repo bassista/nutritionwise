@@ -15,7 +15,7 @@ export default function BottomNav() {
   const { t } = useLocale();
 
   const navItems = [
-    { href: '/diary', labelKey: 'Health' },
+    { href: '/diary', labelKey: 'Diary' },
     { href: '/foods', labelKey: 'Foods' },
     { href: '/favorites', labelKey: 'Favorites' },
     { href: '/meals', labelKey: 'Meals' },
@@ -23,7 +23,7 @@ export default function BottomNav() {
   ];
   
   const navIcons: Record<string, React.ElementType> = {
-    'Health': HeartPulse,
+    'Diary': BookOpen,
     'Foods': Wheat,
     'Favorites': Heart,
     'Meals': UtensilsCrossed,
