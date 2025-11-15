@@ -30,6 +30,8 @@ export const calculateTotalNutrientsForItems = (
 ) => {
     const totals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0 };
     items.forEach(loggedItem => {
+        if (!loggedItem) return; // Fix: Add this check to prevent crash
+
         if (loggedItem.type === 'food') {
             const food = getFoodById(loggedItem.itemId);
             if (food) {
@@ -76,3 +78,4 @@ export const calculateTotalNutrientsForMeal = (meal: Meal, getFoodById: GetFoodB
     });
     return totals;
 };
+
