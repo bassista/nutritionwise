@@ -59,10 +59,6 @@ export default function AnalyticsPage() {
         return periodMap[period];
     }, [period, t]);
     
-    const weightDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.weight !== undefined), [analysisData.lineChartData]);
-    const glucoseDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.glucose !== undefined), [analysisData.lineChartData]);
-    const insulinDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.insulin !== undefined), [analysisData.lineChartData]);
-    
     const topFoodsSorted = useMemo(() => {
         return [...analysisData.topFoods].sort((a, b) => b[topFoodsMetric] - a[topFoodsMetric]).slice(0, 10);
     }, [analysisData.topFoods, topFoodsMetric]);
@@ -75,6 +71,10 @@ export default function AnalyticsPage() {
             goal: settings.nutritionalGoals[nutrient as keyof typeof settings.nutritionalGoals],
         }));
     }, [analysisData.avgNutrients, settings.nutritionalGoals, t]);
+
+    const weightDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.weight !== undefined), [analysisData.lineChartData]);
+    const glucoseDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.glucose !== undefined), [analysisData.lineChartData]);
+    const insulinDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.insulin !== undefined), [analysisData.lineChartData]);
 
     if (noData) {
         return (
@@ -331,6 +331,8 @@ export default function AnalyticsPage() {
         </>
     );
 }
+
+    
 
     
 
