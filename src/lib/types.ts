@@ -54,6 +54,8 @@ export interface DailyLog {
     [mealType in MealType]?: LoggedItem[];
     waterIntakeMl?: number;
     weight?: number;
+    glucose?: number;
+    insulin?: number;
   };
 }
 

@@ -33,18 +33,27 @@ export class LocalStorageAdapter implements IDataAdapter {
         const parsedData = JSON.parse(item);
         // Ensure all top-level keys exist to prevent crashes after data model changes
         const defaultData = this.getDefaultData();
-        return {
+        const loadedData = {
           ...defaultData,
           ...parsedData,
           settings: {
             ...defaultData.settings,
-            ...parsedData.settings,
+            ...(parsedData.settings || {}),
             hydrationSettings: {
                 ...defaultData.settings.hydrationSettings,
                 ...(parsedData.settings?.hydrationSettings || {})
             }
-          }
+          },
+          // ensure dailyLogs has all potential fields
+          dailyLogs: parsedData.dailyLogs || {}
         };
+        // ensure each daily log entry has all fields
+        for (const date in loadedData.dailyLogs) {
+            loadedData.dailyLogs[date] = {
+                ...loadedData.dailyLogs[date]
+            };
+        }
+        return loadedData;
       }
       return this.getDefaultData();
     } catch (error) {

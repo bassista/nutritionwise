@@ -44,12 +44,23 @@ export function processAnalyticsData(
     let totalNutrientsOverPeriod = { calories: 0, protein: 0, carbohydrates: 0, fat: 0, count: 0 };
     
     let lastKnownWeight: number | undefined = undefined;
+    let lastKnownGlucose: number | undefined = undefined;
+    let lastKnownInsulin: number | undefined = undefined;
+    
     for (let i = allLoggedDates.length - 1; i >= 0; i--) {
         const date = allLoggedDates[i];
-        if (date < format(startDate, 'yyyy-MM-dd') && dailyLogs[date]?.weight) {
-            lastKnownWeight = dailyLogs[date]?.weight;
-            break;
+        if (date < format(startDate, 'yyyy-MM-dd')) {
+            if (dailyLogs[date]?.weight) {
+                lastKnownWeight = dailyLogs[date]?.weight;
+            }
+             if (dailyLogs[date]?.glucose) {
+                lastKnownGlucose = dailyLogs[date]?.glucose;
+            }
+            if (dailyLogs[date]?.insulin) {
+                lastKnownInsulin = dailyLogs[date]?.insulin;
+            }
         }
+        if(lastKnownWeight !== undefined && lastKnownGlucose !== undefined && lastKnownInsulin !== undefined) break;
     }
     
     const topFoodsMap = new Map<string, TopFoodInfo>();
@@ -61,6 +72,9 @@ export function processAnalyticsData(
         
         let dailyTotals = { calories: 0, protein: 0, carbohydrates: 0, fat: 0 };
         let weightData: number | undefined = undefined;
+        let glucoseData: number | undefined = undefined;
+        let insulinData: number | undefined = undefined;
+
 
         if (log) {
             const allItems = Object.values(log).flat().filter(item => typeof item === 'object' && item !== null && 'type' in item) as LoggedItem[];
@@ -108,13 +122,29 @@ export function processAnalyticsData(
             } else {
                 weightData = lastKnownWeight;
             }
+            if (log.glucose) {
+                glucoseData = log.glucose;
+                lastKnownGlucose = log.glucose;
+            } else {
+                glucoseData = lastKnownGlucose;
+            }
+            if (log.insulin) {
+                insulinData = log.insulin;
+                lastKnownInsulin = log.insulin;
+            } else {
+                insulinData = lastKnownInsulin;
+            }
         } else {
              weightData = lastKnownWeight;
+             glucoseData = lastKnownGlucose;
+             insulinData = lastKnownInsulin;
         }
         
         return {
             date: format(date, 'MMM d'),
             weight: weightData,
+            glucose: glucoseData,
+            insulin: insulinData,
             ...dailyTotals
         };
     });

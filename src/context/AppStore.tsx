@@ -39,6 +39,8 @@ export interface AppState extends AppData {
   moveLogEntry: (date: string, logId: string, fromMealType: MealType, toMealType: MealType, fromIndex: number, toIndex: number) => void;
   addWaterIntake: (date: string, amountMl: number) => void;
   updateWeight: (date: string, weight?: number) => void;
+  updateGlucose: (date: string, glucose?: number) => void;
+  updateInsulin: (date: string, insulin?: number) => void;
   
   // ShoppingList actions
   setShoppingLists: (updater: (lists: ShoppingList[]) => ShoppingList[]) => void;
@@ -245,7 +247,7 @@ const useAppStore = create<AppState>((set, get) => {
         
             if (fromMealType === toMealType) {
               // Reorder within the same list
-              const reorderedList = arrayMove(newSourceList, fromIndex > toIndex ? fromIndex -1 : fromIndex, toIndex);
+              const reorderedList = arrayMove(sourceList, fromIndex, toIndex);
               newLogs[date] = { ...dayLog, [fromMealType]: reorderedList };
             } else {
               // Move to a different list
@@ -274,6 +276,30 @@ const useAppStore = create<AppState>((set, get) => {
                 delete dayLog.weight;
             } else {
                 dayLog.weight = weight;
+            }
+            newLogs[date] = { ...dayLog };
+            if (Object.keys(newLogs[date]).length === 0) delete newLogs[date];
+            return { dailyLogs: newLogs };
+        }),
+        updateGlucose: (date, glucose) => setStateAndSave(state => {
+            const newLogs = { ...state.dailyLogs };
+            const dayLog = newLogs[date] || {};
+            if (glucose === undefined || glucose <= 0) {
+                delete dayLog.glucose;
+            } else {
+                dayLog.glucose = glucose;
+            }
+            newLogs[date] = { ...dayLog };
+            if (Object.keys(newLogs[date]).length === 0) delete newLogs[date];
+            return { dailyLogs: newLogs };
+        }),
+        updateInsulin: (date, insulin) => setStateAndSave(state => {
+            const newLogs = { ...state.dailyLogs };
+            const dayLog = newLogs[date] || {};
+            if (insulin === undefined || insulin <= 0) {
+                delete dayLog.insulin;
+            } else {
+                dayLog.insulin = insulin;
             }
             newLogs[date] = { ...dayLog };
             if (Object.keys(newLogs[date]).length === 0) delete newLogs[date];

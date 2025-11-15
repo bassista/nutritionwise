@@ -295,5 +295,22 @@
   "No results in favorites.": "Nessun risultato nei preferiti.",
   "Search in all foods": "Cerca in tutti gli alimenti",
   "Meal Added to Diary": "Pasto Aggiunto al Diario",
-  "The ingredients for \"{mealName}\" have been added to your diary.": "Gli ingredienti di \"{mealName}\" sono stati aggiunti al tuo diario."
+  "The ingredients for \"{mealName}\" have been added to your diary.": "Gli ingredienti di \"{mealName}\" sono stati aggiunti al tuo diario.",
+  "Health": "Salute",
+  "Blood Glucose": "Glicemia",
+  "Enter value in mg/dL": "Inserisci valore in mg/dL",
+  "Glucose Saved": "Glicemia Salvata",
+  "Your glucose for this day has been updated to": "La tua glicemia per questo giorno è stata aggiornata a",
+  "Glucose value removed": "Valore glicemia rimosso",
+  "Insulin Intake": "Insulina Assunta",
+  "Enter units": "Inserisci unità",
+  "Insulin Saved": "Insulina Salvata",
+  "Your insulin for this day has been updated to": "La tua insulina per questo giorno è stata aggiornata a",
+  "Insulin value removed": "Valore insulina rimosso",
+  "Glucose Trend": "Andamento Glicemia",
+  "Your glucose trend": "Il tuo andamento della glicemia",
+  "Glucose (mg/dL)": "Glicemia (mg/dL)",
+  "Insulin Trend": "Andamento Insulina",
+  "Your insulin trend": "Il tuo andamento dell'insulina",
+  "Insulin (units)": "Insulina (unità)"
 }

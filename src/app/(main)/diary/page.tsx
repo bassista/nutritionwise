@@ -19,6 +19,8 @@ import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } 
 import useAppStore from '@/context/AppStore';
 import { arrayMove } from '@dnd-kit/sortable';
 import MealLogItem from '@/components/diary/MealLogItem';
+import GlucoseTracker from '@/components/diary/GlucoseTracker';
+import InsulinTracker from '@/components/diary/InsulinTracker';
 
 export default function DiaryPage() {
     const { t, locale } = useLocale();
@@ -92,6 +94,8 @@ export default function DiaryPage() {
                         </Card>
                          <WaterTracker selectedDate={selectedDateString} />
                          <WeightTracker selectedDate={selectedDateString} />
+                         <GlucoseTracker selectedDate={selectedDateString} />
+                         <InsulinTracker selectedDate={selectedDateString} />
                     </div>
                     <div className="flex-1 min-w-[300px] space-y-6">
                        <DailySummary selectedDate={selectedDate} />
