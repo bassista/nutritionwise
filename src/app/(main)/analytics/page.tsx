@@ -72,9 +72,10 @@ export default function AnalyticsPage() {
         }));
     }, [analysisData.avgNutrients, settings.nutritionalGoals, t]);
 
-    const weightDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.weight !== undefined), [analysisData.lineChartData]);
-    const glucoseDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.glucose !== undefined), [analysisData.lineChartData]);
-    const insulinDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.insulin !== undefined), [analysisData.lineChartData]);
+    const weightDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.weight !== undefined && d.weight !== null), [analysisData.lineChartData]);
+    const glucoseDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.glucose !== undefined && d.glucose !== null), [analysisData.lineChartData]);
+    const insulinDataAvailable = useMemo(() => analysisData.lineChartData.some(d => d.insulin !== undefined && d.insulin !== null), [analysisData.lineChartData]);
+
 
     if (noData) {
         return (
@@ -226,32 +227,6 @@ export default function AnalyticsPage() {
                         </CardContent>
                     </Card>
 
-                    {weightDataAvailable && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>{t('Weight Trend')}</CardTitle>
-                                <CardDescription>{t('Your weight trend')} {periodDescription}</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <ChartContainer config={chartConfig} className="h-52 w-full">
-                                    <AreaChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
-                                        <CartesianGrid vertical={false} />
-                                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                                        <YAxis domain={['dataMin - 1', 'dataMax + 1']} unit="kg" />
-                                        <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-                                        <defs>
-                                            <linearGradient id="fillWeight" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="var(--color-weight)" stopOpacity={0.8}/>
-                                            <stop offset="95%" stopColor="var(--color-weight)" stopOpacity={0.1}/>
-                                            </linearGradient>
-                                        </defs>
-                                        <Area type="monotone" dataKey="weight" stroke="var(--color-weight)" strokeWidth={2} dot={false} name={t('Weight (kg)')} fill="url(#fillWeight)" />
-                                    </AreaChart>
-                                </ChartContainer>
-                            </CardContent>
-                        </Card>
-                    )}
-                    
                     <Card>
                         <CardHeader>
                             <CardTitle>{t('Weekly Consistency')}</CardTitle>
@@ -274,26 +249,26 @@ export default function AnalyticsPage() {
                         </CardContent>
                     </Card>
 
-                    {glucoseDataAvailable && (
+                    {weightDataAvailable && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>{t('Glucose Trend')}</CardTitle>
-                                <CardDescription>{t('Your glucose trend')} {periodDescription}</CardDescription>
+                                <CardTitle>{t('Weight Trend')}</CardTitle>
+                                <CardDescription>{t('Your weight trend')} {periodDescription}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <ChartContainer config={chartConfig} className="h-52 w-full">
                                     <AreaChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
                                         <CartesianGrid vertical={false} />
                                         <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                                        <YAxis domain={['dataMin - 10', 'dataMax + 10']} unit="mg/dL" />
+                                        <YAxis domain={['dataMin - 1', 'dataMax + 1']} unit="kg" />
                                         <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
                                         <defs>
-                                            <linearGradient id="fillGlucose" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="var(--color-glucose)" stopOpacity={0.8}/>
-                                            <stop offset="95%" stopColor="var(--color-glucose)" stopOpacity={0.1}/>
+                                            <linearGradient id="fillWeight" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--color-weight)" stopOpacity={0.8}/>
+                                            <stop offset="95%" stopColor="var(--color-weight)" stopOpacity={0.1}/>
                                             </linearGradient>
                                         </defs>
-                                        <Area type="monotone" dataKey="glucose" stroke="var(--color-glucose)" strokeWidth={2} dot={false} name={t('Glucose (mg/dL)')} fill="url(#fillGlucose)" />
+                                        <Area type="monotone" dataKey="weight" stroke="var(--color-weight)" strokeWidth={2} dot={false} name={t('Weight (kg)')} fill="url(#fillWeight)" />
                                     </AreaChart>
                                 </ChartContainer>
                             </CardContent>
@@ -326,14 +301,35 @@ export default function AnalyticsPage() {
                         </Card>
                     )}
 
+                    {glucoseDataAvailable && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>{t('Glucose Trend')}</CardTitle>
+                                <CardDescription>{t('Your glucose trend')} {periodDescription}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ChartContainer config={chartConfig} className="h-52 w-full">
+                                    <AreaChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                                        <YAxis domain={['dataMin - 10', 'dataMax + 10']} unit="mg/dL" />
+                                        <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+                                        <defs>
+                                            <linearGradient id="fillGlucose" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--color-glucose)" stopOpacity={0.8}/>
+                                            <stop offset="95%" stopColor="var(--color-glucose)" stopOpacity={0.1}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <Area type="monotone" dataKey="glucose" stroke="var(--color-glucose)" strokeWidth={2} dot={false} name={t('Glucose (mg/dL)')} fill="url(#fillGlucose)" />
+                                    </AreaChart>
+                                </ChartContainer>
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             </div>
         </>
     );
 }
-
-    
-
-    
 
     
