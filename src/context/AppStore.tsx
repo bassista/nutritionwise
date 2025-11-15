@@ -241,7 +241,7 @@ const useAppStore = create<AppState>((set, get) => {
             
             updatedItemsMap.forEach((item, id) => {
               // Find original mealType. This is inefficient but necessary with the current data structure.
-              // A better structure would be a single list of items with a mealType property.
+              // A better structure would be a single list of items with a mealType property on each item.
               let originalMealType: MealType = 'snack';
               for (const mt of ['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]) {
                   if (dayLog[mt]?.some(i => i.id === id)) {
@@ -264,12 +264,35 @@ const useAppStore = create<AppState>((set, get) => {
             return { dailyLogs: newLogs };
         }),
         removeLogEntry: (date, mealType, logId) => setStateAndSave(state => {
-            const newLogs = { ...state.dailyLogs };
-            if (newLogs[date]?.[mealType]) {
-                newLogs[date][mealType] = newLogs[date][mealType]!.filter(item => item.id !== logId);
-                if (newLogs[date][mealType]!.length === 0) delete newLogs[date][mealType];
-                if (Object.keys(newLogs[date]).length === 0) delete newLogs[date];
+            const currentLogs = state.dailyLogs;
+            const dayLog = currentLogs[date];
+
+            if (!dayLog || !dayLog[mealType]) {
+                return {}; // No changes if the log doesn't exist
             }
+
+            // Create a new day log object for immutability
+            const newDayLog = { ...dayLog };
+            
+            // Filter out the item to be removed
+            newDayLog[mealType] = dayLog[mealType]!.filter(item => item.id !== logId);
+
+            // If the meal type array is now empty, remove the meal type key
+            if (newDayLog[mealType]!.length === 0) {
+                delete newDayLog[mealType];
+            }
+
+            // Create a new dailyLogs object
+            const newLogs = { ...currentLogs };
+
+            // If the day log is now empty (only has keys we ignore or no keys), remove the date entry
+            const remainingKeys = Object.keys(newDayLog).filter(k => k !== 'waterIntakeMl' && k !== 'weight' && k !== 'glucose' && k !== 'insulin');
+            if (remainingKeys.length === 0) {
+                delete newLogs[date];
+            } else {
+                newLogs[date] = newDayLog;
+            }
+
             return { dailyLogs: newLogs };
         }),
         moveLogEntry: (date, activeId, overId) => setStateAndSave(state => {
