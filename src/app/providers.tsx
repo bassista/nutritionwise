@@ -5,11 +5,11 @@ import { LocaleProvider } from '@/context/LocaleContext';
 import useAppStore from '@/context/AppStore';
 import { UIStateProvider } from '@/context/UIStateContext';
 import Spinner from '@/components/ui/spinner';
-import { AchievementProvider } from '@/context/AchievementContext';
+import { useAchievementObserver } from '@/context/AchievementContext';
 
 function AppInitializer({ children }: { children: ReactNode }) {
     const [isInitialized, setIsInitialized] = useState(false);
-    const { load } = useAppStore();
+    const load = useAppStore((state) => state.load);
 
     useEffect(() => {
         const initialize = async () => {
@@ -17,7 +17,8 @@ function AppInitializer({ children }: { children: ReactNode }) {
             setIsInitialized(true);
         };
         initialize();
-    }, [load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     if (!isInitialized) {
         return (
@@ -35,9 +36,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <LocaleProvider>
         <AppInitializer>
           <UIStateProvider>
-            <AchievementProvider>
-                {children}
-            </AchievementProvider>
+              {children}
           </UIStateProvider>
         </AppInitializer>
     </LocaleProvider>

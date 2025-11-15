@@ -1,12 +1,20 @@
 
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { UserAchievement } from '@/lib/types';
 import { allBadges, evaluateAchievements } from '@/lib/gamification';
 import { useToast } from '@/hooks/use-toast';
 import { useLocale } from './LocaleContext';
 import useAppStore from './AppStore';
+
+const AchievementContext = createContext<undefined>(undefined);
+
+export const AchievementProvider = ({ children }: { children: ReactNode }) => {
+    useAchievementObserver(); // Initialize the achievement observer
+    return <AchievementContext.Provider value={undefined}>{children}</AchievementContext.Provider>;
+};
+
 
 // This is not a provider anymore, but a hook that encapsulates the achievement logic
 export const useAchievementObserver = () => {
