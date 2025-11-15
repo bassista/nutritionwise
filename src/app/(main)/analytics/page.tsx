@@ -202,6 +202,29 @@ export default function AnalyticsPage() {
                         </CardContent>
                     </Card>
 
+                    <Card className="lg:col-span-3">
+                        <CardHeader>
+                            <CardTitle>{t('Average Daily Intake')}</CardTitle>
+                            <CardDescription>{t('Your average daily nutrient intake compared to your goals.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {analysisData.avgNutrients.calories > 0 ? (
+                                <ChartContainer config={chartConfig} className="h-52 w-full">
+                                    <BarChart data={averageIntakeComparisonData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                                        <YAxis />
+                                        <ChartTooltip content={<ChartTooltipContent />} />
+                                        <Legend />
+                                        <Bar dataKey="average" fill="var(--color-average)" name={chartConfig.average.label} radius={4} />
+                                        <Bar dataKey="goal" fill="var(--color-goal)" name={chartConfig.goal.label} radius={4} />
+                                    </BarChart>
+                                </ChartContainer>
+                            ) : (
+                                <div className="flex items-center justify-center h-52 text-muted-foreground">{t('Not enough data')}</div>
+                            )}
+                        </CardContent>
+                    </Card>
 
                     {weightDataAvailable && (
                         <Card>
@@ -303,29 +326,6 @@ export default function AnalyticsPage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="lg:col-span-3">
-                        <CardHeader>
-                            <CardTitle>{t('Average Daily Intake')}</CardTitle>
-                            <CardDescription>{t('Your average daily nutrient intake compared to your goals.')}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {analysisData.avgNutrients.calories > 0 ? (
-                                <ChartContainer config={chartConfig} className="h-52 w-full">
-                                    <BarChart data={averageIntakeComparisonData} margin={{ top: 5, right: 20, left: -10, bottom: 0 }}>
-                                        <CartesianGrid vertical={false} />
-                                        <XAxis dataKey="name" tickLine={false} axisLine={false} />
-                                        <YAxis />
-                                        <ChartTooltip content={<ChartTooltipContent />} />
-                                        <Legend />
-                                        <Bar dataKey="average" fill="var(--color-average)" name={chartConfig.average.label} radius={4} />
-                                        <Bar dataKey="goal" fill="var(--color-goal)" name={chartConfig.goal.label} radius={4} />
-                                    </BarChart>
-                                </ChartContainer>
-                            ) : (
-                                <div className="flex items-center justify-center h-52 text-muted-foreground">{t('Not enough data')}</div>
-                            )}
-                        </CardContent>
-                    </Card>
                 </div>
             </div>
         </>
