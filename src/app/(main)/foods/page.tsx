@@ -13,6 +13,8 @@ import { FoodForm } from '@/components/food/FoodForm';
 import { Food } from '@/lib/types';
 import Link from 'next/link';
 import FoodListPage from '@/components/food/FoodListPage';
+import LogFoodDialog from '@/components/diary/LogFoodDialog';
+import { format, startOfToday } from 'date-fns';
 
 
 export default function FoodsPage() {
@@ -23,6 +25,10 @@ export default function FoodsPage() {
   
   const [isFormOpen, setFormOpen] = useState(false);
   const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);
+  const [foodToLog, setFoodToLog] = useState<Food | null>(null);
+  const [isLogFoodDialogOpen, setLogFoodDialogOpen] = useState(false);
+  
+  const selectedDateString = format(startOfToday(), 'yyyy-MM-dd');
 
   const handleDeleteFood = (foodId: string) => {
     const result = deleteFood(foodId);
@@ -49,12 +55,22 @@ export default function FoodsPage() {
     setFoodToEdit(food);
     setFormOpen(true);
   };
+  
+  const handleAddToDiary = (food: Food) => {
+    setFoodToLog(food);
+    setLogFoodDialogOpen(true);
+  };
 
   const handleFormOpenChange = (open: boolean) => {
     setFormOpen(open);
     if (!open) {
       setFoodToEdit(undefined);
     }
+  }
+
+  const handleLogDialogClose = () => {
+    setLogFoodDialogOpen(false);
+    setFoodToLog(null);
   }
 
   return (
@@ -79,6 +95,7 @@ export default function FoodsPage() {
         foods={foods}
         onEditFood={handleEditFood}
         onDeleteFood={handleDeleteFood}
+        onAddToDiary={handleAddToDiary}
         enableSorting={true}
         pageType="all"
       />
@@ -88,6 +105,20 @@ export default function FoodsPage() {
         onOpenChange={handleFormOpenChange}
         foodToEdit={foodToEdit}
       />
+
+      {foodToLog && (
+        <LogFoodDialog
+            open={isLogFoodDialogOpen}
+            onOpenChange={handleLogDialogClose}
+            food={foodToLog}
+            mealType={'snack'} // Default to snack as sections are merged
+            selectedDateString={selectedDateString}
+            onLogSuccess={() => {
+              toast({ title: t('Food Added to Diary') });
+              handleLogDialogClose();
+            }}
+        />
+      )}
     </>
   );
 }

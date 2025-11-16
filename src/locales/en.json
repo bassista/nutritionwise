@@ -48,7 +48,6 @@
   "Choose your preferred language.": "Choose your preferred language.",
   "Edit Meal": "Edit Meal",
   "Create New Meal": "Create New Meal",
-  "Build your custom meal by adding foods and specifying quantities.": "Build your custom meal by adding foods and specifying quantities.",
   "Meal Name": "Meal Name",
   "e.g., Post-Workout Lunch": "e.g., Post-Workout Lunch",
   "Ingredients": "Ingredients",
@@ -324,5 +323,6 @@
   "Ingredient Added to Shopping List": "Ingredient Added to Shopping List",
   "{foodName} has been added to your shopping list.": "{foodName} has been added to your shopping list.",
   "Grid View": "Grid View",
-  "List View": "List View"
+  "List View": "List View",
+  "Food Added to Diary": "Food Added to Diary"
 }

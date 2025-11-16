@@ -27,9 +27,10 @@ interface FoodListProps {
   onReorder?: (activeId: string, overId: string) => void;
   onDeleteFood?: (foodId: string) => void;
   onEditFood?: (food: Food) => void;
+  onAddToDiary?: (food: Food) => void;
 }
 
-export default function FoodList({ foods, onReorder, onDeleteFood, onEditFood }: FoodListProps) {
+export default function FoodList({ foods, onReorder, onDeleteFood, onEditFood, onAddToDiary }: FoodListProps) {
   const { t } = useLocale();
 
   const sensors = useSensors(
@@ -60,7 +61,7 @@ export default function FoodList({ foods, onReorder, onDeleteFood, onEditFood }:
         <SortableContext items={foods.map(f => f.id)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {foods.map(food => (
-              <FoodCardWrapper key={food.id} food={food} reorderable={true} onEdit={onEditFood} onDelete={onDeleteFood} />
+              <FoodCardWrapper key={food.id} food={food} reorderable={true} onEdit={onEditFood} onDelete={onDeleteFood} onAddToDiary={onAddToDiary} />
             ))}
           </div>
         </SortableContext>
@@ -72,7 +73,7 @@ export default function FoodList({ foods, onReorder, onDeleteFood, onEditFood }:
     <div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {foods.map(food => (
-          <FoodCardWrapper key={food.id} food={food} reorderable={false} onDelete={onDeleteFood} onEdit={onEditFood} />
+          <FoodCardWrapper key={food.id} food={food} reorderable={false} onDelete={onDeleteFood} onEdit={onEditFood} onAddToDiary={onAddToDiary} />
         ))}
       </div>
     </div>

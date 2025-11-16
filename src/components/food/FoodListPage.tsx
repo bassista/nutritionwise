@@ -24,6 +24,7 @@ interface FoodListPageProps {
   foods: Food[];
   onEditFood: (food: Food) => void;
   onDeleteFood?: (foodId: string) => void;
+  onAddToDiary?: (food: Food) => void;
   onReorder?: (ids: string[]) => void;
   reorderableIds?: string[];
   enableSorting?: boolean;
@@ -34,6 +35,7 @@ export default function FoodListPage({
   foods,
   onEditFood,
   onDeleteFood,
+  onAddToDiary,
   onReorder,
   reorderableIds,
   enableSorting = false,
@@ -156,6 +158,7 @@ export default function FoodListPage({
               foods={paginatedFoods} 
               onDeleteFood={onDeleteFood}
               onEditFood={onEditFood}
+              onAddToDiary={onAddToDiary}
               onReorder={isReorderable ? handleReorder : undefined}
             />
           ) : (

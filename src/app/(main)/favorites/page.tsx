@@ -13,6 +13,8 @@ import { Food } from '@/lib/types';
 import Link from 'next/link';
 import FoodListPage from '@/components/food/FoodListPage';
 import { useToast } from '@/hooks/use-toast';
+import LogFoodDialog from '@/components/diary/LogFoodDialog';
+import { format, startOfToday } from 'date-fns';
 
 
 export default function FavoritesPage() {
@@ -23,6 +25,10 @@ export default function FavoritesPage() {
 
   const [isFormOpen, setFormOpen] = useState(false);
   const [foodToEdit, setFoodToEdit] = useState<Food | undefined>(undefined);
+  const [foodToLog, setFoodToLog] = useState<Food | null>(null);
+  const [isLogFoodDialogOpen, setLogFoodDialogOpen] = useState(false);
+  
+  const selectedDateString = format(startOfToday(), 'yyyy-MM-dd');
 
   const favoriteFoods = useMemo(() => {
     const foodMap = new Map(foods.map(f => [f.id, f]));
@@ -36,6 +42,11 @@ export default function FavoritesPage() {
   const handleEditFood = (food: Food) => {
     setFoodToEdit(food);
     setFormOpen(true);
+  };
+  
+  const handleAddToDiary = (food: Food) => {
+    setFoodToLog(food);
+    setLogFoodDialogOpen(true);
   };
 
   const handleDeleteFood = (foodId: string) => {
@@ -65,6 +76,11 @@ export default function FavoritesPage() {
     setFoodToEdit(undefined);
     setFormOpen(true);
   };
+  
+  const handleLogDialogClose = () => {
+    setLogFoodDialogOpen(false);
+    setFoodToLog(null);
+  }
 
   return (
     <>
@@ -89,6 +105,7 @@ export default function FavoritesPage() {
         onEditFood={handleEditFood}
         onDeleteFood={handleDeleteFood}
         onReorder={setFavoriteFoodIds}
+        onAddToDiary={handleAddToDiary}
         reorderableIds={favoriteFoodIds}
         pageType="favorites"
       />
@@ -99,6 +116,20 @@ export default function FavoritesPage() {
         foodToEdit={foodToEdit}
         autoFavorite={true}
       />
+
+      {foodToLog && (
+        <LogFoodDialog
+            open={isLogFoodDialogOpen}
+            onOpenChange={handleLogDialogClose}
+            food={foodToLog}
+            mealType={'snack'} // Default to snack as sections are merged
+            selectedDateString={selectedDateString}
+            onLogSuccess={() => {
+              toast({ title: t('Food Added to Diary') });
+              handleLogDialogClose();
+            }}
+        />
+      )}
     </>
   );
 }

@@ -32,21 +32,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getFoodName } from '@/lib/utils';
-import { formatISO, startOfToday } from 'date-fns';
 
 interface FoodCardProps {
   food: Food;
   reorderable?: boolean;
   onDelete?: (foodId: string) => void;
   onEdit?: (food: Food) => void;
+  onAddToDiary?: (food: Food) => void;
   style?: React.CSSProperties;
   attributes?: ReturnType<typeof useSortable>['attributes'];
   listeners?: ReturnType<typeof useSortable>['listeners'];
 }
 
 const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
-  ({ food, reorderable, onDelete, onEdit, style, attributes, listeners }, ref) => {
-    const { favoriteFoodIds, toggleFavorite, addLogEntry } = useAppStore();
+  ({ food, reorderable, onDelete, onEdit, onAddToDiary, style, attributes, listeners }, ref) => {
+    const { favoriteFoodIds, toggleFavorite } = useAppStore();
     const { t, locale } = useLocale();
     const isFavorite = favoriteFoodIds.includes(food.id);
     
@@ -70,10 +70,9 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
       e.stopPropagation();
     };
 
-    const handleAddToDiary = (e: React.MouseEvent) => {
+    const handleAddToDiaryClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        const today = formatISO(startOfToday(), { representation: 'date' });
-        addLogEntry(today, 'snack', { type: 'food', itemId: food.id, grams: food.serving_size_g || 100 });
+        onAddToDiary?.(food);
     };
 
     return (
@@ -120,15 +119,17 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
             </div>
             <div className="flex-grow" />
             <div className="mt-4 flex justify-end gap-1">
+              {onAddToDiary && (
                <Button
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8"
-                onClick={handleAddToDiary}
+                onClick={handleAddToDiaryClick}
                 aria-label={t('Add to Diary')}
               >
                 <CalendarPlus className="w-5 h-5 text-muted-foreground" />
               </Button>
+              )}
               {onEdit && (
                 <Button
                   variant="ghost"
@@ -197,7 +198,7 @@ const FoodCard = React.forwardRef<HTMLDivElement, FoodCardProps>(
 
 FoodCard.displayName = 'FoodCard';
 
-function SortableFoodCard({ food, onEdit, onDelete }: { food: Food, onEdit?: (food: Food) => void, onDelete?: (foodId: string) => void }) {
+function SortableFoodCard({ food, onEdit, onDelete, onAddToDiary }: { food: Food, onEdit?: (food: Food) => void, onDelete?: (foodId: string) => void, onAddToDiary?: (food: Food) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: food.id });
 
@@ -216,13 +217,14 @@ function SortableFoodCard({ food, onEdit, onDelete }: { food: Food, onEdit?: (fo
       listeners={listeners}
       onEdit={onEdit}
       onDelete={onDelete}
+      onAddToDiary={onAddToDiary}
     />
   );
 }
 
-export default function FoodCardWrapper({ food, reorderable, onDelete, onEdit }: Omit<FoodCardProps, 'style' | 'attributes' | 'listeners'>) {
+export default function FoodCardWrapper({ food, reorderable, onDelete, onEdit, onAddToDiary }: Omit<FoodCardProps, 'style' | 'attributes' | 'listeners'>) {
   if (reorderable) {
-    return <SortableFoodCard food={food} onEdit={onEdit} onDelete={onDelete} />;
+    return <SortableFoodCard food={food} onEdit={onEdit} onDelete={onDelete} onAddToDiary={onAddToDiary} />;
   }
-  return <FoodCard food={food} reorderable={false} onDelete={onDelete} onEdit={onEdit} />;
+  return <FoodCard food={food} reorderable={false} onDelete={onDelete} onEdit={onEdit} onAddToDiary={onAddToDiary} />;
 }
