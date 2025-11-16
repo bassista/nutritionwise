@@ -45,7 +45,8 @@ export default function FoodSelectorForMeal({
   useEffect(() => {
     if (open) {
       const isFavoritesContext = mealBuilderContext === 'favorites';
-      setSearchFavoritesOnly(isFavoritesContext && favoriteFoodIds.length > 0);
+      // Default to favorites if available, otherwise search all
+      setSearchFavoritesOnly(favoriteFoodIds.length > 0);
       setSearchTerm('');
       setVisibleCount(ITEMS_PER_PAGE);
     }
