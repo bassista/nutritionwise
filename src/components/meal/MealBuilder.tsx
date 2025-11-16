@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -38,6 +38,8 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
   const [mealName, setMealName] = useState('');
   const [mealFoods, setMealFoods] = useState<MealFood[]>([]);
   const [isFoodSelectorOpen, setFoodSelectorOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -45,11 +47,19 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
         setMealName(mealToEdit.name);
         setMealFoods(mealToEdit.foods);
       } else {
-        setMealName('');
+        setMealName(t('New Meal'));
         setMealFoods([]);
       }
+      setIsEditingName(false);
     }
-  }, [open, mealToEdit]);
+  }, [open, mealToEdit, t]);
+
+  useEffect(() => {
+    if (isEditingName && inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+    }
+  }, [isEditingName]);
 
   const handleAddFood = (food: Food) => {
     if (!mealFoods.some(mf => mf.foodId === food.id)) {
@@ -113,29 +123,35 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
     onOpenChange(false);
   };
 
+  const handleNameEdit = () => {
+    setIsEditingName(false);
+    if (!mealName.trim()) {
+        setMealName(mealToEdit ? mealToEdit.name : t('New Meal'));
+    }
+  }
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="sm:max-w-lg flex flex-col">
           <SheetHeader>
-            <SheetTitle>{mealToEdit ? t('Edit Meal') : t('Create New Meal')}</SheetTitle>
+            {isEditingName ? (
+                <Input
+                    ref={inputRef}
+                    value={mealName}
+                    onChange={(e) => setMealName(e.target.value)}
+                    onBlur={handleNameEdit}
+                    onKeyDown={(e) => e.key === 'Enter' && handleNameEdit()}
+                    className="text-lg font-semibold border-2 border-primary"
+                />
+            ) : (
+                <SheetTitle onClick={() => setIsEditingName(true)} className="cursor-pointer truncate">
+                    {mealName}
+                </SheetTitle>
+            )}
           </SheetHeader>
           <div className="flex flex-col gap-4 py-4 flex-1 min-h-0">
-            <div className="grid grid-cols-4 items-center gap-4 px-1">
-              <Label htmlFor="meal-name" className="text-right">
-                {t('Meal Name')}
-              </Label>
-              <Input
-                id="meal-name"
-                value={mealName}
-                onChange={(e) => setMealName(e.target.value)}
-                placeholder={t('e.g., Post-Workout Lunch')}
-                className="col-span-3"
-              />
-            </div>
-            
             <div className="flex flex-col flex-1 min-h-0 space-y-2">
-              <h3 className="font-semibold px-1">{t('Ingredients')}</h3>
               <ScrollArea className="flex-grow pr-4 -mr-4">
                 <div className="space-y-3 pr-1">
                   <TooltipProvider>
@@ -145,7 +161,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                       const foodName = getFoodName(food, locale);
                       return (
                         <div key={foodId} className="flex flex-col gap-2 bg-muted/50 p-2 rounded-md">
-                          <div className="flex items-center gap-2">
+                           <div className="flex items-center gap-2">
                             <div className="flex-grow">
                                 <p className="font-medium text-sm">{foodName}</p>
                                 <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
