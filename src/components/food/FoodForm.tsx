@@ -189,7 +189,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md flex flex-col h-[90vh] md:h-[80vh]">
         <DialogHeader>
           <DialogTitle>{foodToEdit ? t('Edit Food') : t('Create New Food')}</DialogTitle>
           <DialogDescription>
@@ -197,23 +197,11 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ScrollArea className="h-96 p-1">
-              <div className="space-y-4 p-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-grow min-h-0">
+            <ScrollArea className="flex-grow pr-6 -mr-6">
+              <div className="space-y-4 pr-1">
+                {/* ID field is hidden */}
                  <FormField
-                  control={form.control}
-                  name="id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Unique ID (optional)')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder={t('e.g., barcode or custom ID')} disabled={!!foodToEdit || !!foodToCreate?.id} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
@@ -262,7 +250,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
                 </div>
               </div>
             </ScrollArea>
-            <DialogFooter className="pt-4">
+            <DialogFooter className="pt-4 mt-auto border-t">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('Cancel')}</Button>
                 <Button type="submit">{t('Save')}</Button>
             </DialogFooter>
