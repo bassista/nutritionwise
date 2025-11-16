@@ -7,7 +7,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
   SheetFooter,
   SheetClose,
 } from '@/components/ui/sheet';
@@ -143,8 +142,8 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
               />
             </div>
             
-            <div className="flex-grow flex flex-col min-h-0">
-              <h3 className="font-semibold mb-2">{t('Ingredients')}</h3>
+            <div className="flex-grow flex flex-col min-h-0 space-y-2">
+              <h3 className="font-semibold">{t('Ingredients')}</h3>
               <ScrollArea className="flex-grow pr-4 -mr-4">
                 <div className="space-y-3">
                   <TooltipProvider>
@@ -206,12 +205,11 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                   </TooltipProvider>
                 </div>
               </ScrollArea>
+               <Button variant="outline" className="w-full border-dashed mt-2" onClick={() => setFoodSelectorOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
+              </Button>
             </div>
 
-            <Button variant="outline" className="w-full border-dashed" onClick={() => setFoodSelectorOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
-            </Button>
-            
             <div className='pt-2'>
                 <h3 className="font-semibold mb-2">{t('Total Nutrients')}</h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm p-3 bg-muted rounded-lg">
