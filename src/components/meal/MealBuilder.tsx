@@ -141,53 +141,54 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                       if (!food) return null;
                       const foodName = getFoodName(food, locale);
                       return (
-                        <div key={foodId} className="flex items-center gap-2 bg-muted/50 p-2 rounded-md">
-                          <div className="flex flex-col gap-1 mr-2">
-                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveFood(index, 'up')} disabled={index === 0}>
-                              <ArrowUp className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => moveFood(index, 'down')} disabled={index === mealFoods.length - 1}>
-                              <ArrowDown className="h-4 w-4" />
-                            </Button>
+                        <div key={foodId} className="flex flex-col gap-2 bg-muted/50 p-2 rounded-md">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-grow">
+                                <p className="font-medium text-sm">{foodName}</p>
+                                <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
+                            </div>
+                            <Input
+                                type="number"
+                                value={grams}
+                                onChange={(e) => handleGramsChange(foodId, parseInt(e.target.value))}
+                                className="w-20"
+                                aria-label={`Grams of ${foodName}`}
+                            />
+                            <span className="text-sm text-muted-foreground">g</span>
                           </div>
-                          <div className="flex-grow">
-                            <p className="font-medium text-sm">{foodName}</p>
-                            <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
+                          <div className="flex items-center justify-end gap-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveFood(foodId)}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => handleAddToDiary(food, grams)}>
+                                    <CalendarPlus className="h-4 w-4" />
+                                </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                <p>{t('Add to today\'s diary')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => handleAddToShoppingList(food)}>
+                                    <ShoppingCart className="h-4 w-4" />
+                                </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                <p>{t('Add to shopping list')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <div className="flex flex-col">
+                                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => moveFood(index, 'up')} disabled={index === 0}>
+                                    <ArrowUp className="h-3 w-3" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => moveFood(index, 'down')} disabled={index === mealFoods.length - 1}>
+                                    <ArrowDown className="h-3 w-3" />
+                                </Button>
+                            </div>
                           </div>
-                          <Input
-                            type="number"
-                            value={grams}
-                            onChange={(e) => handleGramsChange(foodId, parseInt(e.target.value))}
-                            className="w-20"
-                            aria-label={`Grams of ${foodName}`}
-                          />
-                          <span className="text-sm text-muted-foreground">g</span>
-                          
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => handleAddToDiary(food, grams)}>
-                                <CalendarPlus className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{t('Add to today\'s diary')}</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => handleAddToShoppingList(food)}>
-                                <ShoppingCart className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{t('Add to shopping list')}</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => handleRemoveFood(foodId)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
                       );
                     })}
