@@ -131,9 +131,6 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
         <SheetContent className="sm:max-w-lg flex flex-col">
           <SheetHeader>
             <SheetTitle>{mealToEdit ? t('Edit Meal') : t('Create New Meal')}</SheetTitle>
-            <SheetDescription>
-              {t('Build your custom meal by adding foods and specifying quantities.')}
-            </SheetDescription>
           </SheetHeader>
           <div className="flex-grow flex flex-col gap-4 py-4 min-h-0">
             <div className="space-y-2">
@@ -244,5 +241,3 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
     </>
   );
 }
-
-    
