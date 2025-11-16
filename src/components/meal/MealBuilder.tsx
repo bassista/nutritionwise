@@ -92,17 +92,6 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
     newMealFoods.splice(newIndex, 0, item);
     setMealFoods(newMealFoods);
   };
-  
-  const totalNutrients = useMemo(() => {
-    return calculateTotalNutrientsForMeal({ id: '', name: mealName, foods: mealFoods }, getFoodById);
-  }, [mealFoods, mealName, getFoodById]);
-
-  const nutrientSummary = [
-    { Icon: Flame, value: totalNutrients.calories.toFixed(0) + ' kcal', color: 'text-orange-400' },
-    { Icon: Beef, value: totalNutrients.protein.toFixed(1) + ' g', color: 'text-blue-400' },
-    { Icon: Wheat, value: totalNutrients.carbohydrates.toFixed(1) + ' g', color: 'text-yellow-400' },
-    { Icon: Droplets, value: totalNutrients.fat.toFixed(1) + ' g', color: 'text-purple-400' }
-  ];
 
   const handleSave = () => {
     if (!mealName.trim()) {
@@ -209,18 +198,6 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                 <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
               </Button>
             </div>
-
-            <div className='pt-2 px-1'>
-                <h3 className="font-semibold mb-2">{t('Total Nutrients')}</h3>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm p-3 bg-muted rounded-lg">
-                    {nutrientSummary.map(({Icon, value, color}) => (
-                        <div key={color} className="flex items-center gap-2">
-                            <Icon className={`h-4 w-4 ${color}`} />
-                            <span className="font-medium">{value}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
           </div>
           <SheetFooter>
             <SheetClose asChild>
@@ -239,5 +216,3 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
     </>
   );
 }
-
-    
