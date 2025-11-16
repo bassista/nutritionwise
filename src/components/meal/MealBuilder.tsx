@@ -121,13 +121,16 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
             <SheetTitle>{mealToEdit ? t('Edit Meal') : t('Create New Meal')}</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-4 py-4 flex-1 min-h-0">
-            <div className="space-y-2 px-1">
-              <Label htmlFor="meal-name">{t('Meal Name')}</Label>
+            <div className="grid grid-cols-4 items-center gap-4 px-1">
+              <Label htmlFor="meal-name" className="text-right">
+                {t('Meal Name')}
+              </Label>
               <Input
                 id="meal-name"
                 value={mealName}
                 onChange={(e) => setMealName(e.target.value)}
                 placeholder={t('e.g., Post-Workout Lunch')}
+                className="col-span-3"
               />
             </div>
             
