@@ -131,7 +131,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
           <SheetHeader>
             <SheetTitle>{mealToEdit ? t('Edit Meal') : t('Create New Meal')}</SheetTitle>
           </SheetHeader>
-          <div className="flex-grow flex flex-col gap-4 py-4 min-h-0">
+          <div className="flex flex-col gap-4 py-4 flex-1 min-h-0">
             <div className="space-y-2 px-1">
               <Label htmlFor="meal-name">{t('Meal Name')}</Label>
               <Input
@@ -142,7 +142,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
               />
             </div>
             
-            <div className="flex-grow flex flex-col min-h-0 space-y-2">
+            <div className="flex flex-col flex-1 min-h-0 space-y-2">
               <h3 className="font-semibold px-1">{t('Ingredients')}</h3>
               <ScrollArea className="flex-grow pr-4 -mr-4">
                 <div className="space-y-3 pr-1">
@@ -205,7 +205,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                   </TooltipProvider>
                 </div>
               </ScrollArea>
-               <Button variant="outline" className="w-full border-dashed mt-2" onClick={() => setFoodSelectorOpen(true)}>
+              <Button variant="outline" className="w-full border-dashed mt-2" onClick={() => setFoodSelectorOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" /> {t('Add Food')}
               </Button>
             </div>
@@ -239,3 +239,5 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
     </>
   );
 }
+
+    
