@@ -21,6 +21,8 @@ export interface AppState extends AppData {
   deleteFood: (foodId: string) => DeleteFoodResult;
   importFoods: (csvRows: { [key: string]: string }[]) => number;
   exportFoodsToCsv: () => string;
+  renameCategory: (oldCategoryName: string, newCategoryName: string) => void;
+  deleteCategory: (categoryName: string, defaultCategoryName: string) => void;
 
   // Meal actions
   getMealById: (id: string) => Meal | undefined;
@@ -166,6 +168,40 @@ const useAppStore = create<AppState>((set, get) => {
             });
             return [headers.join(','), ...rows].join('\n');
         },
+        renameCategory: (oldCategoryName, newCategoryName) => setStateAndSave(state => {
+            const updatedFoods = state.foods.map(food => {
+                const updatedCategory = { ...food.category };
+                let categoryChanged = false;
+                for (const lang in updatedCategory) {
+                    if (updatedCategory[lang] === oldCategoryName) {
+                        updatedCategory[lang] = newCategoryName;
+                        categoryChanged = true;
+                    }
+                }
+                if (categoryChanged) {
+                    return { ...food, category: updatedCategory };
+                }
+                return food;
+            });
+            return { foods: updatedFoods };
+        }),
+        deleteCategory: (categoryName, defaultCategoryName) => setStateAndSave(state => {
+            const updatedFoods = state.foods.map(food => {
+                const updatedCategory = { ...food.category };
+                let categoryChanged = false;
+                for (const lang in updatedCategory) {
+                    if (updatedCategory[lang] === categoryName) {
+                        updatedCategory[lang] = defaultCategoryName;
+                        categoryChanged = true;
+                    }
+                }
+                 if (categoryChanged) {
+                    return { ...food, category: updatedCategory };
+                }
+                return food;
+            });
+            return { foods: updatedFoods };
+        }),
         
         // --- Meal Actions ---
         getMealById: (id) => get().meals.find(m => m.id === id),

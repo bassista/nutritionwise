@@ -11,6 +11,7 @@ import NutritionalGoalsSettings from '@/components/settings/NutritionalGoalsSett
 import HydrationSettings from '@/components/settings/HydrationSettings';
 import DisplaySettings from '@/components/settings/DisplaySettings';
 import DataManagementSettings from '@/components/settings/DataManagementSettings';
+import CategorySettings from '@/components/settings/CategorySettings';
 
 export default function SettingsPage() {
   const { t } = useLocale();
@@ -22,6 +23,7 @@ export default function SettingsPage() {
         <div className="max-w-2xl mx-auto space-y-4">
            <Accordion type="single" collapsible className="w-full" defaultValue="language">
               <LanguageSettings />
+              <CategorySettings />
               <NutritionalGoalsSettings />
               <HydrationSettings />
               <DisplaySettings />
