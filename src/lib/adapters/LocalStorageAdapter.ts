@@ -14,6 +14,7 @@ export class LocalStorageAdapter implements IDataAdapter {
   private getDefaultData(): AppData {
     return {
       foods: defaultFoods,
+      categories: [],
       meals: [],
       favoriteFoodIds: [],
       settings: defaultSettings,

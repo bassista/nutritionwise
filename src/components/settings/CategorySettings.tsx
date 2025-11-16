@@ -11,11 +11,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { getCategoryName } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { Category } from '@/lib/types';
 
 export default function CategorySettings() {
-    const { foods, renameCategory, deleteCategory } = useAppStore();
+    const { categories, addCategory, renameCategory, deleteCategory } = useAppStore();
     const { t, locale } = useLocale();
     const { toast } = useToast();
     
@@ -27,26 +27,22 @@ export default function CategorySettings() {
     const [categoryToRename, setCategoryToRename] = useState<string | null>(null);
     const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
-    const categories = useMemo(() => {
-        const categorySet = new Set<string>();
-        foods.forEach(food => {
-            const catName = food.category?.[locale] || food.category?.['en'];
-            if (catName) {
-                categorySet.add(catName);
-            }
-        });
-        return Array.from(categorySet).sort();
-    }, [foods, locale]);
+    const sortedCategories = useMemo(() => {
+        return [...categories]
+            .map(cat => cat.name[locale] || cat.name['en'])
+            .filter(Boolean)
+            .sort((a, b) => a.localeCompare(b));
+    }, [categories, locale]);
 
     const handleAddCategory = () => {
-        if (newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
-            // "Adding" a category is done by assigning it to a food.
-            // For now, we can just close the dialog. The user can create a food with this category.
-            // To make this more robust, we would need a separate state for categories.
-            // For now, let's just let user rename/delete existing ones.
-            // A better approach is to simply rename an "Uncategorized" food.
-            renameCategory(t('Uncategorized'), newCategoryName.trim());
-            toast({ title: t('Category Added'), description: t("A new category has been created by renaming 'Uncategorized'.")});
+        const trimmedName = newCategoryName.trim();
+        if (trimmedName && !sortedCategories.includes(trimmedName)) {
+            const newCategory: Category = {
+                id: `cat-${Date.now()}`,
+                name: { [locale]: trimmedName, en: trimmedName }
+            };
+            addCategory(newCategory);
+            toast({ title: t('Category Added')});
             setNewCategoryName('');
             setAddDialogOpen(false);
         } else {
@@ -55,8 +51,9 @@ export default function CategorySettings() {
     };
     
     const handleRenameCategory = () => {
-        if (categoryToRename && newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
-            renameCategory(categoryToRename, newCategoryName.trim());
+        const trimmedName = newCategoryName.trim();
+        if (categoryToRename && trimmedName && !sortedCategories.includes(trimmedName)) {
+            renameCategory(categoryToRename, trimmedName);
             toast({ title: t('Category Renamed') });
             setCategoryToRename(null);
             setNewCategoryName('');
@@ -92,7 +89,7 @@ export default function CategorySettings() {
                         </Button>
                         <ScrollArea className="h-64 rounded-md border p-4">
                             <div className="space-y-2">
-                                {categories.map(category => (
+                                {sortedCategories.map(category => (
                                     <div key={category} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
                                         <span className="text-sm font-medium">{category}</span>
                                         <div className="flex items-center gap-1">

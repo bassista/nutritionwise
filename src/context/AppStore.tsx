@@ -2,7 +2,7 @@
 "use client";
 
 import { create } from 'zustand';
-import { AppData, Food, Meal, LoggedItem, MealType, ShoppingList, ShoppingListItem, NutritionalGoals, HydrationSettings, UserAchievement, AppSettings, DeleteFoodResult } from '@/lib/types';
+import { AppData, Food, Meal, LoggedItem, MealType, ShoppingList, ShoppingListItem, NutritionalGoals, HydrationSettings, UserAchievement, AppSettings, DeleteFoodResult, Category } from '@/lib/types';
 import { IDataAdapter } from '@/lib/adapters/IDataAdapter';
 import { LocalStorageAdapter } from '@/lib/adapters/LocalStorageAdapter';
 import { defaultFoods } from '@/lib/data';
@@ -21,7 +21,10 @@ export interface AppState extends AppData {
   deleteFood: (foodId: string) => DeleteFoodResult;
   importFoods: (csvRows: { [key: string]: string }[]) => number;
   exportFoodsToCsv: () => string;
-  renameCategory: (oldCategoryName: string, newCategoryName: string) => void;
+  
+  // Category actions
+  addCategory: (category: Category) => void;
+  renameCategory: (oldName: string, newName: string) => void;
   deleteCategory: (categoryName: string, defaultCategoryName: string) => void;
 
   // Meal actions
@@ -95,6 +98,7 @@ const useAppStore = create<AppState>((set, get) => {
     return {
         // Initial State
         foods: [],
+        categories: [],
         meals: [],
         favoriteFoodIds: [],
         dailyLogs: {},
@@ -168,39 +172,54 @@ const useAppStore = create<AppState>((set, get) => {
             });
             return [headers.join(','), ...rows].join('\n');
         },
-        renameCategory: (oldCategoryName, newCategoryName) => setStateAndSave(state => {
+
+        // --- Category Actions ---
+        addCategory: (category) => setStateAndSave(state => ({
+            categories: [...state.categories, category]
+        })),
+        renameCategory: (oldName, newName) => setStateAndSave(state => {
+            const updatedCategories = state.categories.map(cat => {
+                const newCatName = { ...cat.name };
+                let nameChanged = false;
+                Object.keys(newCatName).forEach(lang => {
+                    if (newCatName[lang] === oldName) {
+                        newCatName[lang] = newName;
+                        nameChanged = true;
+                    }
+                });
+                return nameChanged ? { ...cat, name: newCatName } : cat;
+            });
+
             const updatedFoods = state.foods.map(food => {
-                const updatedCategory = { ...food.category };
+                const newFoodCat = { ...food.category };
                 let categoryChanged = false;
-                for (const lang in updatedCategory) {
-                    if (updatedCategory[lang] === oldCategoryName) {
-                        updatedCategory[lang] = newCategoryName;
+                Object.keys(newFoodCat).forEach(lang => {
+                    if (newFoodCat[lang] === oldName) {
+                        newFoodCat[lang] = newName;
                         categoryChanged = true;
                     }
-                }
-                if (categoryChanged) {
-                    return { ...food, category: updatedCategory };
-                }
-                return food;
+                });
+                return categoryChanged ? { ...food, category: newFoodCat } : food;
             });
-            return { foods: updatedFoods };
+            
+            return { categories: updatedCategories, foods: updatedFoods };
         }),
         deleteCategory: (categoryName, defaultCategoryName) => setStateAndSave(state => {
+            const updatedCategories = state.categories.filter(cat => Object.values(cat.name).every(name => name !== categoryName));
+
             const updatedFoods = state.foods.map(food => {
-                const updatedCategory = { ...food.category };
+                 const newFoodCat = { ...food.category };
                 let categoryChanged = false;
-                for (const lang in updatedCategory) {
-                    if (updatedCategory[lang] === categoryName) {
-                        updatedCategory[lang] = defaultCategoryName;
+                Object.keys(newFoodCat).forEach(lang => {
+                    if (newFoodCat[lang] === categoryName) {
+                        newFoodCat[lang] = defaultCategoryName;
                         categoryChanged = true;
                     }
-                }
-                 if (categoryChanged) {
-                    return { ...food, category: updatedCategory };
-                }
-                return food;
+                });
+                return categoryChanged ? { ...food, category: newFoodCat } : food;
             });
-            return { foods: updatedFoods };
+
+            return { categories: updatedCategories, foods: updatedFoods };
         }),
         
         // --- Meal Actions ---
@@ -411,11 +430,29 @@ const useAppStore = create<AppState>((set, get) => {
         setAppData: (data) => setStateAndSave(() => ({ ...data })),
         load: async () => {
             const data = await dataAdapter.loadData();
+            // Seed categories from foods if categories are not present
+            if (!data.categories || data.categories.length === 0) {
+                const categorySet = new Map<string, { [key: string]: string }>();
+                data.foods.forEach(food => {
+                    const firstLang = Object.keys(food.category)[0];
+                    if (firstLang) {
+                        const catName = food.category[firstLang];
+                        if (catName && !categorySet.has(catName)) {
+                            categorySet.set(catName, food.category);
+                        }
+                    }
+                });
+                data.categories = Array.from(categorySet.values()).map((name, index) => ({
+                    id: `cat-${index}-${Date.now()}`,
+                    name,
+                }));
+            }
             set(data);
         },
         reset: async () => {
             const defaultData: AppData = {
                 foods: defaultFoods,
+                categories: [],
                 meals: [],
                 favoriteFoodIds: [],
                 settings: defaultSettings,
@@ -430,5 +467,3 @@ const useAppStore = create<AppState>((set, get) => {
 });
 
 export default useAppStore;
-
-    

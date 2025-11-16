@@ -41,7 +41,7 @@ export default function FoodListPage({
   enableSorting = false,
   pageType,
 }: FoodListPageProps) {
-  const { settings } = useAppStore();
+  const { settings, categories } = useAppStore();
   const { t, locale } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -52,10 +52,10 @@ export default function FoodListPage({
     setCurrentPage(1);
   }, [searchTerm, categoryFilter]);
 
-  const categories = useMemo(() => {
-    const allCategories = foods.map(f => getCategoryName(f, locale, t));
-    return ['all', ...Array.from(new Set(allCategories.filter(Boolean)))];
-  }, [foods, locale, t]);
+  const categoryNames = useMemo(() => {
+    const allCategoryNames = categories.map(c => c.name[locale] || c.name['en']).filter(Boolean);
+    return ['all', ...Array.from(new Set(allCategoryNames))];
+  }, [categories, locale]);
   
   const sortedFoods = useMemo(() => {
     if (enableSorting) {
@@ -137,14 +137,15 @@ export default function FoodListPage({
                 aria-label={t('Search for a food...')}
               />
             </div>
-            {categories.length > 2 && (
+            {categoryNames.length > 2 && (
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-full md:w-[180px]">
                   <SelectValue placeholder={t('Filter by category')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('All Categories')}</SelectItem>
-                  {categories.filter(cat => cat !== 'all').map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                  {categoryNames.filter(cat => cat !== 'all' && cat !== t('Uncategorized')).map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                  {categoryNames.includes(t('Uncategorized')) && <SelectItem value={t('Uncategorized')}>{t('Uncategorized')}</SelectItem>}
                 </SelectContent>
               </Select>
             )}

@@ -63,15 +63,15 @@ interface FoodFormProps {
 }
 
 export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmitted, autoFavorite = false }: FoodFormProps) {
-  const { addFood, updateFood, foods, toggleFavorite } = useAppStore();
+  const { addFood, updateFood, foods, categories, toggleFavorite } = useAppStore();
   const { toast } = useToast();
   const { t, locale } = useLocale();
 
-  const categories = useMemo(() => {
-    const existingCategories = foods.map(f => getCategoryName(f, locale, t));
+  const categoryNames = useMemo(() => {
     // Ensure "Uncategorized" is always in the list, and use a Set to remove duplicates
-    return Array.from(new Set([t('Uncategorized'), ...existingCategories.filter(Boolean)]));
-  }, [foods, locale, t]);
+    const allCategoryNames = categories.map(c => c.name[locale] || c.name['en']).filter(Boolean);
+    return Array.from(new Set([t('Uncategorized'), ...allCategoryNames]));
+  }, [categories, locale, t]);
   
   const defaultValues: FoodFormValues = useMemo(() => ({
     id: '',
@@ -239,7 +239,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categories.map((category) => (
+                          {categoryNames.map((category) => (
                             <SelectItem key={category} value={category}>
                               {category}
                             </SelectItem>

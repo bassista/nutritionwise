@@ -10,6 +10,11 @@ export interface NutritionalInfo {
   sodium?: number;
 }
 
+export interface Category {
+  id: string;
+  name: { [key: string]: string };
+}
+
 export interface Food extends NutritionalInfo {
   id: string;
   name: { [key: string]: string };
@@ -97,6 +102,7 @@ export interface UserAchievement {
 
 export interface AppData {
   foods: Food[];
+  categories: Category[];
   meals: Meal[];
   favoriteFoodIds: string[];
   settings: AppSettings;
