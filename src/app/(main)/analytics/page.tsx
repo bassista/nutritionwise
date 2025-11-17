@@ -237,7 +237,7 @@ export default function AnalyticsPage() {
                            )}
                         </CardContent>
                     </Card>
-                    
+
                     <Card>
                         <CardHeader>
                             <CardTitle>{t('Consumption by Category')}</CardTitle>
@@ -285,7 +285,7 @@ export default function AnalyticsPage() {
                             )}
                         </CardContent>
                     </Card>
-                    
+
                     <Card>
                         <CardHeader>
                             <CardTitle>{t('Glucose Trend')}</CardTitle>
@@ -381,7 +381,3 @@ export default function AnalyticsPage() {
         </>
     );
 }
-
-    
-
-    
