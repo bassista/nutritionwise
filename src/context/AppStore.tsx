@@ -169,8 +169,23 @@ const useAppStore = create<AppState>((set, get) => {
             const headers = ['id', 'serving_size_g', 'calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'name_category'];
             const rows = foods.map(food => {
                 const allLangs = new Set([...Object.keys(food.name), ...Object.keys(food.category || {})]);
-                const nameCategoryPairs = Array.from(allLangs).map(lang => `${lang}=${food.name[lang] || ''}:${food.category?.[lang] || ''}`).join(';');
-                return [food.id, food.serving_size_g || 100, food.calories || 0, food.protein || 0, food.carbohydrates || 0, food.fat || 0, food.fiber || 0, food.sugar || 0, food.sodium || 0, `"${nameCategoryPairs}"`].join(',');
+                const nameCategoryPairs = Array.from(allLangs).map(lang => {
+                    const name = food.name[lang] || '';
+                    const category = food.category?.[lang] || '';
+                    return `${lang}=${name}:${category}`;
+                }).join(';');
+                return [
+                    food.id,
+                    food.serving_size_g || 100,
+                    food.calories || 0,
+                    food.protein || 0,
+                    food.carbohydrates || 0,
+                    food.fat || 0,
+                    food.fiber || 0,
+                    food.sugar || 0,
+                    food.sodium || 0,
+                    `"${nameCategoryPairs}"`
+                ].join(',');
             });
             return [headers.join(','), ...rows].join('\n');
         },
@@ -491,11 +506,13 @@ const useAppStore = create<AppState>((set, get) => {
             if (!data.categories || data.categories.length === 0) {
                 const categorySet = new Map<string, { [key: string]: string }>();
                 data.foods.forEach(food => {
-                    const firstLang = Object.keys(food.category)[0];
-                    if (firstLang) {
-                        const catName = food.category[firstLang];
-                        if (catName && !categorySet.has(catName)) {
-                            categorySet.set(catName, food.category);
+                    if (food.category) {
+                        const firstLang = Object.keys(food.category)[0];
+                        if (firstLang) {
+                            const catName = food.category[firstLang];
+                            if (catName && !categorySet.has(catName)) {
+                                categorySet.set(catName, food.category);
+                            }
                         }
                     }
                 });
@@ -524,3 +541,5 @@ const useAppStore = create<AppState>((set, get) => {
 });
 
 export default useAppStore;
+
+    
