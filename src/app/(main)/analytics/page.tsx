@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import useAppStore from '@/context/AppStore';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, AreaChart, Area, Cell } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, AreaChart, Area, Cell, ComposedChart } from 'recharts';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { useLocale } from '@/context/LocaleContext';
 import { AnalysisPeriod } from '@/lib/types';
@@ -381,3 +381,5 @@ export default function AnalyticsPage() {
         </>
     );
 }
+
+    
