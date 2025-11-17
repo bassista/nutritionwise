@@ -167,30 +167,6 @@ export default function AnalyticsPage() {
                     
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('Consumption by Category')}</CardTitle>
-                             <CardDescription>{t('Calorie distribution from food categories.')}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex justify-center">
-                           {analysisData.categoryDistribution.length > 0 ? (
-                                <ChartContainer config={chartConfig} className="h-52 w-full">
-                                    <PieChart>
-                                        <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-                                        <Pie data={analysisData.categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} labelLine={false} label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}>
-                                            {analysisData.categoryDistribution.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.fill} />
-                                            ))}
-                                        </Pie>
-                                        <Legend />
-                                    </PieChart>
-                                </ChartContainer>
-                           ) : (
-                             <div className="flex items-center justify-center h-52 text-muted-foreground"><Pizza className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
-                           )}
-                        </CardContent>
-                    </Card>
-                    
-                    <Card>
-                        <CardHeader>
                             <CardTitle>{t('Hydration Trend')}</CardTitle>
                             <CardDescription>{t('Your daily water intake vs. goal.')}</CardDescription>
                         </CardHeader>
@@ -240,6 +216,52 @@ export default function AnalyticsPage() {
                         </CardContent>
                     </Card>
 
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Weekly Consistency')}</CardTitle>
+                            <CardDescription>{t('Average diet score by day of the week.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           {analysisData.consistencyData.some(d => d.score > 0) ? (
+                            <ChartContainer config={chartConfig} className="h-52 w-full">
+                                <BarChart data={analysisData.consistencyData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
+                                    <YAxis domain={[0, 100]} />
+                                    <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+                                    <Bar dataKey="score" fill="var(--color-score)" name={t('Score')} radius={4} />
+                                </BarChart>
+                            </ChartContainer>
+                           ) : (
+                                <div className="flex items-center justify-center h-52 text-muted-foreground"><Trophy className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
+                        </CardContent>
+                    </Card>
+                    
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Consumption by Category')}</CardTitle>
+                             <CardDescription>{t('Calorie distribution from food categories.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex justify-center">
+                           {analysisData.categoryDistribution.length > 0 ? (
+                                <ChartContainer config={chartConfig} className="h-52 w-full">
+                                    <PieChart>
+                                        <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                                        <Pie data={analysisData.categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} labelLine={false} label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}>
+                                            {analysisData.categoryDistribution.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                            ))}
+                                        </Pie>
+                                        <Legend />
+                                    </PieChart>
+                                </ChartContainer>
+                           ) : (
+                             <div className="flex items-center justify-center h-52 text-muted-foreground"><Pizza className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
+                        </CardContent>
+                    </Card>
+
                     <Card className="lg:col-span-3">
                         <CardHeader>
                             <CardTitle>{t('Average Daily Intake')}</CardTitle>
@@ -263,29 +285,7 @@ export default function AnalyticsPage() {
                             )}
                         </CardContent>
                     </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t('Weekly Consistency')}</CardTitle>
-                            <CardDescription>{t('Average diet score by day of the week.')}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                           {analysisData.consistencyData.some(d => d.score > 0) ? (
-                            <ChartContainer config={chartConfig} className="h-52 w-full">
-                                <BarChart data={analysisData.consistencyData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                                    <CartesianGrid vertical={false} />
-                                    <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} />
-                                    <YAxis domain={[0, 100]} />
-                                    <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-                                    <Bar dataKey="score" fill="var(--color-score)" name={t('Score')} radius={4} />
-                                </BarChart>
-                            </ChartContainer>
-                           ) : (
-                                <div className="flex items-center justify-center h-52 text-muted-foreground"><Trophy className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
-                           )}
-                        </CardContent>
-                    </Card>
-
+                    
                     <Card>
                         <CardHeader>
                             <CardTitle>{t('Glucose Trend')}</CardTitle>
@@ -333,6 +333,7 @@ export default function AnalyticsPage() {
                             </ChartContainer>
                         </CardContent>
                     </Card>
+
                     <Card className="lg:col-span-3">
                         <CardHeader>
                             <CardTitle>{t('Top 10 Foods')}</CardTitle>
