@@ -242,49 +242,6 @@ export default function AnalyticsPage() {
 
                     <Card className="lg:col-span-3">
                         <CardHeader>
-                            <CardTitle>{t('Top 10 Foods')}</CardTitle>
-                             <CardDescription>
-                                {t('Your most frequently consumed foods, ranked by')}{' '}
-                                <Select value={topFoodsMetric} onValueChange={(v) => setTopFoodsMetric(v as TopFoodsMetric)}>
-                                    <SelectTrigger className="inline-flex w-auto h-auto p-1 text-sm font-semibold border-none shadow-none">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="count">{t('Frequency')}</SelectItem>
-                                        <SelectItem value="calories">{t('Calories')}</SelectItem>
-                                        <SelectItem value="protein">{t('Protein')}</SelectItem>
-                                        <SelectItem value="carbohydrates">{t('Carbohydrates')}</SelectItem>
-                                        <SelectItem value="fat">{t('Fat')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                           {topFoodsSorted.length > 0 ? (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>{t('Food')}</TableHead>
-                                            <TableHead className="text-right">{t(topFoodsMetric.charAt(0).toUpperCase() + topFoodsMetric.slice(1))}</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {topFoodsSorted.map(food => (
-                                            <TableRow key={food.foodId}>
-                                                <TableCell>{getFoodName(getFoodById(food.foodId)!, locale)}</TableCell>
-                                                <TableCell className="text-right">{food[topFoodsMetric].toFixed(topFoodsMetric === 'count' ? 0 : 1)}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                           ) : (
-                             <div className="flex items-center justify-center h-40 text-muted-foreground"><TrendingUp className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
-                           )}
-                        </CardContent>
-                    </Card>
-
-                    <Card className="lg:col-span-3">
-                        <CardHeader>
                             <CardTitle>{t('Average Daily Intake')}</CardTitle>
                             <CardDescription>{t('Your average daily nutrient intake compared to your goals.')}</CardDescription>
                         </CardHeader>
@@ -376,10 +333,54 @@ export default function AnalyticsPage() {
                             </ChartContainer>
                         </CardContent>
                     </Card>
+                    <Card className="lg:col-span-3">
+                        <CardHeader>
+                            <CardTitle>{t('Top 10 Foods')}</CardTitle>
+                             <CardDescription>
+                                {t('Your most frequently consumed foods, ranked by')}{' '}
+                                <Select value={topFoodsMetric} onValueChange={(v) => setTopFoodsMetric(v as TopFoodsMetric)}>
+                                    <SelectTrigger className="inline-flex w-auto h-auto p-1 text-sm font-semibold border-none shadow-none">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="count">{t('Frequency')}</SelectItem>
+                                        <SelectItem value="calories">{t('Calories')}</SelectItem>
+                                        <SelectItem value="protein">{t('Protein')}</SelectItem>
+                                        <SelectItem value="carbohydrates">{t('Carbohydrates')}</SelectItem>
+                                        <SelectItem value="fat">{t('Fat')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           {topFoodsSorted.length > 0 ? (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>{t('Food')}</TableHead>
+                                            <TableHead className="text-right">{t(topFoodsMetric.charAt(0).toUpperCase() + topFoodsMetric.slice(1))}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {topFoodsSorted.map(food => (
+                                            <TableRow key={food.foodId}>
+                                                <TableCell>{getFoodName(getFoodById(food.foodId)!, locale)}</TableCell>
+                                                <TableCell className="text-right">{food[topFoodsMetric].toFixed(topFoodsMetric === 'count' ? 0 : 1)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                           ) : (
+                             <div className="flex items-center justify-center h-40 text-muted-foreground"><TrendingUp className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </>
     );
 }
+
+    
 
     
