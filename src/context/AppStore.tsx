@@ -167,15 +167,26 @@ const useAppStore = create<AppState>((set, get) => {
         exportFoodsToCsv: () => {
             const { foods } = get();
             const headers = ['id', 'serving_size_g', 'calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'name_category'];
+            
+            const sanitize = (str: string | undefined) => (str || '').replace(/"/g, '""');
+
             const rows = foods.map(food => {
-                const allLangs = new Set([...Object.keys(food.name), ...Object.keys(food.category || {})]);
-                const nameCategoryPairs = Array.from(allLangs).map(lang => {
-                    const name = food.name[lang] || '';
-                    const category = food.category?.[lang] || '';
-                    return `${lang}=${name}:${category}`;
-                }).join(';');
-                return [
-                    food.id,
+                const supportedLangs = ['en', 'it'];
+                const nameCategoryPairs = supportedLangs
+                    .map(lang => {
+                        const name = food.name[lang];
+                        const category = food.category?.[lang];
+                        // Only include the pair if there's a name for that language
+                        if (name) {
+                            return `${lang}=${sanitize(name)}:${sanitize(category)}`;
+                        }
+                        return null;
+                    })
+                    .filter(Boolean) // Remove nulls for languages without a name
+                    .join(';');
+
+                const rowData = [
+                    sanitize(food.id),
                     food.serving_size_g || 100,
                     food.calories || 0,
                     food.protein || 0,
@@ -184,11 +195,14 @@ const useAppStore = create<AppState>((set, get) => {
                     food.fiber || 0,
                     food.sugar || 0,
                     food.sodium || 0,
-                    `"${nameCategoryPairs}"`
-                ].join(',');
+                    `"${nameCategoryPairs}"` // Quote the entire field
+                ];
+                return rowData.join(',');
             });
+            
             return [headers.join(','), ...rows].join('\n');
         },
+
 
         // --- Category Actions ---
         addCategory: (category) => setStateAndSave(state => ({
