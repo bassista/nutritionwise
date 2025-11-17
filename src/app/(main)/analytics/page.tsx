@@ -4,12 +4,12 @@ import { useMemo, useState } from 'react';
 import useAppStore from '@/context/AppStore';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, AreaChart, Area } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, AreaChart, Area, Cell } from 'recharts';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { useLocale } from '@/context/LocaleContext';
 import { AnalysisPeriod } from '@/lib/types';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { LineChart as LineChartIcon, TrendingUp, Trophy } from 'lucide-react';
+import { LineChart as LineChartIcon, TrendingUp, Trophy, Pizza, Droplets, Scale } from 'lucide-react';
 import { processAnalyticsData } from '@/lib/analytics';
 import {
   Select,
@@ -31,8 +31,8 @@ export default function AnalyticsPage() {
     const [topFoodsMetric, setTopFoodsMetric] = useState<TopFoodsMetric>('calories');
 
     const analysisData = useMemo(() => {
-        return processAnalyticsData(period, dailyLogs, getFoodById, getMealById, settings.nutritionalGoals, t);
-    }, [period, dailyLogs, getFoodById, getMealById, settings.nutritionalGoals, t]);
+        return processAnalyticsData(period, dailyLogs, getFoodById, getMealById, settings, t, locale);
+    }, [period, dailyLogs, getFoodById, getMealById, settings, t, locale]);
     
     const chartConfig: ChartConfig = {
         calories: { label: t('Calories'), color: 'hsl(var(--chart-1))' },
@@ -40,12 +40,15 @@ export default function AnalyticsPage() {
         carbohydrates: { label: t('Carbohydrates'), color: 'hsl(var(--chart-3))' },
         fat: { label: t('Fat'), color: 'hsl(var(--chart-4))' },
         weight: { label: t('Weight'), color: 'hsl(var(--chart-5))' },
+        weeklyAvgCalories: { label: t('Avg Calories (7-day)'), color: 'hsl(var(--chart-2))' },
         glucose: { label: t('Glucose'), color: 'hsl(var(--chart-1))' },
         insulin: { label: t('Insulin'), color: 'hsl(var(--chart-2))' },
         consistency: { label: t('Consistency'), color: 'hsl(var(--chart-1))' },
         score: { label: t('Score'), color: 'hsl(var(--chart-2))' },
         average: { label: t('Average Intake'), color: 'hsl(var(--chart-1))'},
         goal: { label: t('Goal'), color: 'hsl(var(--chart-2))'},
+        waterIntake: { label: t('Water Intake'), color: 'hsl(var(--chart-3))' },
+        hydrationGoal: { label: t('Water Goal'), color: 'hsl(var(--chart-4))' },
     };
 
     const noData = Object.keys(dailyLogs).length === 0;
@@ -71,6 +74,13 @@ export default function AnalyticsPage() {
             goal: settings.nutritionalGoals[nutrient as keyof typeof settings.nutritionalGoals],
         }));
     }, [analysisData.avgNutrients, settings.nutritionalGoals, t]);
+
+    const hydrationChartData = useMemo(() => {
+        return analysisData.lineChartData.map(d => ({
+            ...d,
+            hydrationGoal: analysisData.hydrationGoal
+        }));
+    }, [analysisData.lineChartData, analysisData.hydrationGoal]);
 
     if (noData) {
         return (
@@ -155,6 +165,81 @@ export default function AnalyticsPage() {
                         </CardContent>
                     </Card>
                     
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Consumption by Category')}</CardTitle>
+                             <CardDescription>{t('Calorie distribution from food categories.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex justify-center">
+                           {analysisData.categoryDistribution.length > 0 ? (
+                                <ChartContainer config={chartConfig} className="h-52 w-full">
+                                    <PieChart>
+                                        <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                                        <Pie data={analysisData.categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} labelLine={false} label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}>
+                                            {analysisData.categoryDistribution.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                            ))}
+                                        </Pie>
+                                        <Legend />
+                                    </PieChart>
+                                </ChartContainer>
+                           ) : (
+                             <div className="flex items-center justify-center h-52 text-muted-foreground"><Pizza className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
+                        </CardContent>
+                    </Card>
+                    
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Hydration Trend')}</CardTitle>
+                            <CardDescription>{t('Your daily water intake vs. goal.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           {analysisData.lineChartData.some(d => d.waterIntake > 0) ? (
+                               <ChartContainer config={chartConfig} className="h-52 w-full">
+                                    <AreaChart data={hydrationChartData} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                                        <YAxis unit="ml" />
+                                        <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+                                        <Legend />
+                                        <defs>
+                                            <linearGradient id="fillWater" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--color-waterIntake)" stopOpacity={0.8}/>
+                                            <stop offset="95%" stopColor="var(--color-waterIntake)" stopOpacity={0.1}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <Area type="monotone" dataKey="waterIntake" stroke="var(--color-waterIntake)" strokeWidth={2} dot={false} name={t('Water Intake')} fill="url(#fillWater)" />
+                                        <Line type="monotone" dataKey="hydrationGoal" stroke="var(--color-hydrationGoal)" strokeDasharray="3 3" dot={false} name={t('Water Goal')} />
+                                    </AreaChart>
+                                </ChartContainer>
+                           ) : (
+                            <div className="flex items-center justify-center h-52 text-muted-foreground"><Droplets className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Weight and Calorie Correlation')}</CardTitle>
+                            <CardDescription>{t('7-day average calories vs. weight.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ChartContainer config={chartConfig} className="h-52 w-full">
+                                <ComposedChart data={analysisData.lineChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                                    <YAxis yAxisId="left" orientation="left" stroke="var(--color-weight)" domain={['dataMin - 2', 'dataMax + 2']}/>
+                                    <YAxis yAxisId="right" orientation="right" stroke="var(--color-weeklyAvgCalories)" domain={['dataMin - 100', 'dataMax + 100']} />
+                                    <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+                                    <Legend />
+                                    <Area yAxisId="left" type="monotone" dataKey="weight" fill="hsl(var(--chart-5), 0.4)" stroke="hsl(var(--chart-5))" name={t('Weight')} />
+                                    <Line yAxisId="right" type="monotone" dataKey="weeklyAvgCalories" stroke="hsl(var(--chart-2))" dot={false} name={t('Avg Calories (7-day)')} />
+                                </ComposedChart>
+                            </ChartContainer>
+                        </CardContent>
+                    </Card>
+
                     <Card className="lg:col-span-3">
                         <CardHeader>
                             <CardTitle>{t('Top 10 Foods')}</CardTitle>
@@ -246,23 +331,23 @@ export default function AnalyticsPage() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>{t('Weight Trend')}</CardTitle>
-                            <CardDescription>{t('Your weight trend')} {periodDescription}</CardDescription>
+                            <CardTitle>{t('Glucose Trend')}</CardTitle>
+                            <CardDescription>{t('Your glucose trend')} {periodDescription}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <ChartContainer config={chartConfig} className="h-52 w-full">
                                 <AreaChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
                                     <CartesianGrid vertical={false} />
                                     <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                                    <YAxis domain={['dataMin - 1', 'dataMax + 1']} unit="kg" />
+                                    <YAxis domain={['dataMin - 10', 'dataMax + 10']} unit="mg/dL" />
                                     <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
                                     <defs>
-                                        <linearGradient id="fillWeight" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="var(--color-weight)" stopOpacity={0.8}/>
-                                        <stop offset="95%" stopColor="var(--color-weight)" stopOpacity={0.1}/>
+                                        <linearGradient id="fillGlucose" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--color-glucose)" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="var(--color-glucose)" stopOpacity={0.1}/>
                                         </linearGradient>
                                     </defs>
-                                    <Area type="monotone" dataKey="weight" stroke="var(--color-weight)" strokeWidth={2} dot={false} name={t('Weight (kg)')} fill="url(#fillWeight)" />
+                                    <Area type="monotone" dataKey="glucose" stroke="var(--color-glucose)" strokeWidth={2} dot={false} name={t('Glucose (mg/dL)')} fill="url(#fillGlucose)" />
                                 </AreaChart>
                             </ChartContainer>
                         </CardContent>
@@ -287,30 +372,6 @@ export default function AnalyticsPage() {
                                         </linearGradient>
                                     </defs>
                                     <Area type="monotone" dataKey="insulin" stroke="var(--color-insulin)" strokeWidth={2} dot={false} name={t('Insulin (units)')} fill="url(#fillInsulin)" />
-                                </AreaChart>
-                            </ChartContainer>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t('Glucose Trend')}</CardTitle>
-                            <CardDescription>{t('Your glucose trend')} {periodDescription}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ChartContainer config={chartConfig} className="h-52 w-full">
-                                <AreaChart data={analysisData.lineChartData} margin={{ top: 5, right: 20, left: 10, bottom: 0 }}>
-                                    <CartesianGrid vertical={false} />
-                                    <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                                    <YAxis domain={['dataMin - 10', 'dataMax + 10']} unit="mg/dL" />
-                                    <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-                                    <defs>
-                                        <linearGradient id="fillGlucose" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="var(--color-glucose)" stopOpacity={0.8}/>
-                                        <stop offset="95%" stopColor="var(--color-glucose)" stopOpacity={0.1}/>
-                                        </linearGradient>
-                                    </defs>
-                                    <Area type="monotone" dataKey="glucose" stroke="var(--color-glucose)" strokeWidth={2} dot={false} name={t('Glucose (mg/dL)')} fill="url(#fillGlucose)" />
                                 </AreaChart>
                             </ChartContainer>
                         </CardContent>

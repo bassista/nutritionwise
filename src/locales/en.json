@@ -206,7 +206,7 @@
   "Search Food": "Search Food",
   "Add Manually": "Add Manually",
   "Enter item name...": "Enter item name...",
-  "Type the name of the item you want to add and press Enter or click the button below.": "Type the name of the item to add and press Enter or the button below.",
+  "Type the name of the item you want to add and press Enter or click the button below.": "Digita il nome dell'elemento da aggiungere e premi Invio o clicca il pulsante qui sotto.",
   "Add \"{item}\"": "Add \"{item}\"",
   "Close": "Close",
   "Ingredients Added": "Ingredients Added",
@@ -337,5 +337,13 @@
   "Delete Category": "Delete Category",
   "Invalid Name": "Invalid Name",
   "Category name cannot be empty or a duplicate.": "Category name cannot be empty or a duplicate.",
-  "A new category has been created by renaming 'Uncategorized'.": "A new category has been created by renaming 'Uncategorized'."
+  "A new category has been created by renaming 'Uncategorized'.": "A new category has been created by renaming 'Uncategorized'.",
+  "Consumption by Category": "Consumption by Category",
+  "Calorie distribution from food categories.": "Calorie distribution from food categories.",
+  "Hydration Trend": "Hydration Trend",
+  "Your daily water intake vs. goal.": "Your daily water intake vs. goal.",
+  "Water Goal": "Water Goal",
+  "Weight and Calorie Correlation": "Weight and Calorie Correlation",
+  "7-day average calories vs. weight.": "7-day average calories vs. weight.",
+  "Avg Calories (7-day)": "Avg Calories (7-day)"
 }

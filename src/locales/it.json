@@ -339,5 +339,13 @@
   "Delete Category": "Elimina Categoria",
   "Invalid Name": "Nome Non Valido",
   "Category name cannot be empty or a duplicate.": "Il nome della categoria non può essere vuoto o duplicato.",
-  "A new category has been created by renaming 'Uncategorized'.": "Una nuova categoria è stata creata rinominando 'Senza categoria'."
+  "A new category has been created by renaming 'Uncategorized'.": "Una nuova categoria è stata creata rinominando 'Senza categoria'.",
+  "Consumption by Category": "Consumo per Categoria",
+  "Calorie distribution from food categories.": "Distribuzione calorie per categorie di alimenti.",
+  "Hydration Trend": "Andamento Idratazione",
+  "Your daily water intake vs. goal.": "La tua assunzione giornaliera di acqua contro l'obiettivo.",
+  "Water Goal": "Obiettivo Acqua",
+  "Weight and Calorie Correlation": "Correlazione Peso e Calorie",
+  "7-day average calories vs. weight.": "Media calorie su 7 giorni vs. peso.",
+  "Avg Calories (7-day)": "Media Calorie (7gg)"
 }
