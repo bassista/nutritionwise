@@ -168,25 +168,26 @@ const useAppStore = create<AppState>((set, get) => {
             const { foods } = get();
             const headers = ['id', 'serving_size_g', 'calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'name_category'];
             
-            const sanitize = (str: string | undefined) => (str || '').replace(/"/g, '""');
+            const sanitize = (str: string) => str.replace(/"/g, '""');
 
             const rows = foods.map(food => {
                 const supportedLangs = ['en', 'it'];
                 const nameCategoryPairs = supportedLangs
                     .map(lang => {
                         const name = food.name[lang];
-                        const category = food.category?.[lang];
-                        // Only include the pair if there's a name for that language
+                        // Fallback to English category if the current language category is missing
+                        const category = food.category?.[lang] || food.category?.['en'];
+                        
                         if (name) {
-                            return `${lang}=${sanitize(name)}:${sanitize(category)}`;
+                            return `${lang}=${sanitize(name)}:${sanitize(category || '')}`;
                         }
                         return null;
                     })
-                    .filter(Boolean) // Remove nulls for languages without a name
+                    .filter(Boolean)
                     .join(';');
 
                 const rowData = [
-                    sanitize(food.id),
+                    food.id,
                     food.serving_size_g || 100,
                     food.calories || 0,
                     food.protein || 0,
