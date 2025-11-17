@@ -347,5 +347,9 @@
   "Water Goal": "Obiettivo Acqua",
   "Weight and Calorie Correlation": "Correlazione Peso e Calorie",
   "7-day average calories vs. weight.": "Media calorie su 7 giorni vs. peso.",
-  "Avg Calories (7-day)": "Media Calorie (7gg)"
+  "Avg Calories (7-day)": "Media Calorie (7gg)",
+  "Recalculate Nutrients?": "Ricalcolare i Nutrienti?",
+  "Do you want to proportionally recalculate all nutrient values based on the new serving size?": "Vuoi ricalcolare proporzionalmente tutti i valori nutrizionali in base alla nuova porzione?",
+  "Yes": "Sì",
+  "No": "No"
 }

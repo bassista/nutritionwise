@@ -345,5 +345,9 @@
   "Water Goal": "Water Goal",
   "Weight and Calorie Correlation": "Weight and Calorie Correlation",
   "7-day average calories vs. weight.": "7-day average calories vs. weight.",
-  "Avg Calories (7-day)": "Avg Calories (7-day)"
+  "Avg Calories (7-day)": "Avg Calories (7-day)",
+  "Recalculate Nutrients?": "Recalculate Nutrients?",
+  "Do you want to proportionally recalculate all nutrient values based on the new serving size?": "Do you want to proportionally recalculate all nutrient values based on the new serving size?",
+  "Yes": "Yes",
+  "No": "No"
 }

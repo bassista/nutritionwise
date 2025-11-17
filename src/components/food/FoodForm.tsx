@@ -13,6 +13,16 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Form,
   FormControl,
   FormField,
@@ -27,7 +37,7 @@ import useAppStore from '@/context/AppStore';
 import { useToast } from '@/hooks/use-toast';
 import { useLocale } from '@/context/LocaleContext';
 import { Food } from '@/lib/types';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getCategoryName } from '@/lib/utils';
 import {
   Select,
@@ -67,8 +77,11 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
   const { toast } = useToast();
   const { t, locale } = useLocale();
 
+  const [isRecalculateDialogOpen, setRecalculateDialogOpen] = useState(false);
+  const [oldServingSize, setOldServingSize] = useState<number | null>(null);
+  const [newServingSize, setNewServingSize] = useState<number | null>(null);
+
   const categoryNames = useMemo(() => {
-    // Ensure "Uncategorized" is always in the list, and use a Set to remove duplicates
     const allCategoryNames = categories.map(c => c.name[locale] || c.name['en']).filter(Boolean);
     return Array.from(new Set([t('Uncategorized'), ...allCategoryNames]));
   }, [categories, locale, t]);
@@ -94,8 +107,9 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
 
   useEffect(() => {
     if (open) {
+      let initialData;
       if (foodToEdit) {
-        form.reset({
+        initialData = {
           id: foodToEdit.id,
           name: foodToEdit.name[locale] || foodToEdit.name['en'] || '',
           category: getCategoryName(foodToEdit, locale, t),
@@ -107,9 +121,9 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
           fiber: foodToEdit.fiber || 0,
           sugar: foodToEdit.sugar || 0,
           sodium: foodToEdit.sodium || 0,
-        });
+        };
       } else if (foodToCreate) {
-        form.reset({
+        initialData = {
           id: foodToCreate.id || '',
           name: foodToCreate.name?.[locale] || foodToCreate.name?.['en'] || '',
           category: foodToCreate.category?.[locale] || foodToCreate.category?.['en'] || t('Uncategorized'),
@@ -121,11 +135,12 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
           fiber: foodToCreate.fiber || 0,
           sugar: foodToCreate.sugar || 0,
           sodium: foodToCreate.sodium || 0,
-        });
+        };
+      } else {
+        initialData = defaultValues;
       }
-      else {
-        form.reset(defaultValues);
-      }
+      form.reset(initialData);
+      setOldServingSize(initialData.serving_size_g);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, foodToEdit, foodToCreate, form, defaultValues, locale]);
@@ -187,9 +202,42 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
     }
   };
 
+  const handleServingSizeBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const currentServingSize = parseFloat(event.target.value);
+    if (oldServingSize !== null && currentServingSize !== oldServingSize && oldServingSize > 0) {
+      setNewServingSize(currentServingSize);
+      setRecalculateDialogOpen(true);
+    }
+  };
+
+  const handleRecalculateNutrients = () => {
+    if (oldServingSize === null || newServingSize === null || oldServingSize <= 0) return;
+
+    const ratio = newServingSize / oldServingSize;
+    const currentValues = form.getValues();
+    const nutrientFields: (keyof FoodFormValues)[] = ['calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium'];
+
+    nutrientFields.forEach(field => {
+        const currentValue = currentValues[field] as number | undefined;
+        if (typeof currentValue === 'number') {
+            form.setValue(field, parseFloat((currentValue * ratio).toFixed(2)));
+        }
+    });
+    
+    setOldServingSize(newServingSize);
+    setRecalculateDialogOpen(false);
+  };
+  
+  const handleDialogClose = () => {
+    if (newServingSize !== null) {
+      setOldServingSize(newServingSize);
+    }
+    setRecalculateDialogOpen(false);
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md flex flex-col h-[90vh] md:h-[80vh]">
+      <DialogContent className="sm:max-w-md flex flex-col h-[90vh] md:h-auto md:max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>{foodToEdit ? t('Edit Food') : t('Create New Food')}</DialogTitle>
           <DialogDescription>
@@ -200,7 +248,6 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-grow min-h-0">
             <ScrollArea className="flex-grow pr-6 -mr-6">
               <div className="space-y-4 pr-1">
-                {/* ID field is hidden */}
                  <FormField
                   control={form.control}
                   name="name"
@@ -239,7 +286,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
                   )}
                 />
                 <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="serving_size_g" render={({ field }) => (<FormItem><FormLabel>{t('Serving Size (g)')}</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                  <FormField control={form.control} name="serving_size_g" render={({ field }) => (<FormItem><FormLabel>{t('Serving Size (g)')}</FormLabel><FormControl><Input type="number" {...field} onBlur={handleServingSizeBlur} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={form.control} name="calories" render={({ field }) => (<FormItem><FormLabel>{t('Calories (kcal)')}</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={form.control} name="protein" render={({ field }) => (<FormItem><FormLabel>{t('Protein (g)')}</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
                   <FormField control={form.control} name="carbohydrates" render={({ field }) => (<FormItem><FormLabel>{t('Carbs (g)')}</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
@@ -257,6 +304,21 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
           </form>
         </Form>
       </DialogContent>
+      <AlertDialog open={isRecalculateDialogOpen} onOpenChange={setRecalculateDialogOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>{t('Recalculate Nutrients?')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                    {t('Do you want to proportionally recalculate all nutrient values based on the new serving size?')}
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={handleDialogClose}>{t('No')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleRecalculateNutrients}>{t('Yes')}</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
+
