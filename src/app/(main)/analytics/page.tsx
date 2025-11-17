@@ -237,31 +237,7 @@ export default function AnalyticsPage() {
                            )}
                         </CardContent>
                     </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t('Consumption by Category')}</CardTitle>
-                             <CardDescription>{t('Calorie distribution from food categories.')}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex justify-center">
-                           {analysisData.categoryDistribution.length > 0 ? (
-                                <ChartContainer config={chartConfig} className="h-52 w-full">
-                                    <PieChart>
-                                        <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
-                                        <Pie data={analysisData.categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} labelLine={false} label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}>
-                                            {analysisData.categoryDistribution.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.fill} />
-                                            ))}
-                                        </Pie>
-                                        <Legend />
-                                    </PieChart>
-                                </ChartContainer>
-                           ) : (
-                             <div className="flex items-center justify-center h-52 text-muted-foreground"><Pizza className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
-                           )}
-                        </CardContent>
-                    </Card>
-
+                    
                     <Card className="lg:col-span-3">
                         <CardHeader>
                             <CardTitle>{t('Average Daily Intake')}</CardTitle>
@@ -283,6 +259,30 @@ export default function AnalyticsPage() {
                             ) : (
                                 <div className="flex items-center justify-center h-52 text-muted-foreground">{t('Not enough data')}</div>
                             )}
+                        </CardContent>
+                    </Card>
+                    
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t('Consumption by Category')}</CardTitle>
+                             <CardDescription>{t('Calorie distribution from food categories.')}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex justify-center">
+                           {analysisData.categoryDistribution.length > 0 ? (
+                                <ChartContainer config={chartConfig} className="h-52 w-full">
+                                    <PieChart>
+                                        <ChartTooltip content={<ChartTooltipContent nameKey="name" />} />
+                                        <Pie data={analysisData.categoryDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} labelLine={false} label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}>
+                                            {analysisData.categoryDistribution.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                            ))}
+                                        </Pie>
+                                        <Legend />
+                                    </PieChart>
+                                </ChartContainer>
+                           ) : (
+                             <div className="flex items-center justify-center h-52 text-muted-foreground"><Pizza className="h-5 w-5 mr-2"/>{t('Not enough data')}</div>
+                           )}
                         </CardContent>
                     </Card>
 
