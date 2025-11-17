@@ -349,5 +349,18 @@
   "Recalculate Nutrients?": "Recalculate Nutrients?",
   "Do you want to proportionally recalculate all nutrient values based on the new serving size?": "Do you want to proportionally recalculate all nutrient values based on the new serving size?",
   "Yes": "Yes",
-  "No": "No"
+  "No": "No",
+  "Copy from yesterday": "Copy from yesterday",
+  "Copy from last week": "Copy from last week",
+  "Copy from 'X' days ago...": "Copy from 'X' days ago...",
+  "Empty Meal": "Empty Meal",
+  "Diary Copied": "Diary Copied",
+  "Items from {date} have been copied.": "Items from {date} have been copied.",
+  "Copy Failed": "Copy Failed",
+  "No items to copy from the source day.": "No items to copy from the source day.",
+  "Enter the number of days to go back to copy the diary from.": "Enter the number of days to go back to copy the diary from.",
+  "Copy": "Copy",
+  "This will remove all food items from the selected day.": "This will remove all food items from the selected day.",
+  "Empty": "Empty",
+  "Diary Cleared": "Diary Cleared"
 }

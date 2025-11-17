@@ -42,6 +42,8 @@ export interface AppState extends AppData {
   addLogEntry: (date: string, mealType: MealType, items: LogItemInput | LogItemInput[]) => void;
   updateLogEntry: (date: string, logId: string, updates: Partial<LoggedItem>) => void;
   removeLogEntry: (date: string, mealType: MealType, logId: string) => void;
+  copyLogFromDate: (sourceDate: string, targetDate: string) => { success: boolean, message: string };
+  clearLog: (date: string) => void;
   addWaterIntake: (date: string, amountMl: number) => void;
   updateWeight: (date: string, weight?: number) => void;
   updateGlucose: (date: string, glucose?: number) => void;
@@ -291,6 +293,61 @@ const useAppStore = create<AppState>((set, get) => {
             }
         
             newLogs[date] = newDayLog;
+            return { dailyLogs: newLogs };
+        }),
+        copyLogFromDate: (sourceDate, targetDate) => {
+            const { dailyLogs } = get();
+            const sourceLog = dailyLogs[sourceDate];
+            const sourceItems = sourceLog ? (['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).flatMap(mt => sourceLog[mt] || []) : [];
+
+            if (!sourceLog || sourceItems.length === 0) {
+                return { success: false, message: 'No items to copy from the source day.' };
+            }
+
+            // Create new items with new IDs and timestamps
+            const newItems = sourceItems.map(item => ({
+                ...item,
+                id: `${Date.now()}-${Math.random()}`,
+                timestamp: Date.now(),
+            }));
+            
+            setStateAndSave(state => {
+                const newLogs = { ...state.dailyLogs };
+                const targetDayLog = { ...(newLogs[targetDate] || {}) };
+
+                // Clear existing items for the target date before copying
+                targetDayLog.breakfast = [];
+                targetDayLog.lunch = [];
+                targetDayLog.dinner = [];
+                targetDayLog.snack = [];
+
+                // Assuming all copied items go into 'snack' for simplicity, or we could preserve meal types
+                targetDayLog.snack = newItems;
+
+                newLogs[targetDate] = targetDayLog;
+                return { dailyLogs: newLogs };
+            });
+
+            return { success: true, message: 'Diary copied successfully.' };
+        },
+        clearLog: (date) => setStateAndSave(state => {
+            const newLogs = { ...state.dailyLogs };
+            const dayLog = newLogs[date];
+            if (!dayLog) return {};
+
+            const clearedDayLog = {
+                waterIntakeMl: dayLog.waterIntakeMl,
+                weight: dayLog.weight,
+                glucose: dayLog.glucose,
+                insulin: dayLog.insulin,
+            };
+
+            newLogs[date] = clearedDayLog;
+            // Optionally remove the day if it's completely empty
+            if (Object.keys(clearedDayLog).every(k => clearedDayLog[k as keyof typeof clearedDayLog] === undefined)) {
+                delete newLogs[date];
+            }
+
             return { dailyLogs: newLogs };
         }),
         addWaterIntake: (date, amountMl) => setStateAndSave(state => {
