@@ -102,11 +102,11 @@ export default function MealLog({ selectedDateString, onAddFoodClick, onEditItem
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleCopy(1)}>
                             <RotateCcw className="mr-2 h-4 w-4" />
-                            <span>{t('Copy from yesterday')}</span>
+                            <span>{t('Copy from previous day')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleCopy(7)}>
                             <CalendarClock className="mr-2 h-4 w-4" />
-                            <span>{t('Copy from last week')}</span>
+                            <span>{t('Copy from 7 days ago')}</span>
                         </DropdownMenuItem>
                          <DropdownMenuItem onClick={() => { setDaysToGoBack(1); setCopyFromXDaysOpen(true); }}>
                             <Copy className="mr-2 h-4 w-4" />
