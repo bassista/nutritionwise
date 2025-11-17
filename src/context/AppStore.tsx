@@ -301,7 +301,7 @@ const useAppStore = create<AppState>((set, get) => {
             const sourceItems = sourceLog ? (['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).flatMap(mt => sourceLog[mt] || []) : [];
 
             if (!sourceLog || sourceItems.length === 0) {
-                return { success: false, message: 'No items to copy from the source day.' };
+                return { success: false, message: 'noItemsToCopy' };
             }
 
             // Create new items with new IDs and timestamps

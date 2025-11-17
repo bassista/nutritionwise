@@ -357,7 +357,7 @@
   "Diary Copied": "Diary Copied",
   "Items from {date} have been copied.": "Items from {date} have been copied.",
   "Copy Failed": "Copy Failed",
-  "No items to copy from the source day.": "No items to copy from the source day.",
+  "noItemsToCopy": "No items to copy from the source day.",
   "Enter the number of days to go back to copy the diary from.": "Enter the number of days to go back to copy the diary from.",
   "Copy": "Copy",
   "This will remove all food items from the selected day.": "This will remove all food items from the selected day.",

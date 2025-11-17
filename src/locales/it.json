@@ -359,7 +359,7 @@
   "Diary Copied": "Diario Copiato",
   "Items from {date} have been copied.": "Le voci dal {date} sono state copiate.",
   "Copy Failed": "Copia Fallita",
-  "No items to copy from the source day.": "Nessun elemento da copiare dal giorno di origine.",
+  "noItemsToCopy": "Nessun elemento da copiare dal giorno di origine.",
   "Enter the number of days to go back to copy the diary from.": "Inserisci il numero di giorni da cui copiare il diario.",
   "Copy": "Copia",
   "This will remove all food items from the selected day.": "Questo rimuoverà tutti gli alimenti dal giorno selezionato.",

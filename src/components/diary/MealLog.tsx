@@ -68,7 +68,7 @@ export default function MealLog({ selectedDateString, onAddFoodClick, onEditItem
         if (result.success) {
             toast({ title: t('Diary Copied'), description: t('Items from {date} have been copied.', { date: sourceDate }) });
         } else {
-            toast({ variant: 'destructive', title: t('Copy Failed'), description: result.message });
+            toast({ variant: 'destructive', title: t('Copy Failed'), description: t(result.message) });
         }
     };
     
