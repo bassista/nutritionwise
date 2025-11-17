@@ -168,18 +168,22 @@ const useAppStore = create<AppState>((set, get) => {
             const { foods } = get();
             const headers = ['id', 'serving_size_g', 'calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'name_category'];
             
-            const sanitize = (str: string) => str.replace(/"/g, '""');
+            const sanitize = (str: string | undefined) => {
+                if (str === undefined || str === null) return '""';
+                const s = String(str);
+                // Wrap in quotes and escape existing quotes
+                return `"${s.replace(/"/g, '""')}"`;
+            };
 
             const rows = foods.map(food => {
                 const supportedLangs = ['en', 'it'];
                 const nameCategoryPairs = supportedLangs
                     .map(lang => {
                         const name = food.name[lang];
-                        // Fallback to English category if the current language category is missing
                         const category = food.category?.[lang] || food.category?.['en'];
                         
                         if (name) {
-                            return `${lang}=${sanitize(name)}:${sanitize(category || '')}`;
+                            return `${lang}=${name}:${category || ''}`;
                         }
                         return null;
                     })
@@ -196,14 +200,13 @@ const useAppStore = create<AppState>((set, get) => {
                     food.fiber || 0,
                     food.sugar || 0,
                     food.sodium || 0,
-                    `"${nameCategoryPairs}"` // Quote the entire field
+                    sanitize(nameCategoryPairs)
                 ];
                 return rowData.join(',');
             });
             
             return [headers.join(','), ...rows].join('\n');
         },
-
 
         // --- Category Actions ---
         addCategory: (category) => setStateAndSave(state => ({
