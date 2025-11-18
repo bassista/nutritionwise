@@ -55,7 +55,7 @@ export default function ScheduleMealDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex flex-col sm:max-w-xl">
+      <DialogContent className="flex flex-col sm:max-w-xl h-[70vh]">
         <DialogHeader>
           <DialogTitle>{t('Schedule Meal')}</DialogTitle>
           <DialogDescription>
@@ -85,7 +85,7 @@ export default function ScheduleMealDialog({
           />
         </div>
 
-        <ScrollArea className="flex-grow border rounded-md h-[400px]">
+        <ScrollArea className="flex-grow border rounded-md">
           <div className="space-y-1 p-2">
             {filteredMeals.map(meal => (
               <div key={meal.id} className="flex items-center p-2 rounded-md hover:bg-muted/50">
