@@ -166,7 +166,7 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
               <p className="text-sm text-muted-foreground mb-4">{t('Type the name of the item you want to add and press Enter or click the button below.')}</p>
                <Button onClick={handleAddManual} disabled={!searchTerm.trim()}>
                 <Plus className="h-4 w-4 mr-2" />
-                {t('Add "{item}"', { item: searchTerm || '...' })}
+                {t('Add Item')}
               </Button>
            </div>
         )}
