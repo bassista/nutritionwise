@@ -122,7 +122,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
 
   if (isOverlay) {
     return (
-      <div className="rounded-md bg-primary text-primary-foreground p-2 shadow-lg">
+      <div className="rounded-md bg-primary text-primary-foreground p-2 shadow-lg w-40">
         <p className="font-semibold text-sm truncate">{meal.name}</p>
       </div>
     );
@@ -131,8 +131,8 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
 
   if (isCollapsed) {
       return (
-            <div ref={setNodeRef} style={style} className="h-full" {...attributes} {...listeners}>
-              <Card className="flex items-center p-2">
+            <div ref={setNodeRef} style={style} className="h-full" {...attributes}>
+              <Card className="flex items-center p-2" {...listeners}>
                   <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
                       <Edit className="h-4 w-4" />
@@ -152,8 +152,8 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
 
   return (
     <>
-      <div ref={setNodeRef} style={style} className={cn("h-full", isOverlay && "shadow-lg")}>
-        <Card className="flex flex-col h-full" {...attributes} {...listeners}>
+      <div ref={setNodeRef} style={style} className={cn("h-full", isOverlay && "shadow-lg")} {...attributes} {...listeners}>
+        <Card className="flex flex-col h-full cursor-grab active:cursor-grabbing">
           <CardHeader>
             <div className="flex justify-between items-start gap-2">
               <div className='flex-grow'>
@@ -175,7 +175,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer" onClick={e => e.stopPropagation()}>
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>

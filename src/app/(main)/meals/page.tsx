@@ -52,18 +52,6 @@ export default function MealsPage() {
     })
   );
 
-  useEffect(() => {
-    if (activeDragId) {
-      document.body.classList.add('overflow-hidden');
-    } else {
-      document.body.classList.remove('overflow-hidden');
-    }
-
-    return () => {
-      document.body.classList.remove('overflow-hidden');
-    };
-  }, [activeDragId]);
-
   const filteredMeals = useMemo(
     () =>
       meals.filter((meal) =>
