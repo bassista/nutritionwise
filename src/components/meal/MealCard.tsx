@@ -154,14 +154,16 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
   return (
     <>
       <div ref={setNodeRef} style={style} className={cn("h-full", isOverlay && "shadow-lg")}>
-        <Card className="flex flex-col h-full" onClick={() => setIsEditing(true)}>
+        <Card className="flex flex-col h-full" >
           <CardHeader>
             <div className="flex justify-between items-start gap-2">
-              <div className='flex items-center gap-1 flex-grow'>
-                <div {...attributes} {...listeners} className="cursor-grab touch-none p-1 -ml-1">
+              <div className='flex items-center gap-1 flex-grow min-w-0'>
+                <div {...listeners} className="cursor-grab touch-none p-1 -ml-1">
                     <GripVertical className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <CardTitle className="text-lg font-bold">{meal.name}</CardTitle>
+                <div  onClick={() => setIsEditing(true)} className="flex-grow min-w-0 cursor-pointer">
+                    <CardTitle className="text-lg font-bold truncate">{meal.name}</CardTitle>
+                </div>
               </div>
               <div className="flex items-center flex-shrink-0">
                 <TooltipProvider>
@@ -223,7 +225,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
               </div>
             </div>
           </CardHeader>
-          <CardContent className="flex-grow flex flex-col">
+          <CardContent className="flex-grow flex flex-col" onClick={() => setIsEditing(true)}>
             <div className="grid grid-cols-2 gap-4 text-sm">
               {nutrientDisplay.map(({ Icon, value, label, color, name }, index) => (
                   <div key={index} className="flex items-center space-x-2">
@@ -263,7 +265,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
                   </ScrollArea>
               </div>
           </CardContent>
-          <CardFooter className="text-xs text-muted-foreground pt-4">
+          <CardFooter className="text-xs text-muted-foreground pt-4" onClick={() => setIsEditing(true)}>
               <p>{meal.foods.length} {meal.foods.length === 1 ? t('ingredient') : t('ingredients')}</p>
           </CardFooter>
         </Card>
