@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreVertical, Trash2, Edit, Plus, ListTodo, Check, GripVertical } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { getFoodName } from '@/lib/utils';
+import { getFoodName, cn } from '@/lib/utils';
 import ShoppingListItemDisplay from './ShoppingListItem';
 import AddItemDialog from './AddItemDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
@@ -110,7 +110,7 @@ const ShoppingListCardComponent = React.forwardRef<
               )}
             </div>
           </CardHeader>
-          <CardContent className="flex-grow flex flex-col min-h-0">
+          <CardContent className="flex-grow flex flex-col min-h-0 max-h-64">
             <ScrollArea className="flex-grow pr-3 -mr-3">
               {list.items.length > 0 ? (
                 <div className="space-y-2">
