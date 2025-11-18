@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState } from 'react';
-import { format, startOfToday } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { format, startOfToday, isSameDay } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useLocale } from '@/context/LocaleContext';
 import { PageHeader } from '@/components/PageHeader';
@@ -15,9 +15,31 @@ import { Food, LoggedItem, MealType } from '@/lib/types';
 import WaterTracker from '@/components/diary/WaterTracker';
 import DailySummary from '@/components/diary/DailySummary';
 import MealLog from '@/components/diary/MealLog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import useAppStore from '@/context/AppStore';
+import { useToast } from '@/hooks/use-toast';
 
 export default function DiaryPage() {
     const { t, locale } = useLocale();
+    const {
+        mealSchedule,
+        getMealById,
+        addLogEntry,
+        settings,
+        updateSettings,
+        dailyLogs
+    } = useAppStore();
+    const { toast } = useToast();
+
     const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
     
     const [isFoodSelectorOpen, setFoodSelectorOpen] = useState(false);
@@ -26,7 +48,62 @@ export default function DiaryPage() {
     const [foodToLog, setFoodToLog] = useState<Food | null>(null);
     const [itemToEdit, setItemToEdit] = useState<LoggedItem | null>(null);
 
+    const [showMealLogDialog, setShowMealLogDialog] = useState(false);
+    const [mealToLog, setMealToLog] = useState<{ id: string, name: string } | null>(null);
+
     const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
+
+    useEffect(() => {
+        const today = format(startOfToday(), 'yyyy-MM-dd');
+        const isTodaySelected = isSameDay(selectedDate, startOfToday());
+        
+        // Don't show if already checked today, or not viewing today's diary, or if today's diary is not empty
+        const dayHasLogs = dailyLogs[today] && Object.values(dailyLogs[today]).some(log => Array.isArray(log) && log.length > 0);
+
+        if (!isTodaySelected || settings.lastCheckedDateForMealLog === today || dayHasLogs) {
+            return;
+        }
+
+        const mealId = mealSchedule[today];
+        const meal = mealId ? getMealById(mealId) : null;
+
+        if (meal) {
+            setMealToLog({ id: meal.id, name: meal.name });
+            setShowMealLogDialog(true);
+        } else {
+            // Mark as checked for today even if there's no meal, to prevent re-checking on every navigation.
+            updateSettings({ lastCheckedDateForMealLog: today });
+        }
+    }, [selectedDate, mealSchedule, getMealById, settings.lastCheckedDateForMealLog, updateSettings, dailyLogs]);
+
+    const handleLogScheduledMeal = () => {
+        if (!mealToLog) return;
+
+        const today = format(startOfToday(), 'yyyy-MM-dd');
+        const meal = getMealById(mealToLog.id);
+        
+        if (meal) {
+            const itemsToAdd = meal.foods.map(food => ({
+                type: 'food' as const,
+                itemId: food.foodId,
+                grams: food.grams,
+            }));
+            addLogEntry(today, 'snack', itemsToAdd); // Defaulting to snack
+            toast({
+                title: t('Meal Added to Diary'),
+                description: t('The ingredients for "{mealName}" have been added to your diary.', { mealName: meal.name }),
+            });
+        }
+        
+        handleCloseMealLogDialog();
+    };
+
+    const handleCloseMealLogDialog = () => {
+        const today = format(startOfToday(), 'yyyy-MM-dd');
+        updateSettings({ lastCheckedDateForMealLog: today });
+        setShowMealLogDialog(false);
+        setMealToLog(null);
+    };
 
     const handleAddFoodClick = () => {
         setFoodSelectorOpen(true);
@@ -109,6 +186,22 @@ export default function DiaryPage() {
                       selectedDateString={selectedDateString}
                       onLogSuccess={handleEditDialogClose}
                   />
+              )}
+              {mealToLog && (
+                 <AlertDialog open={showMealLogDialog} onOpenChange={setShowMealLogDialog}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>{t("Log Today's Meal?")}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                {t("Today's scheduled meal is \"{mealName}\". Would you like to add its ingredients to your diary?", { mealName: mealToLog.name })}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={handleCloseMealLogDialog}>{t('Cancel')}</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleLogScheduledMeal}>{t('Log Meal')}</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
               )}
         </>
     );
