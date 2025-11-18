@@ -6,8 +6,8 @@ import useAppStore from '@/context/AppStore';
 import { useUIState } from '@/context/UIStateContext';
 import { PageHeader } from '@/components/PageHeader';
 import MealCard from '@/components/meal/MealCard';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { UtensilsCrossed, Plus, Search, Rows, Grid, ListPlus } from 'lucide-react';
+import { AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { UtensilsCrossed, Plus, Search, Rows, Grid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLocale } from '@/context/LocaleContext';
@@ -34,8 +34,8 @@ import { cn } from '@/lib/utils';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import WeeklyMealPlanner from '@/components/meal/WeeklyMealPlanner';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { format } from 'date-fns';
 
 export default function MealsPage() {
   const { meals, setMeals, generateWeeklyShoppingList, scheduleMeal, getMealById } = useAppStore();
@@ -82,7 +82,6 @@ export default function MealsPage() {
 
     if (!over) return;
     
-    // Case 1: Dragging a meal onto a day in the weekly planner
     if (String(over.id).startsWith('day-')) {
         const meal = getMealById(String(active.id));
         const date = over.data.current?.date as Date | undefined;
@@ -92,7 +91,6 @@ export default function MealsPage() {
         }
     }
 
-    // Case 2: Reordering meals in the list
     if (isReorderable && active.id !== over.id) {
         const oldIndex = meals.findIndex((m) => m.id === active.id);
         const newIndex = meals.findIndex((m) => m.id === over.id);
@@ -159,7 +157,7 @@ export default function MealsPage() {
 
         <div className="py-4 pt-8 space-y-4">
           {filteredMeals.length > 0 ? (
-             <SortableContext items={filteredMeals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={isSearching && isMobile}>
+             <SortableContext items={filteredMeals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={isSearching}>
                 <div className={cn(
                     "grid gap-4",
                     isCollapsed ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"

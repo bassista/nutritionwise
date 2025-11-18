@@ -373,5 +373,8 @@
   "A new shopping list has been created for your weekly plan.": "A new shopping list has been created for your weekly plan.",
   "Log Today's Meal?": "Log Today's Meal?",
   "Today's scheduled meal is \"{mealName}\". Would you like to add its ingredients to your diary?": "Today's scheduled meal is \"{mealName}\". Would you like to add its ingredients to your diary?",
-  "Log Meal": "Log Meal"
+  "Log Meal": "Log Meal",
+  "Schedule Meal": "Schedule Meal",
+  "Current Meal": "Current Meal",
+  "Select": "Select"
 }
