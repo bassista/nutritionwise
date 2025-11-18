@@ -53,9 +53,21 @@ export default function FoodListPage({
   }, [searchTerm, categoryFilter]);
 
   const categoryNames = useMemo(() => {
-    const allCategoryNames = categories.map(c => c.name[locale] || c.name['en']).filter(Boolean);
-    return ['all', ...Array.from(new Set(allCategoryNames))];
-  }, [categories, locale]);
+    const uncategorizedStr = t('Uncategorized');
+    const allCategoryNames = new Set(categories.map(c => c.name[locale] || c.name['en']).filter(Boolean));
+    
+    const sortedCategories = Array.from(allCategoryNames)
+      .filter(name => name !== uncategorizedStr)
+      .sort((a, b) => a.localeCompare(b));
+      
+    const hasUncategorized = allCategoryNames.has(uncategorizedStr) || foods.some(f => getCategoryName(f, locale, t) === uncategorizedStr);
+
+    return {
+        sorted: sortedCategories,
+        hasUncategorized: hasUncategorized,
+        uncategorizedName: uncategorizedStr
+    };
+  }, [categories, locale, t, foods]);
   
   const sortedFoods = useMemo(() => {
     if (enableSorting) {
@@ -137,15 +149,15 @@ export default function FoodListPage({
                 aria-label={t('Search for a food...')}
               />
             </div>
-            {categoryNames.length > 2 && (
+            {(categoryNames.sorted.length > 0 || categoryNames.hasUncategorized) && (
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-full md:w-[180px]">
                   <SelectValue placeholder={t('Filter by category')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('All Categories')}</SelectItem>
-                  {categoryNames.filter(cat => cat !== 'all' && cat !== t('Uncategorized')).map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-                  {categoryNames.includes(t('Uncategorized')) && <SelectItem value={t('Uncategorized')}>{t('Uncategorized')}</SelectItem>}
+                  {categoryNames.sorted.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                  {categoryNames.hasUncategorized && <SelectItem value={categoryNames.uncategorizedName}>{categoryNames.uncategorizedName}</SelectItem>}
                 </SelectContent>
               </Select>
             )}
