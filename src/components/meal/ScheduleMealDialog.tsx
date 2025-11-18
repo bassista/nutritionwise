@@ -89,7 +89,7 @@ export default function ScheduleMealDialog({
             <div className="space-y-1 p-2">
                 {filteredMeals.map(meal => (
                 <div key={meal.id} className="flex items-center p-2 rounded-md hover:bg-muted/50">
-                    <span className="flex-grow text-sm">{meal.name}</span>
+                    <span className="flex-grow text-sm truncate">{meal.name}</span>
                     <Button size="sm" variant="outline" onClick={() => onScheduleMeal(selectedDate, meal.id)}>
                     <Plus className="h-4 w-4 mr-1" /> {t('Select')}
                     </Button>
