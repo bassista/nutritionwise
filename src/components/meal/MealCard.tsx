@@ -109,7 +109,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
       addMealToShoppingList(meal.id);
       toast({
           title: t('Ingredients Added'),
-          description: t('The ingredients for "{mealName}" have been added to your shopping list.', { mealName: meal.name }),
+          description: t('The ingredients for "{mealName}" have been added to your list.', { mealName: meal.name }),
       });
   }
   
@@ -192,7 +192,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={(e) => handleAddToShoppingList(e)}>
                         <ShoppingCart className="mr-2 h-4 w-4" />
-                        <span>{t('Add to Shopping List')}</span>
+                        <span>{t('Add to List')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setIsEditing(true)}>
                       <Edit className="mr-2 h-4 w-4" />

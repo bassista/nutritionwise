@@ -37,7 +37,7 @@ export interface AppState extends AppData {
   setMeals: (meals: Meal[]) => void;
 
   // Meal Schedule actions
-  scheduleMeal: (date: string, mealId: string) => void;
+  scheduleMeal: (date: string, mealId: string | null) => void;
 
   // Favorite actions
   toggleFavorite: (foodId: string) => void;

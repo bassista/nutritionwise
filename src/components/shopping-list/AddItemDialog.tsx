@@ -89,7 +89,7 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md flex flex-col h-[70vh]">
         <DialogHeader>
-          <DialogTitle>{t('Add to Shopping List')}</DialogTitle>
+          <DialogTitle>{t('Add to List')}</DialogTitle>
           <DialogDescription>
             {t('Search for a food or add an item manually.')}
           </DialogDescription>

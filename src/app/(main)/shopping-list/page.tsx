@@ -67,7 +67,7 @@ export default function ShoppingListPage() {
   
   return (
     <>
-      <PageHeader title={t('Shopping Lists')}>
+      <PageHeader title={t('Lists')}>
         <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> {t('New List')}
         </Button>
@@ -93,7 +93,7 @@ export default function ShoppingListPage() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('Create New Shopping List')}</DialogTitle>
+            <DialogTitle>{t('Create New List')}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <Input

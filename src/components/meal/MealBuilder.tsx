@@ -88,8 +88,8 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
   const handleAddToShoppingList = (food: Food) => {
     addFoodToShoppingList(food.id);
     toast({
-        title: t('Ingredient Added to Shopping List'),
-        description: t('{foodName} has been added to your shopping list.', { foodName: getFoodName(food, locale) }),
+        title: t('Ingredient Added to List'),
+        description: t('{foodName} has been added to your list.', { foodName: getFoodName(food, locale) }),
     });
   };
 
@@ -196,7 +196,7 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                                 </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                <p>{t('Add to shopping list')}</p>
+                                <p>{t('Add to list')}</p>
                                 </TooltipContent>
                             </Tooltip>
                             <div className="flex flex-col">

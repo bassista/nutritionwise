@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Wheat, Heart, UtensilsCrossed, Plus, BookOpen, ShoppingCart, Trophy, HeartPulse } from 'lucide-react';
+import { Wheat, Heart, UtensilsCrossed, Plus, BookOpen, ShoppingCart, Trophy, HeartPulse, List } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ export default function BottomNav() {
     { href: '/foods', labelKey: 'Foods' },
     { href: '/favorites', labelKey: 'Favorites' },
     { href: '/meals', labelKey: 'Meals' },
-    { href: '/shopping-list', labelKey: 'Shopping Lists' },
+    { href: '/shopping-list', labelKey: 'Lists' },
   ];
   
   const navIcons: Record<string, React.ElementType> = {
@@ -27,7 +27,7 @@ export default function BottomNav() {
     'Foods': Wheat,
     'Favorites': Heart,
     'Meals': UtensilsCrossed,
-    'Shopping Lists': ShoppingCart,
+    'Lists': List,
   };
 
 

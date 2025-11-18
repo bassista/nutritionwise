@@ -170,7 +170,7 @@ const ShoppingListCardComponent = React.forwardRef<
           <AlertDialogHeader>
             <AlertDialogTitle>{t('Are you sure?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('This will permanently delete the "{listName}" shopping list.', { listName: list.name })}
+              {t('This will permanently delete the "{listName}" list.', { listName: list.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

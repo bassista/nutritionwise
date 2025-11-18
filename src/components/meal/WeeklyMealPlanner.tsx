@@ -69,7 +69,7 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
                       </Button>
                       <Button onClick={handleGenerate} size="sm" className="h-8 flex-grow sm:flex-grow-0">
                           <ListPlus className="h-4 w-4 mr-2"/>
-                          {t('Generate Weekly Shopping List')}
+                          {t('Generate Weekly List')}
                       </Button>
                   </div>
               </div>

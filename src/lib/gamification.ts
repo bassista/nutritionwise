@@ -27,7 +27,7 @@ export const allBadges: Badge[] = [
    {
     id: 'list-specialist',
     name: 'List Specialist',
-    description: 'Create your first shopping list.',
+    description: 'Create your first list.',
   },
 
   // Medium
