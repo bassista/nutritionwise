@@ -26,6 +26,7 @@ export interface AppState extends AppData {
   addCategory: (category: Category) => void;
   renameCategory: (oldName: string, newName: string) => void;
   deleteCategory: (categoryName: string, defaultCategoryName: string) => void;
+  setCategorySortOrder: (categoryName: string, foodIds: string[]) => void;
 
   // Meal actions
   getMealById: (id: string) => Meal | undefined;
@@ -107,6 +108,7 @@ const useAppStore = create<AppState>((set, get) => {
         shoppingLists: [],
         userAchievements: [],
         settings: defaultSettings,
+        categorySortOrders: {},
 
         // --- Food Actions ---
         getFoodById: (id: string) => get().foods.find(f => f.id === id),
@@ -168,12 +170,7 @@ const useAppStore = create<AppState>((set, get) => {
             const { foods } = get();
             const headers = ['id', 'serving_size_g', 'calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'name_category'];
             
-            const sanitize = (str: string | undefined) => {
-                if (str === undefined || str === null) return '""';
-                const s = String(str);
-                // Wrap in quotes and escape existing quotes
-                return `"${s.replace(/"/g, '""')}"`;
-            };
+            const sanitize = (str: string) => `"${str.replace(/"/g, '""')}"`;
 
             const rows = foods.map(food => {
                 const supportedLangs = ['en', 'it'];
@@ -237,7 +234,13 @@ const useAppStore = create<AppState>((set, get) => {
                 return categoryChanged ? { ...food, category: newFoodCat } : food;
             });
             
-            return { categories: updatedCategories, foods: updatedFoods };
+            const updatedSortOrders = { ...state.categorySortOrders };
+            if (updatedSortOrders[oldName]) {
+                updatedSortOrders[newName] = updatedSortOrders[oldName];
+                delete updatedSortOrders[oldName];
+            }
+
+            return { categories: updatedCategories, foods: updatedFoods, categorySortOrders: updatedSortOrders };
         }),
         deleteCategory: (categoryName, defaultCategoryName) => setStateAndSave(state => {
             const updatedCategories = state.categories.filter(cat => Object.values(cat.name).every(name => name !== categoryName));
@@ -253,9 +256,18 @@ const useAppStore = create<AppState>((set, get) => {
                 });
                 return categoryChanged ? { ...food, category: newFoodCat } : food;
             });
+            
+            const updatedSortOrders = { ...state.categorySortOrders };
+            delete updatedSortOrders[categoryName];
 
-            return { categories: updatedCategories, foods: updatedFoods };
+            return { categories: updatedCategories, foods: updatedFoods, categorySortOrders: updatedSortOrders };
         }),
+        setCategorySortOrder: (categoryName: string, foodIds: string[]) => setStateAndSave(state => ({
+            categorySortOrders: {
+                ...state.categorySortOrders,
+                [categoryName]: foodIds,
+            }
+        })),
         
         // --- Meal Actions ---
         getMealById: (id) => get().meals.find(m => m.id === id),
@@ -551,6 +563,7 @@ const useAppStore = create<AppState>((set, get) => {
                 dailyLogs: {},
                 shoppingLists: defaultShoppingLists,
                 userAchievements: [],
+                categorySortOrders: {},
             };
             await dataAdapter.saveData(defaultData);
             set(defaultData);

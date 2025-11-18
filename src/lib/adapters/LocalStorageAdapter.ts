@@ -21,6 +21,7 @@ export class LocalStorageAdapter implements IDataAdapter {
       dailyLogs: {},
       shoppingLists: defaultShoppingLists,
       userAchievements: [],
+      categorySortOrders: {},
     };
   }
   

@@ -18,7 +18,7 @@ import { format, startOfToday } from 'date-fns';
 
 
 export default function FoodsPage() {
-  const { foods, deleteFood } = useAppStore();
+  const { foods, deleteFood, setCategorySortOrder, categorySortOrders } = useAppStore();
   const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const { toast } = useToast();
@@ -96,7 +96,8 @@ export default function FoodsPage() {
         onEditFood={handleEditFood}
         onDeleteFood={handleDeleteFood}
         onAddToDiary={handleAddToDiary}
-        enableSorting={true}
+        onReorder={setCategorySortOrder}
+        categorySortOrders={categorySortOrders}
         pageType="all"
       />
 

@@ -25,9 +25,9 @@ interface FoodListPageProps {
   onEditFood: (food: Food) => void;
   onDeleteFood?: (foodId: string) => void;
   onAddToDiary?: (food: Food) => void;
-  onReorder?: (ids: string[]) => void;
+  onReorder?: ((ids: string[]) => void) | ((categoryName: string, foodIds: string[]) => void);
   reorderableIds?: string[];
-  enableSorting?: boolean;
+  categorySortOrders?: { [categoryName: string]: string[] };
   pageType: 'all' | 'favorites';
 }
 
@@ -38,7 +38,7 @@ export default function FoodListPage({
   onAddToDiary,
   onReorder,
   reorderableIds,
-  enableSorting = false,
+  categorySortOrders,
   pageType,
 }: FoodListPageProps) {
   const { settings, categories } = useAppStore();
@@ -60,7 +60,7 @@ export default function FoodListPage({
       .filter(name => name !== uncategorizedStr)
       .sort((a, b) => a.localeCompare(b));
       
-    const hasUncategorized = allCategoryNames.has(uncategorizedStr) || foods.some(f => getCategoryName(f, locale, t) === uncategorizedStr);
+    const hasUncategorized = foods.some(f => getCategoryName(f, locale, t) === uncategorizedStr);
 
     return {
         sorted: sortedCategories,
@@ -69,34 +69,68 @@ export default function FoodListPage({
     };
   }, [categories, locale, t, foods]);
   
-  const sortedFoods = useMemo(() => {
-    if (enableSorting) {
-      return [...foods].sort((a, b) => getFoodName(a, locale).localeCompare(getFoodName(b, locale)));
-    }
-    return foods;
-  }, [foods, locale, enableSorting]);
-
   const filteredFoods = useMemo(() =>
-    sortedFoods.filter(food => {
+    foods.filter(food => {
       const matchesSearch = getFoodName(food, locale).toLowerCase().includes(searchTerm.toLowerCase());
       const categoryName = getCategoryName(food, locale, t);
       const matchesCategory = categoryFilter === 'all' || categoryName === categoryFilter;
       return matchesSearch && matchesCategory;
-    }), [sortedFoods, searchTerm, categoryFilter, locale, t]
+    }), [foods, searchTerm, categoryFilter, locale, t]
   );
   
-  const isReorderable = onReorder && !searchTerm && categoryFilter === 'all';
+  const sortedAndFilteredFoods = useMemo(() => {
+    let foodsToSort = [...filteredFoods];
+
+    // Apply favorite sort order if it's the favorites page and no filter/search
+    if (pageType === 'favorites' && reorderableIds && !searchTerm) {
+        const foodMap = new Map(foodsToSort.map(f => [f.id, f]));
+        return reorderableIds.map(id => foodMap.get(id)).filter(Boolean) as Food[];
+    }
+    
+    // Apply category sort order if a category is selected and an order exists
+    if (categoryFilter !== 'all' && categorySortOrders?.[categoryFilter]) {
+        const order = categorySortOrders[categoryFilter];
+        const foodMap = new Map(foodsToSort.map(f => [f.id, f]));
+        const orderedFoods = order.map(id => foodMap.get(id)).filter(Boolean) as Food[];
+        const unorderedFoods = foodsToSort.filter(f => !order.includes(f.id));
+        return [...orderedFoods, ...unorderedFoods];
+    }
+    
+    // Default alphabetical sort for 'all' page
+    if (pageType === 'all') {
+        return foodsToSort.sort((a, b) => getFoodName(a, locale).localeCompare(getFoodName(b, locale)));
+    }
+    
+    return foodsToSort;
+
+  }, [filteredFoods, pageType, reorderableIds, searchTerm, categoryFilter, categorySortOrders, locale]);
+
+  const isReorderable = useMemo(() => {
+    if (pageType === 'favorites' && !searchTerm) return true;
+    if (pageType === 'all' && categoryFilter !== 'all' && !searchTerm) return true;
+    return false;
+  }, [pageType, searchTerm, categoryFilter]);
+
 
   const handleReorder = (activeId: string, overId: string) => {
-    if (onReorder && reorderableIds) {
-      const oldIndex = reorderableIds.indexOf(activeId);
-      const newIndex = reorderableIds.indexOf(overId);
-      onReorder(arrayMove(reorderableIds, oldIndex, newIndex));
+    if (!onReorder) return;
+
+    if (pageType === 'favorites' && reorderableIds) {
+        const oldIndex = reorderableIds.indexOf(activeId);
+        const newIndex = reorderableIds.indexOf(overId);
+        const newOrder = arrayMove(reorderableIds, oldIndex, newIndex);
+        (onReorder as (ids: string[]) => void)(newOrder);
+    } else if (pageType === 'all' && categoryFilter !== 'all') {
+        const currentOrder = sortedAndFilteredFoods.map(f => f.id);
+        const oldIndex = currentOrder.indexOf(activeId);
+        const newIndex = currentOrder.indexOf(overId);
+        const newOrder = arrayMove(currentOrder, oldIndex, newIndex);
+        (onReorder as (category: string, ids: string[]) => void)(categoryFilter, newOrder);
     }
   }
 
-  const totalPages = Math.ceil(filteredFoods.length / itemsPerPage);
-  const paginatedFoods = filteredFoods.slice(
+  const totalPages = Math.ceil(sortedAndFilteredFoods.length / itemsPerPage);
+  const paginatedFoods = sortedAndFilteredFoods.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -178,7 +212,7 @@ export default function FoodListPage({
             <EmptyState />
           )}
 
-          {filteredFoods.length > 0 && totalPages > 1 && (
+          {sortedAndFilteredFoods.length > 0 && totalPages > 1 && (
              <PaginationControls
               currentPage={currentPage}
               totalPages={totalPages}

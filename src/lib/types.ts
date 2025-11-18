@@ -109,6 +109,7 @@ export interface AppData {
   dailyLogs: DailyLog;
   shoppingLists: ShoppingList[];
   userAchievements: UserAchievement[];
+  categorySortOrders: { [categoryName: string]: string[] };
 }
 
 export type DeleteFoodResult = {
