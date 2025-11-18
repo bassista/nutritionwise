@@ -39,7 +39,7 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
   };
   
   const handleGenerate = () => {
-    const mealIds = week.map(day => mealSchedule[format(day, 'yyyy-MM-dd')]).filter(Boolean);
+    const mealIds = week.map(day => mealSchedule[format(day, 'yyyy-MM-dd')]).filter(Boolean) as string[];
     onGenerateList(mealIds);
   };
 
@@ -87,7 +87,11 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
                         isOver && isDraggingOverMeal ? 'bg-primary/20 border-primary' : 'bg-muted/50',
                         isSameDay(day, new Date()) && 'border-primary'
                       )}
-                      onClick={() => meal && alert(meal.name)}
+                      onClick={() => {
+                        if (meal) {
+                            alert(meal.name);
+                        }
+                      }}
                     >
                       <p className="text-xs sm:text-sm font-semibold capitalize">
                         {format(day, 'eeee', { locale: locale === 'it' ? it : undefined })}
