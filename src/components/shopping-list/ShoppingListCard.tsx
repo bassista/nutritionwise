@@ -100,9 +100,11 @@ const ShoppingListCardComponent = React.forwardRef<
                     <TooltipTrigger asChild>
                       <CardTitle className="text-lg font-bold truncate">{displayName}</CardTitle>
                     </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{originalListName}</p>
-                    </TooltipContent>
+                    {displayName !== originalListName &&
+                      <TooltipContent>
+                        <p>{originalListName}</p>
+                      </TooltipContent>
+                    }
                   </Tooltip>
                 </TooltipProvider>
               </div>
