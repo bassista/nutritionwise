@@ -88,7 +88,7 @@ const ShoppingListCardComponent = React.forwardRef<
                   <GripVertical className="w-5 h-5 text-muted-foreground" />
                 </div>
               )}
-              <CardTitle className="text-lg font-bold flex-grow">{listName}</CardTitle>
+              <CardTitle className="text-lg font-bold flex-grow truncate">{listName}</CardTitle>
               {list.isDeletable && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
