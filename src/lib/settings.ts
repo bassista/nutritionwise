@@ -21,5 +21,4 @@ export const defaultSettings: AppSettings = {
   foodsPerPage: 8,
   nutritionalGoals: defaultGoals,
   hydrationSettings: defaultHydrationSettings,
-  lastCheckedDateForMealLog: undefined,
 };

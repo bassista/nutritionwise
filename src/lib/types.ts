@@ -42,7 +42,6 @@ export interface AppSettings {
   foodsPerPage: number;
   nutritionalGoals: NutritionalGoals;
   hydrationSettings: HydrationSettings;
-  lastCheckedDateForMealLog?: string;
 }
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
@@ -116,6 +115,7 @@ export interface AppData {
   userAchievements: UserAchievement[];
   categorySortOrders: { [categoryName: string]: string[] };
   mealSchedule: MealSchedule;
+  lastCheckedDateForMealLog?: string;
 }
 
 export type DeleteFoodResult = {

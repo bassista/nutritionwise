@@ -74,6 +74,9 @@ export interface AppState extends AppData {
   // Achievement actions
   setAchievements: (achievements: UserAchievement[]) => void;
   
+  // App State Actions
+  setLastCheckedDateForMealLog: (date: string | undefined) => void;
+
   // AppData actions
   setAppData: (data: AppData) => void;
   load: () => Promise<void>;
@@ -116,6 +119,7 @@ const useAppStore = create<AppState>((set, get) => {
         settings: defaultSettings,
         categorySortOrders: {},
         mealSchedule: {},
+        lastCheckedDateForMealLog: undefined,
 
         // --- Food Actions ---
         getFoodById: (id: string) => get().foods.find(f => f.id === id),
@@ -590,6 +594,9 @@ const useAppStore = create<AppState>((set, get) => {
         // --- Achievement Actions ---
         setAchievements: (achievements) => setStateAndSave(() => ({ userAchievements: achievements })),
 
+        // --- App State Actions ---
+        setLastCheckedDateForMealLog: (date) => setStateAndSave(() => ({ lastCheckedDateForMealLog: date })),
+
         // --- AppData Actions ---
         setAppData: (data) => setStateAndSave(() => ({ ...data })),
         load: async () => {
@@ -627,6 +634,7 @@ const useAppStore = create<AppState>((set, get) => {
                 userAchievements: [],
                 categorySortOrders: {},
                 mealSchedule: {},
+                lastCheckedDateForMealLog: undefined,
             };
             await dataAdapter.saveData(defaultData);
             set(defaultData);

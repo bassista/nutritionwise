@@ -23,6 +23,7 @@ export class LocalStorageAdapter implements IDataAdapter {
       userAchievements: [],
       categorySortOrders: {},
       mealSchedule: {},
+      lastCheckedDateForMealLog: undefined,
     };
   }
   

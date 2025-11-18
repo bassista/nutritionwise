@@ -34,9 +34,9 @@ export default function DiaryPage() {
         mealSchedule,
         getMealById,
         addLogEntry,
-        settings,
-        updateSettings,
-        dailyLogs
+        dailyLogs,
+        lastCheckedDateForMealLog,
+        setLastCheckedDateForMealLog,
     } = useAppStore();
     const { toast } = useToast();
 
@@ -69,7 +69,7 @@ export default function DiaryPage() {
             (todaysLog.snack && todaysLog.snack.length > 0)
         );
 
-        if (settings.lastCheckedDateForMealLog === today || dayHasFoodLogs) {
+        if (lastCheckedDateForMealLog === today || dayHasFoodLogs) {
             return;
         }
 
@@ -81,9 +81,9 @@ export default function DiaryPage() {
             setShowMealLogDialog(true);
         } else {
             // Mark as checked for today even if there's no meal, to prevent re-checking on every navigation.
-            updateSettings({ lastCheckedDateForMealLog: today });
+            setLastCheckedDateForMealLog(today);
         }
-    }, [selectedDate, mealSchedule, getMealById, settings.lastCheckedDateForMealLog, updateSettings, dailyLogs]);
+    }, [selectedDate, mealSchedule, getMealById, lastCheckedDateForMealLog, setLastCheckedDateForMealLog, dailyLogs]);
 
     const handleLogScheduledMeal = () => {
         if (!mealToLog) return;
@@ -109,7 +109,7 @@ export default function DiaryPage() {
 
     const handleCloseMealLogDialog = () => {
         const today = format(startOfToday(), 'yyyy-MM-dd');
-        updateSettings({ lastCheckedDateForMealLog: today });
+        setLastCheckedDateForMealLog(today);
         setShowMealLogDialog(false);
         setMealToLog(null);
     };
