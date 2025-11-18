@@ -21,7 +21,7 @@ export default function ShoppingListItemDisplay({ item, food, onToggle, onRemove
 
   return (
     <div className="flex items-center justify-between gap-2 p-2 rounded-md hover:bg-muted/50">
-      <div className="flex-1 min-w-0 flex items-center gap-2">
+       <div className="flex items-center gap-2 min-w-0">
         <Checkbox
           id={item.id}
           checked={item.checked}
