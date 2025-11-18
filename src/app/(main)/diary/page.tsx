@@ -57,7 +57,12 @@ export default function DiaryPage() {
         const today = format(startOfToday(), 'yyyy-MM-dd');
         const isTodaySelected = isSameDay(selectedDate, startOfToday());
         
+        console.log("--- DEBUG: Inizio controllo auto-log ---");
+        console.log("Data odierna:", today);
+        console.log("Data selezionata è oggi?", isTodaySelected);
+
         if (!isTodaySelected) {
+            console.log("-> USCITA: Non è la data di oggi.");
             return;
         }
 
@@ -68,18 +73,26 @@ export default function DiaryPage() {
             (todaysLog.dinner && todaysLog.dinner.length > 0) ||
             (todaysLog.snack && todaysLog.snack.length > 0)
         );
+        
+        console.log("Ultimo check eseguito il:", lastCheckedDateForMealLog);
+        console.log("Oggi ha già alimenti registrati?", dayHasFoodLogs);
 
         if (lastCheckedDateForMealLog === today || dayHasFoodLogs) {
+             console.log("-> USCITA: Già controllato oggi o ci sono già alimenti.");
             return;
         }
 
         const mealId = mealSchedule[today];
         const meal = mealId ? getMealById(mealId) : null;
+        
+        console.log("Pasto pianificato per oggi:", meal ? meal.name : "Nessuno");
 
         if (meal) {
+            console.log("-> AZIONE: Mostro il pop-up.");
             setMealToLog({ id: meal.id, name: meal.name });
             setShowMealLogDialog(true);
         } else {
+            console.log("-> AZIONE: Nessun pasto da registrare, segno come controllato per oggi.");
             // Mark as checked for today even if there's no meal, to prevent re-checking on every navigation.
             setLastCheckedDateForMealLog(today);
         }
@@ -215,3 +228,5 @@ export default function DiaryPage() {
         </>
     );
 }
+
+    
