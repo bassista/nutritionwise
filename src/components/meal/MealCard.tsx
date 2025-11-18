@@ -45,107 +45,110 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 import { getFoodName, cn, calculateTotalNutrientsForMeal } from '@/lib/utils';
-import { formatISO, startOfToday } from 'date-fns';
+import { format, formatISO, startOfToday } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { calculateMealScore } from '@/lib/scoring';
-import { useDraggable } from '@dnd-kit/core';
-
 
 interface MealCardProps {
   meal: Meal;
   isReorderable?: boolean;
   isCollapsed?: boolean;
-  isDraggable?: boolean;
 }
 
+export default function MealCard({ meal, isReorderable, isCollapsed }: MealCardProps) {
+  const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList, settings } = useAppStore();
+  const [isEditing, setIsEditing] = useState(false);
+  const { t, locale } = useLocale();
+  const { toast } = useToast();
 
-const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps & {
-    style?: React.CSSProperties;
-    attributes?: ReturnType<typeof useDraggable>['attributes'];
-    listeners?: ReturnType<typeof useDraggable>['listeners'];
-}>(
-  ({ meal, isReorderable, isCollapsed, isDraggable, style, attributes, listeners }, ref) => {
-    const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList, settings } = useAppStore();
-    const [isEditing, setIsEditing] = useState(false);
-    const { t, locale } = useLocale();
-    const { toast } = useToast();
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: meal.id,
+    data: { type: 'meal', meal },
+    disabled: !isReorderable,
+  });
 
-    const totalNutrients = useMemo(
-      () => calculateTotalNutrientsForMeal(meal, getFoodById),
-      [meal, getFoodById]
-    );
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  
+  const totalNutrients = useMemo(
+    () => calculateTotalNutrientsForMeal(meal, getFoodById),
+    [meal, getFoodById]
+  );
 
-    const mealScore = useMemo(
-        () => calculateMealScore(totalNutrients, settings.nutritionalGoals),
-        [totalNutrients, settings.nutritionalGoals]
-    );
+  const mealScore = useMemo(
+      () => calculateMealScore(totalNutrients, settings.nutritionalGoals),
+      [totalNutrients, settings.nutritionalGoals]
+  );
 
-    const handleDelete = () => {
-      deleteMeal(meal.id);
-    };
+  const handleDelete = () => {
+    deleteMeal(meal.id);
+  };
 
-    const handleAddToDiary = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        const today = formatISO(startOfToday(), { representation: 'date' });
-        const itemsToAdd = meal.foods.map(food => ({
-            type: 'food' as const,
-            itemId: food.foodId,
-            grams: food.grams,
-        }));
-        addLogEntry(today, 'snack', itemsToAdd); // Default to snack
-        toast({
-            title: t('Meal Added to Diary'),
-            description: t('The ingredients for "{mealName}" have been added to your diary.', { mealName: meal.name }),
-        });
-    };
+  const handleAddToDiary = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const today = formatISO(startOfToday(), { representation: 'date' });
+      const itemsToAdd = meal.foods.map(food => ({
+          type: 'food' as const,
+          itemId: food.foodId,
+          grams: food.grams,
+      }));
+      addLogEntry(today, 'snack', itemsToAdd); // Default to snack
+      toast({
+          title: t('Meal Added to Diary'),
+          description: t('The ingredients for "{mealName}" have been added to your diary.', { mealName: meal.name }),
+      });
+  };
 
-    const handleAddToShoppingList = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        addMealToShoppingList(meal.id);
-        toast({
-            title: t('Ingredients Added'),
-            description: t('The ingredients for "{mealName}" have been added to your shopping list.', { mealName: meal.name }),
-        });
-    }
-    
-    const nutrientDisplay = [
-      { Icon: Flame, value: totalNutrients.calories.toFixed(0), label: 'kcal', color: 'text-orange-400', name: t('Calories') },
-      { Icon: Beef, value: totalNutrients.protein.toFixed(1), label: 'g', color: 'text-blue-400', name: t('Protein') },
-      { Icon: Wheat, value: totalNutrients.carbohydrates.toFixed(1), label: 'g', color: 'text-yellow-400', name: t('Carbohydrates') },
-      { Icon: Droplets, value: totalNutrients.fat.toFixed(1), label: 'g', color: 'text-purple-400', name: t('Fat') }
-    ];
+  const handleAddToShoppingList = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      addMealToShoppingList(meal.id);
+      toast({
+          title: t('Ingredients Added'),
+          description: t('The ingredients for "{mealName}" have been added to your shopping list.', { mealName: meal.name }),
+      });
+  }
+  
+  const nutrientDisplay = [
+    { Icon: Flame, value: totalNutrients.calories.toFixed(0), label: 'kcal', color: 'text-orange-400', name: t('Calories') },
+    { Icon: Beef, value: totalNutrients.protein.toFixed(1), label: 'g', color: 'text-blue-400', name: t('Protein') },
+    { Icon: Wheat, value: totalNutrients.carbohydrates.toFixed(1), label: 'g', color: 'text-yellow-400', name: t('Carbohydrates') },
+    { Icon: Droplets, value: totalNutrients.fat.toFixed(1), label: 'g', color: 'text-purple-400', name: t('Fat') }
+  ];
 
-    if (isCollapsed) {
-        return (
-             <div ref={ref} style={style} className="h-full" {...attributes}>
-                <Card className="flex items-center p-2" {...listeners}>
-                    <GripVertical className="w-5 h-5 text-muted-foreground cursor-grab active:cursor-grabbing touch-none p-1" />
-                    <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
-                        <Edit className="h-4 w-4" />
-                    </Button>
-                </Card>
-                 {isEditing && (
-                  <MealBuilder
-                    open={isEditing}
-                    onOpenChange={setIsEditing}
-                    mealToEdit={meal}
-                  />
-                )}
-            </div>
-        )
-    }
+  if (isCollapsed) {
+      return (
+            <div ref={setNodeRef} style={style} className="h-full">
+              <Card className="flex items-center p-2" {...attributes} {...listeners}>
+                  <GripVertical className="w-5 h-5 text-muted-foreground cursor-grab active:cursor-grabbing touch-none p-1" />
+                  <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
+                      <Edit className="h-4 w-4" />
+                  </Button>
+              </Card>
+                {isEditing && (
+                <MealBuilder
+                  open={isEditing}
+                  onOpenChange={setIsEditing}
+                  mealToEdit={meal}
+                />
+              )}
+          </div>
+      )
+  }
 
 
-    return (
-      <>
-        <div ref={ref} style={style} className="h-full" {...attributes}>
-        <Card className="flex flex-col h-full">
-          <CardHeader {...listeners} className="cursor-grab active:cursor-grabbing">
+  return (
+    <>
+      <div ref={setNodeRef} style={style} className="h-full" {...attributes}>
+        <Card className="flex flex-col h-full" {...listeners}>
+          <CardHeader>
             <div className="flex justify-between items-start gap-2">
-               <div className='flex-grow'>
+              <div className='flex-grow'>
                     <CardTitle className="text-lg font-bold">{meal.name}</CardTitle>
-               </div>
+              </div>
               <div className="flex items-center flex-shrink-0">
                 <TooltipProvider>
                     <Tooltip>
@@ -167,11 +170,11 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps & {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                     <DropdownMenuItem onClick={handleAddToDiary}>
+                    <DropdownMenuItem onClick={handleAddToDiary}>
                         <CalendarPlus className="mr-2 h-4 w-4" />
                         <span>{t('Add to Diary')}</span>
                     </DropdownMenuItem>
-                     <DropdownMenuItem onClick={(e) => handleAddToShoppingList(e)}>
+                    <DropdownMenuItem onClick={(e) => handleAddToShoppingList(e)}>
                         <ShoppingCart className="mr-2 h-4 w-4" />
                         <span>{t('Add to Shopping List')}</span>
                     </DropdownMenuItem>
@@ -261,46 +264,4 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps & {
         )}
       </>
     );
-  }
-);
-MealCardComponent.displayName = 'MealCard';
-
-function SortableMealCard({ meal, isCollapsed, isReorderable }: { meal: Meal; isCollapsed?: boolean; isReorderable?: boolean }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: meal.id, disabled: !isReorderable });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const { attributes: draggableAttributes, listeners: draggableListeners, setNodeRef: draggableSetNodeRef } = useDraggable({
-    id: `meal-${meal.id}`,
-    data: { type: 'meal', meal },
-  });
-
-  const combinedRef = (node: HTMLDivElement | null) => {
-    setNodeRef(node);
-    draggableSetNodeRef(node);
-  };
-  
-  // For reordering, we want to drag the whole card. For planning, also the whole card.
-  // The DndContext will figure out what to do.
-  return (
-    <MealCardComponent
-      ref={combinedRef}
-      meal={meal}
-      isReorderable={isReorderable}
-      isCollapsed={isCollapsed}
-      style={style}
-      attributes={attributes}
-      listeners={listeners}
-    />
-  );
-}
-
-export default function MealCard({ meal, isReorderable, isCollapsed, isDraggable }: MealCardProps) {
-    // We always wrap in SortableMealCard, but disable sorting via the `isReorderable` prop.
-    // The draggable for the weekly planner is handled inside.
-    return <SortableMealCard meal={meal} isCollapsed={isCollapsed} isReorderable={isReorderable} />;
 }

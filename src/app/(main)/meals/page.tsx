@@ -74,10 +74,10 @@ export default function MealsPage() {
     
     // Case 1: Dragging a meal onto a day in the weekly planner
     if (String(over.id).startsWith('day-')) {
-        const mealId = String(active.id).replace('meal-', '');
-        const date = over.data.current?.date;
-        if (mealId && date) {
-            scheduleMeal(date, mealId);
+        const meal = active.data.current?.meal as Meal | undefined;
+        const date = over.data.current?.date as Date | undefined;
+        if (meal && date) {
+            scheduleMeal(format(date, 'yyyy-MM-dd'), meal.id);
             return;
         }
     }
@@ -149,13 +149,13 @@ export default function MealsPage() {
 
         <div className="py-4 pt-8 space-y-4">
           {filteredMeals.length > 0 ? (
-             <SortableContext items={meals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={!isReorderable}>
+             <SortableContext items={filteredMeals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={!isReorderable}>
                 <div className={cn(
                     "grid gap-4",
                     isCollapsed ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                 )}>
                   {filteredMeals.map(meal => (
-                    <MealCard key={meal.id} meal={meal} isReorderable={isReorderable} isDraggable={true} isCollapsed={isCollapsed} />
+                    <MealCard key={meal.id} meal={meal} isReorderable={isReorderable} isCollapsed={isCollapsed} />
                   ))}
                 </div>
               </SortableContext>
