@@ -92,23 +92,25 @@ const ShoppingListCardComponent = React.forwardRef<
                 <CardTitle className="text-lg font-bold truncate">{listName}</CardTitle>
               </div>
               {list.isDeletable && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setRenameOpen(true)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      <span>{t('Rename')}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setDeleteConfirmOpen(true)} className="text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      <span>{t('Delete')}</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex-shrink-0">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => setRenameOpen(true)}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        <span>{t('Rename')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setDeleteConfirmOpen(true)} className="text-destructive">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>{t('Delete')}</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               )}
             </div>
           </CardHeader>
@@ -134,11 +136,11 @@ const ShoppingListCardComponent = React.forwardRef<
               )}
             </ScrollArea>
           </CardContent>
-          <CardFooter className="flex flex-wrap gap-2 pt-6">
-            <Button variant="outline" size="sm" onClick={() => toggleAllShoppingListItems(list.id, !allItemsChecked)} className="flex-grow w-full sm:w-auto">
+          <CardFooter className="flex flex-row flex-wrap gap-2 pt-6">
+            <Button variant="outline" size="sm" onClick={() => toggleAllShoppingListItems(list.id, !allItemsChecked)} className="w-full sm:w-auto flex-grow">
               <Check className="mr-2 h-4 w-4" /> {allItemsChecked ? t('Uncheck All') : t('Check All')}
             </Button>
-            <Button size="sm" onClick={() => setAddItemOpen(true)} className="flex-grow w-full sm:w-auto">
+            <Button size="sm" onClick={() => setAddItemOpen(true)} className="w-full sm:w-auto flex-grow">
               <Plus className="mr-2 h-4 w-4" /> {t('Add Item')}
             </Button>
           </CardFooter>
