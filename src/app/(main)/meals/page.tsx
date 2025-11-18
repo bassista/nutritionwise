@@ -50,7 +50,7 @@ export default function MealsPage() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 250,
+        delay: 150,
         tolerance: 5,
       },
     }),
@@ -159,7 +159,7 @@ export default function MealsPage() {
 
         <div className="py-4 pt-8 space-y-4">
           {filteredMeals.length > 0 ? (
-             <SortableContext items={filteredMeals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={!isReorderable && isMobile}>
+             <SortableContext items={filteredMeals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={isSearching && isMobile}>
                 <div className={cn(
                     "grid gap-4",
                     isCollapsed ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
