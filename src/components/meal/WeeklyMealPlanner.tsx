@@ -64,7 +64,7 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
             </div>
         </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
+        <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
           {week.map(day => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const mealId = mealSchedule[dateKey];
@@ -88,7 +88,7 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
                         isSameDay(day, new Date()) && 'border-primary'
                       )}
                     >
-                      <p className="text-xs sm:text-sm font-semibold capitalize">
+                      <p className="text-xs sm:text-sm font-semibold capitalize w-full truncate">
                         {format(day, 'eeee', { locale: locale === 'it' ? it : undefined })}
                       </p>
                       <p className="text-xs text-muted-foreground">
