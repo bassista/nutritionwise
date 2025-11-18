@@ -27,7 +27,7 @@ export default function ShoppingListItemDisplay({ item, food, onToggle, onRemove
           checked={item.checked}
           onCheckedChange={(checked) => onToggle(item.id, Boolean(checked))}
         />
-        <label htmlFor={item.id} className={`flex-grow text-sm truncate ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
+        <label htmlFor={item.id} className={`text-sm truncate ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
           {name}
         </label>
       </div>
