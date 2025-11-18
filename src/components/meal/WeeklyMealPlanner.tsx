@@ -27,7 +27,7 @@ interface WeeklyMealPlannerProps {
 
 export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: WeeklyMealPlannerProps) {
   const { mealSchedule, getMealById, meals, scheduleMeal } = useAppStore();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isScheduling, setIsScheduling] = useState(false);
