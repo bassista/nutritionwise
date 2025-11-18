@@ -88,11 +88,13 @@ const ShoppingListCardComponent = React.forwardRef<
                   <GripVertical className="w-5 h-5 text-muted-foreground" />
                 </div>
               )}
-              <CardTitle className="text-lg font-bold flex-grow truncate">{listName}</CardTitle>
+              <div className="flex-grow min-w-0">
+                <CardTitle className="text-lg font-bold truncate">{listName}</CardTitle>
+              </div>
               {list.isDeletable && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -133,10 +135,10 @@ const ShoppingListCardComponent = React.forwardRef<
             </ScrollArea>
           </CardContent>
           <CardFooter className="flex flex-wrap gap-2 pt-6">
-            <Button variant="outline" size="sm" onClick={() => toggleAllShoppingListItems(list.id, !allItemsChecked)} className="w-full sm:w-auto flex-grow">
+            <Button variant="outline" size="sm" onClick={() => toggleAllShoppingListItems(list.id, !allItemsChecked)} className="flex-grow w-full sm:w-auto">
               <Check className="mr-2 h-4 w-4" /> {allItemsChecked ? t('Uncheck All') : t('Check All')}
             </Button>
-            <Button size="sm" onClick={() => setAddItemOpen(true)} className="w-full sm:w-auto flex-grow">
+            <Button size="sm" onClick={() => setAddItemOpen(true)} className="flex-grow w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" /> {t('Add Item')}
             </Button>
           </CardFooter>
