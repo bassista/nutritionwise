@@ -12,6 +12,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { Meal } from '@/lib/types';
 import { Search, Plus, Trash2 } from 'lucide-react';
 import useAppStore from '@/context/AppStore';
+import { cn } from '@/lib/utils';
 
 interface ScheduleMealDialogProps {
   open: boolean;
@@ -54,7 +55,7 @@ export default function ScheduleMealDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex flex-col h-[70vh]">
+      <DialogContent className="flex flex-col h-[70vh] sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>{t('Schedule Meal')}</DialogTitle>
           <DialogDescription>
