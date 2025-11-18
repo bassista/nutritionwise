@@ -56,11 +56,15 @@ export default function DiaryPage() {
     useEffect(() => {
         const today = format(startOfToday(), 'yyyy-MM-dd');
         const isTodaySelected = isSameDay(selectedDate, startOfToday());
-        
-        // Don't show if already checked today, or not viewing today's diary, or if today's diary is not empty
-        const dayHasLogs = dailyLogs[today] && Object.values(dailyLogs[today]).some(log => Array.isArray(log) && log.length > 0);
+        const todaysLog = dailyLogs[today];
+        const dayHasFoodLogs = todaysLog && (
+            (todaysLog.breakfast && todaysLog.breakfast.length > 0) ||
+            (todaysLog.lunch && todaysLog.lunch.length > 0) ||
+            (todaysLog.dinner && todaysLog.dinner.length > 0) ||
+            (todaysLog.snack && todaysLog.snack.length > 0)
+        );
 
-        if (!isTodaySelected || settings.lastCheckedDateForMealLog === today || dayHasLogs) {
+        if (!isTodaySelected || settings.lastCheckedDateForMealLog === today || dayHasFoodLogs) {
             return;
         }
 
