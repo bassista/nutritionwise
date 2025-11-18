@@ -53,24 +53,27 @@ interface MealCardProps {
   meal: Meal;
   isReorderable?: boolean;
   isCollapsed?: boolean;
+  isDragging?: boolean;
+  isOverlay?: boolean;
 }
 
-export default function MealCard({ meal, isReorderable, isCollapsed }: MealCardProps) {
+export default function MealCard({ meal, isReorderable, isCollapsed, isDragging, isOverlay }: MealCardProps) {
   const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList, settings } = useAppStore();
   const [isEditing, setIsEditing] = useState(false);
   const { t, locale } = useLocale();
   const { toast } = useToast();
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: meal.id,
     data: { type: 'meal', meal },
-    disabled: !isReorderable,
+    disabled: !isReorderable && !isOverlay, // Allow dragging for planning even if not reorderable
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 100 : 'auto',
   };
   
   const totalNutrients = useMemo(
@@ -120,9 +123,9 @@ export default function MealCard({ meal, isReorderable, isCollapsed }: MealCardP
 
   if (isCollapsed) {
       return (
-            <div ref={setNodeRef} style={style} className="h-full">
-              <Card className="flex items-center p-2" {...attributes} {...listeners}>
-                  <GripVertical className="w-5 h-5 text-muted-foreground cursor-grab active:cursor-grabbing touch-none p-1" />
+            <div ref={setNodeRef} style={isOverlay ? undefined : style} className="h-full" {...attributes}>
+              <Card className="flex items-center p-2" {...listeners}>
+                  {isReorderable && <GripVertical className="w-5 h-5 text-muted-foreground cursor-grab active:cursor-grabbing touch-none p-1" />}
                   <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
                       <Edit className="h-4 w-4" />
@@ -142,8 +145,8 @@ export default function MealCard({ meal, isReorderable, isCollapsed }: MealCardP
 
   return (
     <>
-      <div ref={setNodeRef} style={style} className="h-full" {...attributes}>
-        <Card className="flex flex-col h-full" {...listeners}>
+      <div ref={setNodeRef} style={isOverlay ? undefined : style} className={cn("h-full", isOverlay && "shadow-lg")}>
+        <Card className="flex flex-col h-full" {...attributes} {...listeners}>
           <CardHeader>
             <div className="flex justify-between items-start gap-2">
               <div className='flex-grow'>

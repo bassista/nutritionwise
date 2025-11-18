@@ -20,6 +20,7 @@ import {
   useSensors,
   DragEndEvent,
   DragStartEvent,
+  DragOverlay,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -36,7 +37,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
 export default function MealsPage() {
-  const { meals, setMeals, generateWeeklyShoppingList, scheduleMeal } = useAppStore();
+  const { meals, setMeals, generateWeeklyShoppingList, scheduleMeal, getMealById } = useAppStore();
   const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const { toast } = useToast();
@@ -61,6 +62,7 @@ export default function MealsPage() {
   
   const isSearching = searchTerm.trim().length > 0;
   const isReorderable = !isSearching;
+  const activeMeal = activeDragId ? getMealById(activeDragId) : null;
 
 
   function handleDragStart(event: DragStartEvent) {
@@ -156,7 +158,7 @@ export default function MealsPage() {
                     isCollapsed ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                 )}>
                   {filteredMeals.map(meal => (
-                    <MealCard key={meal.id} meal={meal} isReorderable={isReorderable} isCollapsed={isCollapsed} />
+                    <MealCard key={meal.id} meal={meal} isReorderable={isReorderable} isCollapsed={isCollapsed} isDragging={activeDragId === meal.id} />
                   ))}
                 </div>
               </SortableContext>
@@ -176,6 +178,9 @@ export default function MealsPage() {
           )}
         </div>
       </div>
+      <DragOverlay>
+        {activeMeal ? <MealCard meal={activeMeal} isCollapsed={isCollapsed} isOverlay /> : null}
+      </DragOverlay>
     </DndContext>
   );
 }
