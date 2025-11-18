@@ -43,12 +43,17 @@ export default function LogFoodDialog({ open, onOpenChange, food, mealType, sele
     onLogSuccess();
   };
 
+  const foodDisplayName = getFoodName(food, locale);
+  const truncatedName = foodDisplayName.length > 16 ? `${foodDisplayName.substring(0, 13)}...` : foodDisplayName;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('Log Food')}</DialogTitle>
-          <DialogDescription>{getFoodName(food, locale)}</DialogDescription>
+          <DialogDescription title={foodDisplayName}>
+            {truncatedName}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
