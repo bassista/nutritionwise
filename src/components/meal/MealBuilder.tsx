@@ -159,11 +159,21 @@ export default function MealBuilder({ open, onOpenChange, mealToEdit }: MealBuil
                       const food = getFoodById(foodId);
                       if (!food) return null;
                       const foodName = getFoodName(food, locale);
+                      const displayName = foodName.length > 16 ? `${foodName.substring(0, 13)}...` : foodName;
                       return (
                         <div key={foodId} className="flex flex-col gap-2 bg-muted/50 p-2 rounded-md">
                            <div className="flex items-center gap-2">
-                            <div className="flex-grow">
-                                <p className="font-medium text-sm">{foodName}</p>
+                            <div className="flex-grow min-w-0">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <p className="font-medium text-sm truncate">{displayName}</p>
+                                    </TooltipTrigger>
+                                    {displayName !== foodName &&
+                                        <TooltipContent>
+                                            <p>{foodName}</p>
+                                        </TooltipContent>
+                                    }
+                                </Tooltip>
                                 <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
                             </div>
                             <Input
