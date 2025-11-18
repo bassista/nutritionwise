@@ -551,7 +551,8 @@ const useAppStore = create<AppState>((set, get) => {
         generateWeeklyShoppingList: (mealIds, listName) => setStateAndSave(state => {
             const { getMealById, getFoodById } = state;
             const weeklyIngredients = new Map<string, { food: Food, totalGrams: number }>();
-    
+            const listId = 'weekly-plan-list';
+
             mealIds.forEach(mealId => {
                 const meal = getMealById(mealId);
                 meal?.foods.forEach(mealFood => {
@@ -573,15 +574,25 @@ const useAppStore = create<AppState>((set, get) => {
                 text: `${getFoodName(food, 'en')} (~${totalGrams.toFixed(0)}g)`, // 'en' as fallback
                 checked: false,
             }));
+
+            const existingListIndex = state.shoppingLists.findIndex(list => list.id === listId);
+            const newLists = [...state.shoppingLists];
+
+            if (existingListIndex > -1) {
+                // Update existing list
+                newLists[existingListIndex] = { ...newLists[existingListIndex], items: newListItems };
+            } else {
+                // Create new list
+                const newList: ShoppingList = {
+                    id: listId,
+                    name: listName,
+                    items: newListItems,
+                    isDeletable: true,
+                };
+                newLists.push(newList);
+            }
     
-            const newList: ShoppingList = {
-                id: `sl-${Date.now()}`,
-                name: listName,
-                items: newListItems,
-                isDeletable: true,
-            };
-    
-            return { shoppingLists: [...state.shoppingLists, newList] };
+            return { shoppingLists: newLists };
         }),
 
         // --- Settings Actions ---

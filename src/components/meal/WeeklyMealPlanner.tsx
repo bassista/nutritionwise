@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import ScheduleMealDialog from './ScheduleMealDialog';
+import { useToast } from '@/hooks/use-toast';
 
 interface WeeklyMealPlannerProps {
   onGenerateList: (mealIds: string[]) => void;
@@ -26,7 +27,8 @@ interface WeeklyMealPlannerProps {
 
 export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: WeeklyMealPlannerProps) {
   const { mealSchedule, getMealById, meals, scheduleMeal } = useAppStore();
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isScheduling, setIsScheduling] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -40,6 +42,10 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
   const handleGenerate = () => {
     const mealIds = week.map(day => mealSchedule[format(day, 'yyyy-MM-dd')]).filter(Boolean) as string[];
     onGenerateList(mealIds);
+     toast({
+      title: t('List Generated'),
+      description: t('The weekly shopping list has been updated.'),
+    })
   };
 
   const handleDayClick = (day: Date) => {
