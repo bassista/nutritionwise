@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -237,7 +236,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md flex flex-col h-[90vh] md:h-auto md:max-h-[90vh]">
+      <DialogContent className="sm:max-w-md flex flex-col h-[90vh] max-h-[800px]">
         <DialogHeader>
           <DialogTitle>{foodToEdit ? t('Edit Food') : t('Create New Food')}</DialogTitle>
           <DialogDescription>
@@ -321,4 +320,3 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
     </Dialog>
   );
 }
-
