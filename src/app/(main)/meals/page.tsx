@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import WeeklyMealPlanner from '@/components/meal/WeeklyMealPlanner';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 export default function MealsPage() {
   const { meals, setMeals, generateWeeklyShoppingList, scheduleMeal } = useAppStore();
