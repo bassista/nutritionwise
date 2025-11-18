@@ -23,11 +23,15 @@ interface ShoppingListItemProps {
 
 export default function ShoppingListItemDisplay({ item, food, onToggle, onRemove }: ShoppingListItemProps) {
   const { locale } = useLocale();
-  const name = food ? getFoodName(food, locale) : item.text;
+  const fullName = food ? getFoodName(food, locale) : item.text;
+
+  const displayName = fullName && fullName.length > 16
+    ? `${fullName.substring(0, 13)}...`
+    : fullName;
 
   return (
     <div className="flex items-center justify-between gap-2 p-2 rounded-md hover:bg-muted/50">
-      <div className="flex items-center gap-2 min-w-0 flex-1">
+      <div className="flex-1 min-w-0 flex items-center gap-2">
         <Checkbox
           id={item.id}
           checked={item.checked}
@@ -37,13 +41,13 @@ export default function ShoppingListItemDisplay({ item, food, onToggle, onRemove
             <Tooltip>
                 <TooltipTrigger asChild>
                      <div className="w-full">
-                        <label htmlFor={item.id} className={`text-sm truncate block ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
-                            {name}
+                        <label htmlFor={item.id} className={`text-sm block ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
+                            {displayName}
                         </label>
                     </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>{name}</p>
+                    <p>{fullName}</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>
