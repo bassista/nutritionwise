@@ -66,7 +66,6 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: meal.id,
     data: { type: 'meal', meal },
-    disabled: !isReorderable && !isOverlay, // Allow dragging for planning even if not reorderable
   });
 
   const style = {
@@ -121,11 +120,19 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
     { Icon: Droplets, value: totalNutrients.fat.toFixed(1), label: 'g', color: 'text-purple-400', name: t('Fat') }
   ];
 
+  if (isOverlay) {
+    return (
+      <div className="rounded-md bg-primary text-primary-foreground p-2 shadow-lg">
+        <p className="font-semibold text-sm truncate">{meal.name}</p>
+      </div>
+    );
+  }
+
+
   if (isCollapsed) {
       return (
-            <div ref={setNodeRef} style={isOverlay ? undefined : style} className="h-full" {...attributes}>
-              <Card className="flex items-center p-2" {...listeners}>
-                  {isReorderable && <GripVertical className="w-5 h-5 text-muted-foreground cursor-grab active:cursor-grabbing touch-none p-1" />}
+            <div ref={setNodeRef} style={style} className="h-full" {...attributes} {...listeners}>
+              <Card className="flex items-center p-2">
                   <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
                       <Edit className="h-4 w-4" />
@@ -145,7 +152,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
 
   return (
     <>
-      <div ref={setNodeRef} style={isOverlay ? undefined : style} className={cn("h-full", isOverlay && "shadow-lg")}>
+      <div ref={setNodeRef} style={style} className={cn("h-full", isOverlay && "shadow-lg")}>
         <Card className="flex flex-col h-full" {...attributes} {...listeners}>
           <CardHeader>
             <div className="flex justify-between items-start gap-2">
