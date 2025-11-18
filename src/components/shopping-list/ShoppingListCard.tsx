@@ -132,7 +132,7 @@ const ShoppingListCardComponent = React.forwardRef<
               )}
             </ScrollArea>
           </CardContent>
-          <CardFooter className="flex flex-wrap gap-2 pt-6">
+          <CardFooter className="flex flex-col sm:flex-row flex-wrap gap-2 pt-6">
             <Button variant="outline" size="sm" onClick={() => toggleAllShoppingListItems(list.id, !allItemsChecked)} className="flex-1 basis-40">
               <Check className="mr-2 h-4 w-4" /> {allItemsChecked ? t('Uncheck All') : t('Check All')}
             </Button>
