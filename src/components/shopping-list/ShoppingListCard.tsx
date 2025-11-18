@@ -18,6 +18,7 @@ import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface ShoppingListCardProps {
   list: ShoppingList;
@@ -70,7 +71,12 @@ const ShoppingListCardComponent = React.forwardRef<
   };
 
   const allItemsChecked = list.items.length > 0 && list.items.every(item => item.checked);
-  const listName = !list.isDeletable ? t('Meals') : list.name;
+  
+  const originalListName = !list.isDeletable ? t('Meals') : list.name;
+  let displayName = originalListName;
+  if (list.isDeletable && list.name.length > 16) {
+    displayName = list.name.substring(0, 13) + '...';
+  }
 
   return (
     <>
@@ -89,7 +95,16 @@ const ShoppingListCardComponent = React.forwardRef<
                 </div>
               )}
               <div className="flex-grow min-w-0">
-                <CardTitle className="text-lg font-bold truncate">{listName}</CardTitle>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <CardTitle className="text-lg font-bold truncate">{displayName}</CardTitle>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{originalListName}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               {list.isDeletable && (
                 <div className="flex-shrink-0">
