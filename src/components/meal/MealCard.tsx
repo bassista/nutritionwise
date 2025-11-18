@@ -48,12 +48,14 @@ import { getFoodName, cn, calculateTotalNutrientsForMeal } from '@/lib/utils';
 import { formatISO, startOfToday } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { calculateMealScore } from '@/lib/scoring';
+import { useDraggable } from '@dnd-kit/core';
 
 
 interface MealCardProps {
   meal: Meal;
   reorderable?: boolean;
   isCollapsed?: boolean;
+  isDraggable?: boolean;
   style?: React.CSSProperties;
   attributes?: ReturnType<typeof useSortable>['attributes'];
   listeners?: ReturnType<typeof useSortable>['listeners'];
@@ -61,11 +63,17 @@ interface MealCardProps {
 
 
 const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
-  ({ meal, reorderable, isCollapsed, style, attributes, listeners }, ref) => {
+  ({ meal, reorderable, isCollapsed, isDraggable, style, attributes, listeners }, ref) => {
     const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList, settings } = useAppStore();
     const [isEditing, setIsEditing] = useState(false);
     const { t, locale } = useLocale();
     const { toast } = useToast();
+
+    const { attributes: draggableAttributes, listeners: draggableListeners, setNodeRef: setDraggableNodeRef } = useDraggable({
+      id: `meal-${meal.id}`,
+      data: { type: 'meal', meal },
+      disabled: !isDraggable,
+    });
 
     const totalNutrients = useMemo(
       () => calculateTotalNutrientsForMeal(meal, getFoodById),
@@ -112,20 +120,41 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
       { Icon: Droplets, value: totalNutrients.fat.toFixed(1), label: 'g', color: 'text-purple-400', name: t('Fat') }
     ];
 
+    const finalRef = (node: HTMLDivElement) => {
+      if (ref) {
+        if (typeof ref === 'function') ref(node);
+        else (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }
+      if (isDraggable) {
+        setDraggableNodeRef(node);
+      }
+    };
+
+    const combinedListeners = {
+      ...listeners,
+      ...(isDraggable ? draggableListeners : {}),
+    };
+    const combinedAttributes = {
+      ...attributes,
+      ...(isDraggable ? draggableAttributes : {}),
+    };
+
     if (isCollapsed) {
         return (
-             <div ref={ref} style={style} className="h-full">
+             <div ref={finalRef} style={style} className="h-full" {...combinedAttributes}>
                 <Card className="flex items-center p-2">
                     {reorderable && (
                         <div
                             className="p-2 cursor-grab active:cursor-grabbing touch-none"
-                            {...attributes}
                             {...listeners}
                             onClick={(e) => e.stopPropagation()}
                         >
                             <GripVertical className="w-5 h-5 text-muted-foreground" />
                         </div>
                     )}
+                     <div className="p-2 cursor-grab active:cursor-grabbing touch-none" {...combinedListeners}>
+                        <GripVertical className="w-5 h-5 text-muted-foreground" />
+                    </div>
                     <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
                         <Edit className="h-4 w-4" />
@@ -145,15 +174,14 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
 
     return (
       <>
-        <div ref={ref} style={style} className="h-full">
+        <div ref={finalRef} style={style} className="h-full" {...combinedAttributes}>
         <Card className="flex flex-col h-full">
           <CardHeader>
             <div className="flex justify-between items-start gap-2">
-                {reorderable && (
+                {(reorderable || isDraggable) && (
                    <div
                     className="p-1 cursor-grab active:cursor-grabbing touch-none"
-                    {...attributes}
-                    {...listeners}
+                    {...combinedListeners}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <GripVertical className="w-5 h-5 text-muted-foreground" />
@@ -303,9 +331,9 @@ function SortableMealCard({ meal, isCollapsed }: { meal: Meal; isCollapsed?: boo
   );
 }
 
-export default function MealCard({ meal, reorderable, isCollapsed }: Omit<MealCardProps, 'style' | 'attributes' | 'listeners'>) {
-  if (reorderable) {
-    return <SortableMealCard meal={meal} isCollapsed={isCollapsed} />;
-  }
-  return <MealCardComponent meal={meal} isCollapsed={isCollapsed} />;
+export default function MealCard({ meal, reorderable, isCollapsed, isDraggable }: Omit<MealCardProps, 'style' | 'attributes' | 'listeners'>) {
+    if (reorderable) {
+        return <SortableMealCard meal={meal} isCollapsed={isCollapsed} />;
+    }
+    return <MealCardComponent meal={meal} isCollapsed={isCollapsed} isDraggable={isDraggable} />;
 }

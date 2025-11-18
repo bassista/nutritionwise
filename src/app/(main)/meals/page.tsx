@@ -7,7 +7,7 @@ import { useUIState } from '@/context/UIStateContext';
 import { PageHeader } from '@/components/PageHeader';
 import MealCard from '@/components/meal/MealCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { UtensilsCrossed, Plus, Search, Rows, Grid } from 'lucide-react';
+import { UtensilsCrossed, Plus, Search, Rows, Grid, ListPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLocale } from '@/context/LocaleContext';
@@ -19,6 +19,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -30,13 +32,17 @@ import type { Meal } from '@/lib/types';
 import { arrayMove } from '@dnd-kit/sortable';
 import { cn } from '@/lib/utils';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import WeeklyMealPlanner from '@/components/meal/WeeklyMealPlanner';
+import { useToast } from '@/hooks/use-toast';
 
 export default function MealsPage() {
-  const { meals, setMeals } = useAppStore();
+  const { meals, setMeals, generateWeeklyShoppingList } = useAppStore();
   const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -55,18 +61,39 @@ export default function MealsPage() {
   
   const isSearching = searchTerm.trim().length > 0;
 
+  function handleDragStart(event: DragStartEvent) {
+    setActiveDragId(String(event.active.id));
+  }
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
+    setActiveDragId(null);
+    if (over && active.id !== over.id && !String(over.id).startsWith('day-')) {
       const oldIndex = meals.findIndex((m) => m.id === active.id);
       const newIndex = meals.findIndex((m) => m.id === over.id);
-      const newOrder = arrayMove(meals, oldIndex, newIndex);
-      setMeals(newOrder);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newOrder = arrayMove(meals, oldIndex, newIndex);
+        setMeals(newOrder);
+      }
     }
   }
 
+  const handleGenerateList = (mealIds: string[]) => {
+    generateWeeklyShoppingList(mealIds, t('Weekly Plan'));
+    toast({
+      title: t('Shopping List Generated'),
+      description: t('A new shopping list has been created for your weekly plan.'),
+    })
+  }
+
   return (
-    <>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      id="meals-dnd-context"
+    >
       <PageHeader title={t('My Meals')}>
         <div className="flex items-center gap-2">
             <TooltipProvider>
@@ -86,8 +113,11 @@ export default function MealsPage() {
             </Button>
         </div>
       </PageHeader>
-      <div className="sticky top-16 bg-background/80 backdrop-blur-sm z-10 -mb-4">
-        <div className="container mx-auto px-4">
+      
+      <div className="container mx-auto px-4 flex-grow overflow-auto">
+        <WeeklyMealPlanner onGenerateList={handleGenerateList} activeDragId={activeDragId} />
+
+        <div className="sticky top-16 bg-background/80 backdrop-blur-sm z-10 -mb-4 mt-6">
           <div className="relative py-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
@@ -100,27 +130,19 @@ export default function MealsPage() {
             />
           </div>
         </div>
-      </div>
-      <div className="container mx-auto px-4 flex-grow overflow-auto">
+
         <div className="py-4 pt-8 space-y-4">
           {filteredMeals.length > 0 ? (
-             <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-              id="meals-dnd-context"
-            >
-              <SortableContext items={meals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy}>
+             <SortableContext items={meals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={isSearching}>
                 <div className={cn(
                     "grid gap-4",
                     isCollapsed ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                 )}>
                   {filteredMeals.map(meal => (
-                    <MealCard key={meal.id} meal={meal} reorderable={!isSearching} isCollapsed={isCollapsed} />
+                    <MealCard key={meal.id} meal={meal} reorderable={!isSearching} isDraggable={true} isCollapsed={isCollapsed} />
                   ))}
                 </div>
               </SortableContext>
-            </DndContext>
           ) : (
             <div className="text-center mt-8 p-8 border-2 border-dashed rounded-lg">
                 <UtensilsCrossed className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -137,6 +159,6 @@ export default function MealsPage() {
           )}
         </div>
       </div>
-    </>
+    </DndContext>
   );
 }

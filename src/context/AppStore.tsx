@@ -2,11 +2,12 @@
 "use client";
 
 import { create } from 'zustand';
-import { AppData, Food, Meal, LoggedItem, MealType, ShoppingList, ShoppingListItem, NutritionalGoals, HydrationSettings, UserAchievement, AppSettings, DeleteFoodResult, Category } from '@/lib/types';
+import { AppData, Food, Meal, LoggedItem, MealType, ShoppingList, ShoppingListItem, NutritionalGoals, HydrationSettings, UserAchievement, AppSettings, DeleteFoodResult, Category, MealSchedule } from '@/lib/types';
 import { IDataAdapter } from '@/lib/adapters/IDataAdapter';
 import { LocalStorageAdapter } from '@/lib/adapters/LocalStorageAdapter';
 import { defaultFoods } from '@/lib/data';
 import { defaultSettings } from '@/lib/settings';
+import { getFoodName } from '@/lib/utils';
 
 const dataAdapter: IDataAdapter = new LocalStorageAdapter();
 
@@ -35,6 +36,9 @@ export interface AppState extends AppData {
   deleteMeal: (mealId: string) => void;
   setMeals: (meals: Meal[]) => void;
 
+  // Meal Schedule actions
+  scheduleMeal: (date: string, mealId: string) => void;
+
   // Favorite actions
   toggleFavorite: (foodId: string) => void;
   setFavoriteFoodIds: (ids: string[]) => void;
@@ -59,6 +63,8 @@ export interface AppState extends AppData {
   toggleAllShoppingListItems: (listId: string, check: boolean) => void;
   addMealToShoppingList: (mealId: string) => void;
   addFoodToShoppingList: (foodId: string) => void;
+  generateWeeklyShoppingList: (mealIds: string[], listName: string) => void;
+
 
   // Settings actions
   updateNutritionalGoals: (goals: NutritionalGoals) => void;
@@ -109,6 +115,7 @@ const useAppStore = create<AppState>((set, get) => {
         userAchievements: [],
         settings: defaultSettings,
         categorySortOrders: {},
+        mealSchedule: {},
 
         // --- Food Actions ---
         getFoodById: (id: string) => get().foods.find(f => f.id === id),
@@ -170,13 +177,14 @@ const useAppStore = create<AppState>((set, get) => {
             const { foods } = get();
             const headers = ['id', 'serving_size_g', 'calories', 'protein', 'carbohydrates', 'fat', 'fiber', 'sugar', 'sodium', 'name_category'];
             
-            const sanitize = (str: string) => `"${str.replace(/"/g, '""')}"`;
+            const sanitize = (str: string = '') => `"${str.replace(/"/g, '""')}"`;
 
             const rows = foods.map(food => {
                 const supportedLangs = ['en', 'it'];
                 const nameCategoryPairs = supportedLangs
                     .map(lang => {
                         const name = food.name[lang];
+                        // Fallback to 'en' category if the specific language category doesn't exist
                         const category = food.category?.[lang] || food.category?.['en'];
                         
                         if (name) {
@@ -188,7 +196,7 @@ const useAppStore = create<AppState>((set, get) => {
                     .join(';');
 
                 const rowData = [
-                    food.id,
+                    sanitize(food.id),
                     food.serving_size_g || 100,
                     food.calories || 0,
                     food.protein || 0,
@@ -275,8 +283,27 @@ const useAppStore = create<AppState>((set, get) => {
         updateMeal: (updatedMeal) => setStateAndSave(state => ({
             meals: state.meals.map(m => (m.id === updatedMeal.id ? updatedMeal : m)),
         })),
-        deleteMeal: (mealId) => setStateAndSave(state => ({ meals: state.meals.filter(m => m.id !== mealId) })),
+        deleteMeal: (mealId) => setStateAndSave(state => {
+            const newSchedule = { ...state.mealSchedule };
+            Object.keys(newSchedule).forEach(date => {
+                if (newSchedule[date] === mealId) {
+                    delete newSchedule[date];
+                }
+            });
+            return {
+                meals: state.meals.filter(m => m.id !== mealId),
+                mealSchedule: newSchedule,
+            };
+        }),
         setMeals: (meals) => setStateAndSave(() => ({ meals })),
+
+        // --- Meal Schedule Actions ---
+        scheduleMeal: (date, mealId) => setStateAndSave(state => ({
+            mealSchedule: {
+                ...state.mealSchedule,
+                [date]: mealId
+            }
+        })),
 
         // --- Favorite Actions ---
         toggleFavorite: (foodId) => setStateAndSave(state => ({
@@ -517,6 +544,41 @@ const useAppStore = create<AppState>((set, get) => {
                 return { shoppingLists: lists };
             });
         },
+        generateWeeklyShoppingList: (mealIds, listName) => setStateAndSave(state => {
+            const { getMealById, getFoodById } = state;
+            const weeklyIngredients = new Map<string, { food: Food, totalGrams: number }>();
+    
+            mealIds.forEach(mealId => {
+                const meal = getMealById(mealId);
+                meal?.foods.forEach(mealFood => {
+                    const food = getFoodById(mealFood.foodId);
+                    if (food) {
+                        const existing = weeklyIngredients.get(food.id);
+                        if (existing) {
+                            existing.totalGrams += mealFood.grams;
+                        } else {
+                            weeklyIngredients.set(food.id, { food, totalGrams: mealFood.grams });
+                        }
+                    }
+                });
+            });
+    
+            const newListItems: ShoppingListItem[] = Array.from(weeklyIngredients.values()).map(({ food, totalGrams }) => ({
+                id: `sli-${Date.now()}-${food.id}`,
+                foodId: food.id,
+                text: `${getFoodName(food, 'en')} (~${totalGrams.toFixed(0)}g)`, // 'en' as fallback
+                checked: false,
+            }));
+    
+            const newList: ShoppingList = {
+                id: `sl-${Date.now()}`,
+                name: listName,
+                items: newListItems,
+                isDeletable: true,
+            };
+    
+            return { shoppingLists: [...state.shoppingLists, newList] };
+        }),
 
         // --- Settings Actions ---
         updateNutritionalGoals: (goals) => setStateAndSave(state => ({ settings: { ...state.settings, nutritionalGoals: goals } })),
@@ -564,6 +626,7 @@ const useAppStore = create<AppState>((set, get) => {
                 shoppingLists: defaultShoppingLists,
                 userAchievements: [],
                 categorySortOrders: {},
+                mealSchedule: {},
             };
             await dataAdapter.saveData(defaultData);
             set(defaultData);
@@ -572,5 +635,3 @@ const useAppStore = create<AppState>((set, get) => {
 });
 
 export default useAppStore;
-
-    

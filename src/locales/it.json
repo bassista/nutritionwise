@@ -319,7 +319,7 @@
   "Add to today's diary": "Aggiungi al diario di oggi",
   "Add to shopping list": "Aggiungi alla lista della spesa",
   "Ingredient Added to Shopping List": "Ingrediente Aggiunto alla Lista Spesa",
-  "{foodName} has been added to your shopping list.": "{foodName} è stato aggiunto alla tua lista della spesa.",
+"{foodName} has been added to your shopping list.": "{foodName} è stato aggiunto alla tua lista della spesa.",
   "Grid View": "Vista Griglia",
   "List View": "Vista Lista",
   "Food Added to Diary": "Alimento Aggiunto al Diario",
@@ -364,5 +364,16 @@
   "Copy": "Copia",
   "This will remove all food items from the selected day.": "Questo rimuoverà tutti gli alimenti dal giorno selezionato.",
   "Empty": "Svuota",
-  "Diary Cleared": "Diario Svuotato"
+  "Diary Cleared": "Diario Svuotato",
+  "Weekly Meal Plan": "Piano Pasti Settimanale",
+  "Drag meals here to plan your week": "Trascina i pasti qui per pianificare la tua settimana",
+  "Prev": "Prec",
+  "Today": "Oggi",
+  "Generate Weekly Shopping List": "Genera Lista Spesa Settimanale",
+  "Weekly Plan": "Piano Settimanale",
+  "Shopping List Generated": "Lista della Spesa Generata",
+  "A new shopping list has been created for your weekly plan.": "È stata creata una nuova lista della spesa per il tuo piano settimanale.",
+  "Log Today's Meal?": "Registrare il Pasto di Oggi?",
+  "Today's scheduled meal is \"{mealName}\". Would you like to add its ingredients to your diary?": "Il pasto programmato per oggi è \"{mealName}\". Vuoi aggiungere i suoi ingredienti al tuo diario?",
+  "Log Meal": "Registra Pasto"
 }

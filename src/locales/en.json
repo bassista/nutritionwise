@@ -179,7 +179,7 @@
   "Your average daily nutrient intake compared to your goals.": "Your average daily nutrient intake compared to your goals.",
   "No Data for Analysis": "No Data for Analysis",
   "Start logging your meals in the diary to see your analytics.": "Start logging your meals in the diary to see your analytics.",
-  "Not enough data": "Not enough data",
+"Not enough data": "Not enough data",
   "CSV Food Data": "CSV Food Data",
   "Download Foods (CSV)": "Download in CSV",
   "CSV Exported": "CSV Exported",
@@ -362,5 +362,16 @@
   "Copy": "Copy",
   "This will remove all food items from the selected day.": "This will remove all food items from the selected day.",
   "Empty": "Empty",
-  "Diary Cleared": "Diary Cleared"
+  "Diary Cleared": "Diary Cleared",
+  "Weekly Meal Plan": "Weekly Meal Plan",
+  "Drag meals here to plan your week": "Drag meals here to plan your week",
+  "Prev": "Prev",
+  "Today": "Today",
+  "Generate Weekly Shopping List": "Generate Weekly Shopping List",
+  "Weekly Plan": "Weekly Plan",
+  "Shopping List Generated": "Shopping List Generated",
+  "A new shopping list has been created for your weekly plan.": "A new shopping list has been created for your weekly plan.",
+  "Log Today's Meal?": "Log Today's Meal?",
+  "Today's scheduled meal is \"{mealName}\". Would you like to add its ingredients to your diary?": "Today's scheduled meal is \"{mealName}\". Would you like to add its ingredients to your diary?",
+  "Log Meal": "Log Meal"
 }

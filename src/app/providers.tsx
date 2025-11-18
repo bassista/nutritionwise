@@ -5,7 +5,8 @@ import { LocaleProvider } from '@/context/LocaleContext';
 import useAppStore from '@/context/AppStore';
 import { UIStateProvider } from '@/context/UIStateContext';
 import Spinner from '@/components/ui/spinner';
-import { useAchievementObserver } from '@/context/AchievementContext';
+import { AchievementProvider } from '@/context/AchievementContext';
+import MealPlanAutoLogger from '@/components/meal/MealPlanAutoLogger';
 
 function AppInitializer({ children }: { children: ReactNode }) {
     const [isInitialized, setIsInitialized] = useState(false);
@@ -36,7 +37,10 @@ export function Providers({ children }: { children: ReactNode }) {
     <LocaleProvider>
         <AppInitializer>
           <UIStateProvider>
-              {children}
+            <AchievementProvider>
+                {children}
+                <MealPlanAutoLogger />
+            </AchievementProvider>
           </UIStateProvider>
         </AppInitializer>
     </LocaleProvider>
