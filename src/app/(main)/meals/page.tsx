@@ -35,6 +35,7 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/comp
 import WeeklyMealPlanner from '@/components/meal/WeeklyMealPlanner';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function MealsPage() {
   const { meals, setMeals, generateWeeklyShoppingList, scheduleMeal, getMealById } = useAppStore();
@@ -44,6 +45,7 @@ export default function MealsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -152,7 +154,7 @@ export default function MealsPage() {
 
         <div className="py-4 pt-8 space-y-4">
           {filteredMeals.length > 0 ? (
-             <SortableContext items={filteredMeals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={!isReorderable}>
+             <SortableContext items={filteredMeals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={!isReorderable || isMobile}>
                 <div className={cn(
                     "grid gap-4",
                     isCollapsed ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
