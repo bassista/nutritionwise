@@ -1,4 +1,3 @@
-
 "use client";
 
 import { ShoppingListItem, Food } from '@/lib/types';
@@ -41,14 +40,16 @@ export default function ShoppingListItemDisplay({ item, food, onToggle, onRemove
             <Tooltip>
                 <TooltipTrigger asChild>
                      <div className="w-full">
-                        <label htmlFor={item.id} className={`text-sm block ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
+                        <label htmlFor={item.id} className={`text-sm block truncate ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
                             {displayName}
                         </label>
                     </div>
                 </TooltipTrigger>
-                <TooltipContent>
-                    <p>{fullName}</p>
-                </TooltipContent>
+                {displayName !== fullName && (
+                  <TooltipContent>
+                      <p>{fullName}</p>
+                  </TooltipContent>
+                )}
             </Tooltip>
         </TooltipProvider>
       </div>
