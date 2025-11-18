@@ -1,4 +1,3 @@
-
 "use client";
 
 import { ShoppingListItem, Food } from '@/lib/types';
@@ -7,6 +6,12 @@ import { getFoodName } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface ShoppingListItemProps {
   item: ShoppingListItem;
@@ -27,9 +32,18 @@ export default function ShoppingListItemDisplay({ item, food, onToggle, onRemove
           checked={item.checked}
           onCheckedChange={(checked) => onToggle(item.id, Boolean(checked))}
         />
-        <label htmlFor={item.id} className={`text-sm truncate ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
-          {name}
-        </label>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                     <label htmlFor={item.id} className={`text-sm truncate ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
+                        {name}
+                    </label>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{name}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
       </div>
       <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => onRemove(item.id)}>
         <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
