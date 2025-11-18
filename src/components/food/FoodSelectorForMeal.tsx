@@ -19,6 +19,7 @@ import { useLocale } from '@/context/LocaleContext';
 import { getFoodName } from '@/lib/utils';
 import { useUIState } from '@/context/UIStateContext';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const ITEMS_PER_PAGE = 40;
 
@@ -123,21 +124,32 @@ export default function FoodSelectorForMeal({
         </div>
         <ScrollArea className="flex-grow">
           <div className="space-y-2">
+            <TooltipProvider>
             {visibleFoods.map(food => {
-              const foodName = getFoodName(food, locale);
+              const fullName = getFoodName(food, locale);
+              const displayName = fullName.length > 16 ? `${fullName.substring(0, 13)}...` : fullName;
               return (
                 <div
                   key={food.id}
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted"
                 >
-                  <div className="flex-grow">
-                    <p className="font-medium text-sm">{foodName}</p>
+                  <div className="flex-grow min-w-0">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <p className="font-medium text-sm truncate">{displayName}</p>
+                        </TooltipTrigger>
+                        {displayName !== fullName && (
+                        <TooltipContent>
+                            <p>{fullName}</p>
+                        </TooltipContent>
+                        )}
+                    </Tooltip>
                     <p className="text-xs text-muted-foreground">{food.calories} kcal / {food.serving_size_g || 100}g</p>
                   </div>
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-8 w-8 flex-shrink-0"
                     onClick={() => handleSelectFood(food)}
                   >
                     <Plus className="h-4 w-4" />
@@ -145,6 +157,7 @@ export default function FoodSelectorForMeal({
                 </div>
               )
             })}
+            </TooltipProvider>
              {filteredFoods.length > visibleCount && (
                 <div className="flex justify-center py-4">
                     <Button variant="outline" onClick={() => setVisibleCount(c => c + ITEMS_PER_PAGE)}>
