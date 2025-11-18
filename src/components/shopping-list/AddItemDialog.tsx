@@ -12,6 +12,7 @@ import { Food } from '@/lib/types';
 import { getFoodName } from '@/lib/utils';
 import { Plus, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 const ITEMS_PER_PAGE = 40;
 
@@ -130,34 +131,51 @@ export default function AddItemDialog({ open, onOpenChange, onAddItem, existingI
 
         {activeTab === 'search' && (
           <ScrollArea className="flex-grow">
-            <div className="space-y-2">
-              {visibleFoods.map(food => (
-                <div key={food.id} className="flex items-center p-2 rounded-md hover:bg-muted">
-                  <span className="flex-grow text-sm">{getFoodName(food, locale)}</span>
-                  <Button size="sm" variant="ghost" onClick={() => handleSelectFood(food)}>
-                    <Plus className="h-4 w-4 mr-1" /> {t('Add')}
-                  </Button>
-                </div>
-              ))}
-              {filteredFoods.length > visibleCount && (
-                <div className="flex justify-center py-4">
-                    <Button variant="outline" onClick={() => setVisibleCount(c => c + ITEMS_PER_PAGE)}>
-                        {t('Load More')} ({filteredFoods.length - visibleCount} {t('remaining')})
-                    </Button>
-                </div>
-              )}
-               {filteredFoods.length === 0 && searchTerm && !showSearchAllButton && (
-                    <p className="text-center text-sm text-muted-foreground py-4">{t('No foods match your search.')}</p>
-                )}
-                {showSearchAllButton && (
-                    <div className="text-center py-4">
-                        <p className="text-sm text-muted-foreground mb-2">{t('No results in favorites.')}</p>
-                        <Button variant="secondary" onClick={() => setSearchFavoritesOnly(false)}>
-                            {t('Search in all foods')}
-                        </Button>
+            <TooltipProvider>
+              <div className="space-y-2">
+                {visibleFoods.map(food => {
+                  const fullName = getFoodName(food, locale);
+                  const displayName = fullName && fullName.length > 16 ? `${fullName.substring(0, 13)}...` : fullName;
+                  return (
+                    <div key={food.id} className="flex items-center p-2 rounded-md hover:bg-muted">
+                       <div className="flex-grow text-sm truncate">
+                         <Tooltip>
+                           <TooltipTrigger asChild>
+                              <span className="cursor-default">{displayName}</span>
+                           </TooltipTrigger>
+                            {displayName !== fullName &&
+                              <TooltipContent>
+                                <p>{fullName}</p>
+                              </TooltipContent>
+                            }
+                         </Tooltip>
+                       </div>
+                      <Button size="sm" variant="ghost" onClick={() => handleSelectFood(food)}>
+                        <Plus className="h-4 w-4 mr-1" /> {t('Add')}
+                      </Button>
                     </div>
+                  )
+                })}
+                {filteredFoods.length > visibleCount && (
+                  <div className="flex justify-center py-4">
+                      <Button variant="outline" onClick={() => setVisibleCount(c => c + ITEMS_PER_PAGE)}>
+                          {t('Load More')} ({filteredFoods.length - visibleCount} {t('remaining')})
+                      </Button>
+                  </div>
                 )}
-            </div>
+                 {filteredFoods.length === 0 && searchTerm && !showSearchAllButton && (
+                      <p className="text-center text-sm text-muted-foreground py-4">{t('No foods match your search.')}</p>
+                  )}
+                  {showSearchAllButton && (
+                      <div className="text-center py-4">
+                          <p className="text-sm text-muted-foreground mb-2">{t('No results in favorites.')}</p>
+                          <Button variant="secondary" onClick={() => setSearchFavoritesOnly(false)}>
+                              {t('Search in all foods')}
+                          </Button>
+                      </div>
+                  )}
+              </div>
+            </TooltipProvider>
           </ScrollArea>
         )}
         
