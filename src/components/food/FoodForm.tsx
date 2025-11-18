@@ -237,7 +237,7 @@ export function FoodForm({ open, onOpenChange, foodToEdit, foodToCreate, onSubmi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md flex flex-col h-[90vh] md:h-auto md:max-h-[80vh]">
+      <DialogContent className="sm:max-w-md flex flex-col h-[90vh] md:h-auto md:max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>{foodToEdit ? t('Edit Food') : t('Create New Food')}</DialogTitle>
           <DialogDescription>
