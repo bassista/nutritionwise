@@ -101,7 +101,7 @@ export interface UserAchievement {
 }
 
 export type MealSchedule = {
-  [date: string]: string; // date: mealId
+  [date: string]: string | null; // date: mealId
 }
 
 
