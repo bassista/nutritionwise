@@ -69,7 +69,7 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
             const dateKey = format(day, 'yyyy-MM-dd');
             const mealId = mealSchedule[dateKey];
             const meal = mealId ? getMealById(mealId) : undefined;
-            const isDraggingOverMeal = activeDragId?.startsWith('meal-');
+            const isDraggingOverMeal = activeDragId !== null;
             
             const { setNodeRef, isOver } = useDroppable({
               id: `day-${dateKey}`,
@@ -87,11 +87,6 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
                         isOver && isDraggingOverMeal ? 'bg-primary/20 border-primary' : 'bg-muted/50',
                         isSameDay(day, new Date()) && 'border-primary'
                       )}
-                      onClick={() => {
-                        if (meal) {
-                            alert(meal.name);
-                        }
-                      }}
                     >
                       <p className="text-xs sm:text-sm font-semibold capitalize">
                         {format(day, 'eeee', { locale: locale === 'it' ? it : undefined })}
