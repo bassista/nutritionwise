@@ -20,16 +20,18 @@ export default function ShoppingListItemDisplay({ item, food, onToggle, onRemove
   const name = food ? getFoodName(food, locale) : item.text;
 
   return (
-    <div className="flex items-center gap-2 p-2 rounded-md hover:bg-muted/50">
-      <Checkbox
-        id={item.id}
-        checked={item.checked}
-        onCheckedChange={(checked) => onToggle(item.id, Boolean(checked))}
-      />
-      <label htmlFor={item.id} className={`flex-grow text-sm truncate min-w-0 ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
-        {name}
-      </label>
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onRemove(item.id)}>
+    <div className="flex items-center justify-between gap-2 p-2 rounded-md hover:bg-muted/50">
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        <Checkbox
+          id={item.id}
+          checked={item.checked}
+          onCheckedChange={(checked) => onToggle(item.id, Boolean(checked))}
+        />
+        <label htmlFor={item.id} className={`flex-grow text-sm truncate ${item.checked ? 'line-through text-muted-foreground' : ''}`}>
+          {name}
+        </label>
+      </div>
+      <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0" onClick={() => onRemove(item.id)}>
         <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
       </Button>
     </div>
