@@ -45,7 +45,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 import { getFoodName, cn, calculateTotalNutrientsForMeal } from '@/lib/utils';
-import { format, formatISO, startOfToday } from 'date-fns';
+import { formatISO, startOfToday } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { calculateMealScore } from '@/lib/scoring';
 
@@ -122,19 +122,21 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
 
   if (isOverlay) {
     return (
-      <div className="rounded-md bg-primary text-primary-foreground p-2 shadow-lg w-40">
+      <div className="rounded-md bg-primary text-primary-foreground p-2 shadow-lg w-32">
         <p className="font-semibold text-sm truncate">{meal.name}</p>
       </div>
     );
   }
 
-
   if (isCollapsed) {
       return (
-            <div ref={setNodeRef} style={style} className="h-full" {...attributes}>
-              <Card className="flex items-center p-2" {...listeners}>
+            <div ref={setNodeRef} style={style} className="h-full">
+              <Card className="flex items-center p-2" onClick={() => setIsEditing(true)}>
+                  <div {...attributes} {...listeners} className="cursor-grab touch-none p-1">
+                      <GripVertical className="h-5 w-5 text-muted-foreground" />
+                  </div>
                   <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); setIsEditing(true);}}>
                       <Edit className="h-4 w-4" />
                   </Button>
               </Card>
@@ -149,15 +151,17 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
       )
   }
 
-
   return (
     <>
-      <div ref={setNodeRef} style={style} className={cn("h-full", isOverlay && "shadow-lg")} {...attributes} {...listeners}>
-        <Card className="flex flex-col h-full cursor-grab active:cursor-grabbing">
+      <div ref={setNodeRef} style={style} className={cn("h-full", isOverlay && "shadow-lg")}>
+        <Card className="flex flex-col h-full" onClick={() => setIsEditing(true)}>
           <CardHeader>
             <div className="flex justify-between items-start gap-2">
-              <div className='flex-grow'>
-                    <CardTitle className="text-lg font-bold">{meal.name}</CardTitle>
+              <div className='flex items-center gap-1 flex-grow'>
+                <div {...attributes} {...listeners} className="cursor-grab touch-none p-1 -ml-1">
+                    <GripVertical className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-lg font-bold">{meal.name}</CardTitle>
               </div>
               <div className="flex items-center flex-shrink-0">
                 <TooltipProvider>
@@ -179,7 +183,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" onClick={e => e.stopPropagation()}>
                     <DropdownMenuItem onClick={handleAddToDiary}>
                         <CalendarPlus className="mr-2 h-4 w-4" />
                         <span>{t('Add to Diary')}</span>
@@ -194,9 +198,9 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
                     </DropdownMenuItem>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                          <Trash2 className="mr-2 h-4 w-4 text-destructive" />
-                          <span className="text-destructive">{t('Delete')}</span>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          <span>{t('Delete')}</span>
                         </DropdownMenuItem>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -242,8 +246,7 @@ export default function MealCard({ meal, isReorderable, isCollapsed, isDragging,
             </div>
             <Separator className="my-4" />
               <div 
-                className="flex-grow space-y-2 cursor-pointer rounded-md -m-2 p-2 hover:bg-muted/50"
-                onClick={() => setIsEditing(true)}
+                className="flex-grow space-y-2 rounded-md -m-2 p-2"
               >
                   <h4 className="text-sm font-medium mb-2">{t('Ingredients')}</h4>
                   <ScrollArea className="h-24 pr-3">
