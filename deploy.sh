@@ -36,11 +36,11 @@ if [ "$CURRENT_BRANCH" != "develop" ]; then
 fi
 
 # Reset su experimental
-echo "➡️ Reset hard su origin/eevelop"
+echo "➡️ Reset hard su origin/develop"
 git reset --hard origin/experimental
 
 # Push e tag
-echo "➡️ Push su origin/eevelop"
+echo "➡️ Push su origin/develop"
 git push origin develop
 
 echo "➡️ Creazione tag v${VERSION}"
