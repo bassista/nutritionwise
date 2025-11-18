@@ -54,7 +54,7 @@ export default function ScheduleMealDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md flex flex-col h-[70vh]">
+      <DialogContent className="flex flex-col h-[70vh]">
         <DialogHeader>
           <DialogTitle>{t('Schedule Meal')}</DialogTitle>
           <DialogDescription>
