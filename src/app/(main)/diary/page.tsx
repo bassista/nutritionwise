@@ -57,7 +57,10 @@ export default function DiaryPage() {
         const today = format(startOfToday(), 'yyyy-MM-dd');
         const isTodaySelected = isSameDay(selectedDate, startOfToday());
         
-        // Specific check for food logs
+        if (!isTodaySelected) {
+            return;
+        }
+
         const todaysLog = dailyLogs[today];
         const dayHasFoodLogs = todaysLog && (
             (todaysLog.breakfast && todaysLog.breakfast.length > 0) ||
@@ -66,7 +69,7 @@ export default function DiaryPage() {
             (todaysLog.snack && todaysLog.snack.length > 0)
         );
 
-        if (!isTodaySelected || settings.lastCheckedDateForMealLog === today || dayHasFoodLogs) {
+        if (settings.lastCheckedDateForMealLog === today || dayHasFoodLogs) {
             return;
         }
 
