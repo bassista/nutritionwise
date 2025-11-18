@@ -48,7 +48,7 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
         <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <CardTitle>{t('Weekly Meal Plan')}</CardTitle>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(subDays(currentDate, 7))}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
@@ -56,7 +56,7 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(addDays(currentDate, 7))}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
-                    <Button onClick={handleGenerate} size="sm" className="h-8">
+                    <Button onClick={handleGenerate} size="sm" className="h-8 flex-grow sm:flex-grow-0">
                         <ListPlus className="h-4 w-4 mr-2"/>
                         {t('Generate Weekly Shopping List')}
                     </Button>
@@ -64,7 +64,7 @@ export default function WeeklyMealPlanner({ onGenerateList, activeDragId }: Week
             </div>
         </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
           {week.map(day => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const mealId = mealSchedule[dateKey];

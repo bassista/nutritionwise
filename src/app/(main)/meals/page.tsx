@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import useAppStore from '@/context/AppStore';
 import { useUIState } from '@/context/UIStateContext';
 import { PageHeader } from '@/components/PageHeader';
@@ -52,6 +52,18 @@ export default function MealsPage() {
     })
   );
 
+  useEffect(() => {
+    if (activeDragId) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, [activeDragId]);
+
   const filteredMeals = useMemo(
     () =>
       meals.filter((meal) =>
@@ -77,7 +89,7 @@ export default function MealsPage() {
     
     // Case 1: Dragging a meal onto a day in the weekly planner
     if (String(over.id).startsWith('day-')) {
-        const meal = active.data.current?.meal as Meal | undefined;
+        const meal = getMealById(String(active.id));
         const date = over.data.current?.date as Date | undefined;
         if (meal && date) {
             scheduleMeal(format(date, 'yyyy-MM-dd'), meal.id);
