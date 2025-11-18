@@ -56,6 +56,8 @@ export default function DiaryPage() {
     useEffect(() => {
         const today = format(startOfToday(), 'yyyy-MM-dd');
         const isTodaySelected = isSameDay(selectedDate, startOfToday());
+        
+        // Specific check for food logs
         const todaysLog = dailyLogs[today];
         const dayHasFoodLogs = todaysLog && (
             (todaysLog.breakfast && todaysLog.breakfast.length > 0) ||

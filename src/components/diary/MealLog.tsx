@@ -5,8 +5,8 @@ import { useMemo, useState } from 'react';
 import useAppStore from '@/context/AppStore';
 import { useLocale } from '@/context/LocaleContext';
 import { Button } from '@/components/ui/button';
-import { Plus, Utensils, MoreVertical, Copy, Trash2, CalendarClock, RotateCcw } from 'lucide-react';
-import { LoggedItem, MealType } from '@/lib/types';
+import { Plus, Utensils, MoreVertical, Copy, Trash2, CalendarClock, RotateCcw, UtensilsCrossed } from 'lucide-react';
+import { LoggedItem, Meal, MealType } from '@/lib/types';
 import DiaryLogItem from './DiaryLogItem';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { getFoodName } from '@/lib/utils';
@@ -22,6 +22,7 @@ import { format, subDays } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
+import CopyMealDialog from '../meal/CopyMealDialog';
 
 
 interface MealLogProps {
@@ -31,13 +32,19 @@ interface MealLogProps {
 }
 
 export default function MealLog({ selectedDateString, onAddFoodClick, onEditItemClick }: MealLogProps) {
-    const { dailyLogs, removeLogEntry, getFoodById, copyLogFromDate, clearLog } = useAppStore();
+    const { dailyLogs, removeLogEntry, getFoodById, copyLogFromDate, clearLog, mealSchedule, getMealById, addLogEntry } = useAppStore();
     const { t, locale } = useLocale();
     const { toast } = useToast();
     
     const [isCopyFromXDaysOpen, setCopyFromXDaysOpen] = useState(false);
     const [isClearConfirmOpen, setClearConfirmOpen] = useState(false);
     const [daysToGoBack, setDaysToGoBack] = useState(1);
+
+    const [isCopyMealConfirmOpen, setCopyMealConfirmOpen] = useState(false);
+    const [isCopyMealSelectOpen, setCopyMealSelectOpen] = useState(false);
+
+    const scheduledMealId = mealSchedule[selectedDateString];
+    const scheduledMeal = scheduledMealId ? getMealById(scheduledMealId) : null;
 
     const todaysLog = useMemo(() => dailyLogs[selectedDateString] || {}, [dailyLogs, selectedDateString]);
 
@@ -85,6 +92,38 @@ export default function MealLog({ selectedDateString, onAddFoodClick, onEditItem
         setClearConfirmOpen(false);
     };
 
+    const handleCopyFromMealClick = () => {
+        if (scheduledMeal) {
+            setCopyMealConfirmOpen(true);
+        } else {
+            setCopyMealSelectOpen(true);
+        }
+    };
+
+    const copyMealToLog = (meal: Meal | null) => {
+        if (!meal) return;
+        const itemsToAdd = meal.foods.map(food => ({
+            type: 'food' as const,
+            itemId: food.foodId,
+            grams: food.grams,
+        }));
+        addLogEntry(selectedDateString, 'snack', itemsToAdd); // Defaulting to snack
+        toast({
+            title: t('Meal Added to Diary'),
+            description: t('The ingredients for "{mealName}" have been added to your diary.', { mealName: meal.name }),
+        });
+    }
+
+    const handleConfirmCopyScheduledMeal = () => {
+        copyMealToLog(scheduledMeal);
+        setCopyMealConfirmOpen(false);
+    };
+
+    const handleSelectAndCopyMeal = (meal: Meal) => {
+        copyMealToLog(meal);
+        setCopyMealSelectOpen(false);
+    }
+
     return (
       <>
         <Card>
@@ -100,6 +139,11 @@ export default function MealLog({ selectedDateString, onAddFoodClick, onEditItem
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                         <DropdownMenuItem onClick={handleCopyFromMealClick}>
+                            <UtensilsCrossed className="mr-2 h-4 w-4" />
+                            <span>{t('Copy from Meals')}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => handleCopy(1)}>
                             <RotateCcw className="mr-2 h-4 w-4" />
                             <span>{t('Copy from previous day')}</span>
@@ -185,6 +229,27 @@ export default function MealLog({ selectedDateString, onAddFoodClick, onEditItem
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
-        </>
+
+        <AlertDialog open={isCopyMealConfirmOpen} onOpenChange={setCopyMealConfirmOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{t('Copy Scheduled Meal?')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {t('This day has a scheduled meal: "{mealName}". Would you like to add its ingredients to your diary?', { mealName: scheduledMeal?.name || ''})}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmCopyScheduledMeal}>{t('Copy Meal')}</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+
+        <CopyMealDialog 
+            open={isCopyMealSelectOpen}
+            onOpenChange={setCopyMealSelectOpen}
+            onSelectMeal={handleSelectAndCopyMeal}
+        />
+      </>
     );
 }

@@ -378,5 +378,11 @@
   "Log Meal": "Registra Pasto",
   "Schedule Meal": "Pianifica Pasto",
   "Current Meal": "Pasto Attuale",
-  "Select": "Seleziona"
+  "Select": "Seleziona",
+  "Copy from Meals": "Copia da Pasti",
+  "Copy Scheduled Meal?": "Copiare il pasto pianificato?",
+  "This day has a scheduled meal: \"{mealName}\". Would you like to add its ingredients to your diary?": "Questo giorno ha un pasto pianificato: \"{mealName}\". Vuoi aggiungere i suoi ingredienti al tuo diario?",
+  "Copy Meal": "Copia Pasto",
+  "Copy from Meal": "Copia da Pasto",
+  "Select a meal to copy its ingredients to the diary.": "Seleziona un pasto da cui copiare gli ingredienti nel diario."
 }

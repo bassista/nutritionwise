@@ -376,5 +376,11 @@
   "Log Meal": "Log Meal",
   "Schedule Meal": "Schedule Meal",
   "Current Meal": "Current Meal",
-  "Select": "Select"
+  "Select": "Select",
+  "Copy from Meals": "Copy from Meals",
+  "Copy Scheduled Meal?": "Copy Scheduled Meal?",
+  "This day has a scheduled meal: \"{mealName}\". Would you like to add its ingredients to your diary?": "This day has a scheduled meal: \"{mealName}\". Would you like to add its ingredients to your diary?",
+  "Copy Meal": "Copy Meal",
+  "Copy from Meal": "Copy from Meal",
+  "Select a meal to copy its ingredients to the diary.": "Select a meal to copy its ingredients to the diary."
 }
