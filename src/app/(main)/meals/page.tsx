@@ -19,7 +19,6 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  DragOverEvent,
   DragStartEvent,
 } from '@dnd-kit/core';
 import {
@@ -36,7 +35,7 @@ import WeeklyMealPlanner from '@/components/meal/WeeklyMealPlanner';
 import { useToast } from '@/hooks/use-toast';
 
 export default function MealsPage() {
-  const { meals, setMeals, generateWeeklyShoppingList } = useAppStore();
+  const { meals, setMeals, generateWeeklyShoppingList, scheduleMeal } = useAppStore();
   const { setMealBuilderOpen } = useUIState();
   const { t } = useLocale();
   const { toast } = useToast();
@@ -60,6 +59,8 @@ export default function MealsPage() {
   );
   
   const isSearching = searchTerm.trim().length > 0;
+  const isReorderable = !isSearching;
+
 
   function handleDragStart(event: DragStartEvent) {
     setActiveDragId(String(event.active.id));
@@ -68,13 +69,28 @@ export default function MealsPage() {
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     setActiveDragId(null);
-    if (over && active.id !== over.id && !String(over.id).startsWith('day-')) {
-      const oldIndex = meals.findIndex((m) => m.id === active.id);
-      const newIndex = meals.findIndex((m) => m.id === over.id);
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newOrder = arrayMove(meals, oldIndex, newIndex);
-        setMeals(newOrder);
-      }
+
+    if (!over) return;
+    
+    // Case 1: Dragging a meal onto a day in the weekly planner
+    if (String(over.id).startsWith('day-')) {
+        const mealId = String(active.id).replace('meal-', '');
+        const date = over.data.current?.date;
+        if (mealId && date) {
+            scheduleMeal(date, mealId);
+            return;
+        }
+    }
+
+    // Case 2: Reordering meals in the list
+    if (isReorderable && active.id !== over.id) {
+        const oldIndex = meals.findIndex((m) => m.id === active.id);
+        const newIndex = meals.findIndex((m) => m.id === over.id);
+        
+        if (oldIndex !== -1 && newIndex !== -1) {
+            const newOrder = arrayMove(meals, oldIndex, newIndex);
+            setMeals(newOrder);
+        }
     }
   }
 
@@ -133,13 +149,13 @@ export default function MealsPage() {
 
         <div className="py-4 pt-8 space-y-4">
           {filteredMeals.length > 0 ? (
-             <SortableContext items={meals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={isSearching}>
+             <SortableContext items={meals.map(m => m.id)} strategy={isCollapsed ? verticalListSortingStrategy : rectSortingStrategy} disabled={!isReorderable}>
                 <div className={cn(
                     "grid gap-4",
                     isCollapsed ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                 )}>
                   {filteredMeals.map(meal => (
-                    <MealCard key={meal.id} meal={meal} reorderable={!isSearching} isDraggable={true} isCollapsed={isCollapsed} />
+                    <MealCard key={meal.id} meal={meal} isReorderable={isReorderable} isDraggable={true} isCollapsed={isCollapsed} />
                   ))}
                 </div>
               </SortableContext>

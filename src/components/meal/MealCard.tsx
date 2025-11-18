@@ -53,27 +53,22 @@ import { useDraggable } from '@dnd-kit/core';
 
 interface MealCardProps {
   meal: Meal;
-  reorderable?: boolean;
+  isReorderable?: boolean;
   isCollapsed?: boolean;
   isDraggable?: boolean;
-  style?: React.CSSProperties;
-  attributes?: ReturnType<typeof useSortable>['attributes'];
-  listeners?: ReturnType<typeof useSortable>['listeners'];
 }
 
 
-const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
-  ({ meal, reorderable, isCollapsed, isDraggable, style, attributes, listeners }, ref) => {
+const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps & {
+    style?: React.CSSProperties;
+    attributes?: ReturnType<typeof useDraggable>['attributes'];
+    listeners?: ReturnType<typeof useDraggable>['listeners'];
+}>(
+  ({ meal, isReorderable, isCollapsed, isDraggable, style, attributes, listeners }, ref) => {
     const { getFoodById, deleteMeal, addLogEntry, addMealToShoppingList, settings } = useAppStore();
     const [isEditing, setIsEditing] = useState(false);
     const { t, locale } = useLocale();
     const { toast } = useToast();
-
-    const { attributes: draggableAttributes, listeners: draggableListeners, setNodeRef: setDraggableNodeRef } = useDraggable({
-      id: `meal-${meal.id}`,
-      data: { type: 'meal', meal },
-      disabled: !isDraggable,
-    });
 
     const totalNutrients = useMemo(
       () => calculateTotalNutrientsForMeal(meal, getFoodById),
@@ -120,41 +115,11 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
       { Icon: Droplets, value: totalNutrients.fat.toFixed(1), label: 'g', color: 'text-purple-400', name: t('Fat') }
     ];
 
-    const finalRef = (node: HTMLDivElement) => {
-      if (ref) {
-        if (typeof ref === 'function') ref(node);
-        else (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-      }
-      if (isDraggable) {
-        setDraggableNodeRef(node);
-      }
-    };
-
-    const combinedListeners = {
-      ...listeners,
-      ...(isDraggable ? draggableListeners : {}),
-    };
-    const combinedAttributes = {
-      ...attributes,
-      ...(isDraggable ? draggableAttributes : {}),
-    };
-
     if (isCollapsed) {
         return (
-             <div ref={finalRef} style={style} className="h-full" {...combinedAttributes}>
-                <Card className="flex items-center p-2">
-                    {reorderable && (
-                        <div
-                            className="p-2 cursor-grab active:cursor-grabbing touch-none"
-                            {...listeners}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <GripVertical className="w-5 h-5 text-muted-foreground" />
-                        </div>
-                    )}
-                     <div className="p-2 cursor-grab active:cursor-grabbing touch-none" {...combinedListeners}>
-                        <GripVertical className="w-5 h-5 text-muted-foreground" />
-                    </div>
+             <div ref={ref} style={style} className="h-full" {...attributes}>
+                <Card className="flex items-center p-2" {...listeners}>
+                    <GripVertical className="w-5 h-5 text-muted-foreground cursor-grab active:cursor-grabbing touch-none p-1" />
                     <p className="font-semibold flex-grow truncate px-2">{meal.name}</p>
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
                         <Edit className="h-4 w-4" />
@@ -174,19 +139,10 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
 
     return (
       <>
-        <div ref={finalRef} style={style} className="h-full" {...combinedAttributes}>
+        <div ref={ref} style={style} className="h-full" {...attributes}>
         <Card className="flex flex-col h-full">
-          <CardHeader>
+          <CardHeader {...listeners} className="cursor-grab active:cursor-grabbing">
             <div className="flex justify-between items-start gap-2">
-                {(reorderable || isDraggable) && (
-                   <div
-                    className="p-1 cursor-grab active:cursor-grabbing touch-none"
-                    {...combinedListeners}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <GripVertical className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                )}
                <div className='flex-grow'>
                     <CardTitle className="text-lg font-bold">{meal.name}</CardTitle>
                </div>
@@ -206,7 +162,7 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer">
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -309,20 +265,32 @@ const MealCardComponent = React.forwardRef<HTMLDivElement, MealCardProps>(
 );
 MealCardComponent.displayName = 'MealCard';
 
-function SortableMealCard({ meal, isCollapsed }: { meal: Meal; isCollapsed?: boolean }) {
+function SortableMealCard({ meal, isCollapsed, isReorderable }: { meal: Meal; isCollapsed?: boolean; isReorderable?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: meal.id });
+    useSortable({ id: meal.id, disabled: !isReorderable });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
+  const { attributes: draggableAttributes, listeners: draggableListeners, setNodeRef: draggableSetNodeRef } = useDraggable({
+    id: `meal-${meal.id}`,
+    data: { type: 'meal', meal },
+  });
+
+  const combinedRef = (node: HTMLDivElement | null) => {
+    setNodeRef(node);
+    draggableSetNodeRef(node);
+  };
+  
+  // For reordering, we want to drag the whole card. For planning, also the whole card.
+  // The DndContext will figure out what to do.
   return (
     <MealCardComponent
-      ref={setNodeRef}
+      ref={combinedRef}
       meal={meal}
-      reorderable={true}
+      isReorderable={isReorderable}
       isCollapsed={isCollapsed}
       style={style}
       attributes={attributes}
@@ -331,9 +299,8 @@ function SortableMealCard({ meal, isCollapsed }: { meal: Meal; isCollapsed?: boo
   );
 }
 
-export default function MealCard({ meal, reorderable, isCollapsed, isDraggable }: Omit<MealCardProps, 'style' | 'attributes' | 'listeners'>) {
-    if (reorderable) {
-        return <SortableMealCard meal={meal} isCollapsed={isCollapsed} />;
-    }
-    return <MealCardComponent meal={meal} isCollapsed={isCollapsed} isDraggable={isDraggable} />;
+export default function MealCard({ meal, isReorderable, isCollapsed, isDraggable }: MealCardProps) {
+    // We always wrap in SortableMealCard, but disable sorting via the `isReorderable` prop.
+    // The draggable for the weekly planner is handled inside.
+    return <SortableMealCard meal={meal} isCollapsed={isCollapsed} isReorderable={isReorderable} />;
 }
