@@ -76,11 +76,33 @@ The Analytics page provides data visualizations of the user's nutritional histor
 - **Glucose & Insulin Trends**: Area charts tracking glucose and insulin levels over time.
 
 ### 3.8. Gamification
-- **Achievements**: The app includes a system of badges that users can unlock by completing specific milestones (e.g., "7-Day Streak," "Meal Creator").
+- **Achievements**: The app includes a system of badges that users can unlock by completing specific milestones (e.g., "7-Day Streak," "Meal Creator"). The list of achievements is available on the "Achievements" page.
 - **Scoring System**:
     - **Meal Score**: Grades individual meals based on macro balance and quality.
     - **Daily Score**: Grades the entire day's consumption against nutritional goals.
     - **Hydration Score**: Grades water intake against the daily goal.
+
+#### 3.8.1. List of Achievements
+
+**Easy Tier**
+- **First Meal Logged**: Log any food or meal in the diary for the first time.
+- **Meal Creator**: Create one custom meal.
+- **First Favorite**: Mark one food as a favorite.
+- **Scanner Pro**: Add a new food by scanning its barcode.
+- **List Specialist**: Create one custom shopping list.
+
+**Medium Tier**
+- **7-Day Streak**: Log at least one food or meal for 7 consecutive days.
+- **Hydration Marathoner**: Meet the daily water intake goal for 7 consecutive days.
+- **Pro Planner**: Create a total of 10 custom meals.
+- **Favorite Collector**: Save 25 different foods to the favorites list.
+- **30-Day Streak**: Log at least one food or meal for 30 consecutive days.
+
+**Hard Tier**
+- **Hydration Monarch**: Meet the daily water intake goal for 30 consecutive days.
+- **Supreme Chef**: Create a total of 50 custom meals.
+- **Guru of Favorites**: Save 100 different foods in the favorites list.
+- **Legend of Perseverance**: Log at least one food or meal for 100 consecutive days.
 
 ### 3.9. Settings & Customization
 - **Language**: The app supports English and Italian, selectable by the user.
